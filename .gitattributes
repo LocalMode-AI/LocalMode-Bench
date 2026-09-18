@@ -1,0 +1,5 @@
+# Run files and the machine-written index are generated data: keep diffs
+# collapsed in PR views and out of language statistics.
+runs/**/*.json linguist-generated=true
+quarantine/**/*.json linguist-generated=true
+index/*.json linguist-generated=true -diff

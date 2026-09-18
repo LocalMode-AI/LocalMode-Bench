@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this dataset, please cite it as below, and note the protocol version embedded in each run file you used."
+title: "LocalMode Bench Open Data: Community-Submitted Benchmark Runs of In-Browser AI Inference"
+type: dataset
+authors:
+  - family-names: "Juady"
+    given-names: "Muath"
+repository-code: "https://github.com/LocalMode-AI/LocalMode-Bench"
+url: "https://localmode.ai/bench"
+license: CC0-1.0
+date-released: 2026-09-18
+keywords:
+  - benchmark
+  - browser
+  - WebGPU
+  - WebAssembly
+  - LLM
+  - embeddings
+  - on-device AI
+  - crowdsourced
+abstract: >-
+  Community-submitted benchmark runs measuring LLM and embedding inference
+  across browser AI runtimes (WebLLM, wllama, Transformers.js, LiteRT,
+  Chrome Built-in AI, MediaPipe) on real consumer devices, under the
+  versioned protocol localmode-bench/1. Each run contains raw
+  per-chunk timing traces, a full environment capture, and a SHA-256
+  digest, so all published statistics are independently recomputable.
