@@ -15,7 +15,7 @@ Every file under `runs/` and `quarantine/` is one `BenchRunResult` JSON object, 
 | `environment` | object | Full environment capture (see below) |
 | `fingerprint` | object | Deterministic matmul calibration microbenchmark (`mflops`, `iterations`, `durationMs`, `checksum`) |
 | `cells` | array | One entry per (runtime × model × workload) cell (see below) |
-| `events` | array | Suite-level trace events (`suite-start`, `visibility-hidden`, `wakelock-released`, `pressure-change`, …) with timestamps |
+| `events` | array | Suite-level trace events (`suite-start`, `visibility-hidden`, `wakelock-released`, `pressure-change`, …) with timestamps. `pressure-change` is recorded per one-second sample in files produced before bench 0.4.0 and on state transitions only afterwards |
 | `clientSummaries` | array? | Client-computed summaries (advisory; the server recomputes from traces) |
 | `nonce` | string? | Server-issued session nonce (verified tier) |
 | `digest` | string | SHA-256 hex of the canonical JSON of this object without `digest` |
@@ -62,8 +62,8 @@ Note: `hardware.coresClamped` in files produced before bench 0.3.0 is `true` for
 | `iterations` | LLM: `{ startT, chunks: [{t, c}], endT, text, providerUsage?, finishReason, gates }` - per-chunk wall-clock trace + full generated text. Embedding: `{ startT, endT, count, dimensions, gates }` |
 | `memory` | Bytes at protocol points (`baseline`/`postLoad`/`postRun`, and since v2 `atError` for cells that failed) + which API measured them |
 | `quality` | Optional fidelity-lane score (tinyMMLU accuracy or STS-B Spearman). Since v2, MMLU cells also carry raw per-item `outputs` (capped at 400 chars each) and a `parseRate` (fraction of parseable answers; a low value marks a format-limited score), so scores are recomputable |
-| `status` / `invalidReasons` | `ok \| invalid \| error \| skipped`. Since v2 a timed LLM iteration generating fewer than 16 chars is gated `degenerate-output` and the cell is `invalid` |
-| `error` | `{ name, message, cause? }` for `error` cells; since v2 `cause` carries the wrapped provider error's message |
+| `status` / `invalidReasons` | `ok \| invalid \| error \| skipped`. Since v2 a timed LLM iteration generating fewer than 16 chars is gated `degenerate-output` and the cell is `invalid`. `skipped` cells carry the reason in `invalidReasons` (`runtime unavailable: ...`, `lane disabled by the submitter`); since bench 0.4.0 every cell a suite defines is present, so a suite label describes what was attempted and a skipped cell says why it was not |
+| `error` | `{ name, message, cause?, causeName?, causeStack? }` for `error` cells; since v2 `cause` carries the wrapped provider error's message, and since bench 0.4.0 `causeName` its name and `causeStack` its stack (capped at 4,000 characters; a WASM abort such as wllama's `RuntimeError` "(ABORT) " names its native frame only there) |
 | `status` | `ok \| invalid \| error \| skipped` - invalid cells carry `invalidReasons`, never silent retries |
 
 ## Metric definitions (how to recompute)
