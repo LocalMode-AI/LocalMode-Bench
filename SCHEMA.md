@@ -10,7 +10,7 @@ Every file under `runs/` and `quarantine/` is one `BenchRunResult` JSON object, 
 | `schemaVersion` | `2` (older files: `1`) | Result JSON schema version |
 | `runId` | string | UUID of the run (also the filename) |
 | `createdAt` | ISO 8601 string | UTC timestamp |
-| `harness` | `{ name, version, appVersion? }` | Harness identity |
+| `harness` | `{ name, version, appVersion?, runtimeVersions?, commit? }` | Harness identity. Since bench 0.3.0 `runtimeVersions` maps each runtime package the host bundled to its version (e.g. `"@huggingface/transformers": "4.2.0"`, `"@wllama/wllama": "3.5.1"` - the CDN pin that executes) and `commit` is the host build's git commit when exposed |
 | `suite` | `quick \| standard \| thorough \| custom` | Suite preset |
 | `environment` | object | Full environment capture (see below) |
 | `fingerprint` | object | Deterministic matmul calibration microbenchmark (`mflops`, `iterations`, `durationMs`, `checksum`) |
@@ -22,7 +22,30 @@ Every file under `runs/` and `quarantine/` is one `BenchRunResult` JSON object, 
 
 ## `environment`
 
-Browser identity with provenance (`ua-ch` on Chromium; `ua-parse` elsewhere with `os.version: "unknown-frozen"` - UA strings are frozen by design), WebGPU adapter info (`vendor`, `architecture`, limits, features), hardware fields **labeled clamped** (`cores`, `deviceMemoryGB` - browsers cap or randomize them), cross-origin isolation, WASM SIMD, storage estimate, battery charging state, compute-pressure availability, inferred `timerResolutionUs`, and an optional `userReportedDevice` free-text field (displayed as user-reported, never trusted).
+Browser identity with provenance (`ua-ch` on Chromium; `ua-parse` elsewhere with `os.version: "unknown-frozen"` - UA strings are frozen by design), WebGPU adapter info (`vendor`, `architecture`, limits, features), hardware fields **labeled clamped** (`cores`, `deviceMemoryGB` - browsers cap or randomize them), cross-origin isolation, WASM SIMD, storage estimate, battery charging state, compute-pressure availability, inferred `timerResolutionUs`, and an optional `userReportedDevice` free-text field (displayed as user-reported, never trusted; paid-study runs carry `prolific:<12-hex SHA-256 prefix>` here, never a participant id).
+
+Since `@localmode/bench` 0.3.0 (additive optional fields; the schema version is unchanged and older files simply lack them) a run also records everything else the browser discloses, every probe guarded so a missing API records nothing for its key:
+
+| Field | Meaning |
+| --- | --- |
+| `userAgent` | Raw `navigator.userAgent`, kept verbatim so future parsers can re-derive fields |
+| `browser.engine` / `vendor` / `webdriver` / `pdfViewerEnabled` | Rendering engine (`Blink` / `Gecko` / `WebKit`), `navigator.vendor`, automation flag, PDF viewer (a headless signal) |
+| `os.bitness` / `wow64` / `navigatorPlatform` | UA-CH bitness and WoW64 flag (Chromium); legacy `navigator.platform` |
+| `device` | `{ type: phone \| tablet \| desktop \| xr \| tv \| unknown, mobile, formFactors?, maxTouchPoints, pointerCoarse?, hoverNone?, displayMode? }` - form factor from UA-CH form factors, the UA, and touch points (an iPad reporting as a Mac is unmasked by `maxTouchPoints`) |
+| `hardware.jsHeapSizeLimitBytes` / `jsHeapUsedBytes` | `performance.memory` ceiling and idle usage (Chromium) |
+| `gpu.subgroupMinSize` / `subgroupMaxSize` / `preferredCanvasFormat` / `wgslLanguageFeatures` | Further WebGPU adapter identity; `limits` now carries 12 limits |
+| `webgl` | `{ contextKind, vendor, renderer, version, shadingLanguageVersion, maxTextureSize, maxRenderbufferSize, maxVertexUniformVectors, maxFragmentUniformVectors, extensionCount, softwareRenderer }` (unmasked strings where `WEBGL_debug_renderer_info` exists) |
+| `gpuModel` | GPU model: the WebGPU adapter description where a browser fills it in, else parsed from the WebGL renderer string with the ANGLE wrapper, PCI id and Direct3D suffix removed (`"Apple M4"`, `"NVIDIA GeForce RTX 4070"`, `"Mali-G78 MP20"`; Firefox coarsens it to e.g. `"Apple M1, or similar"`; Playwright/headless software GL reports SwiftShader) |
+| `flags.secureContext` / `flags.wasm` | Secure context; the WebAssembly proposal matrix probed by validating canonical modules (the wasm-feature-detect 1.9.0 detection modules): `simd, relaxedSimd, threads, bulkMemory, exceptions, exceptionsFinal, extendedConst, gc, memory64, multiMemory, multiValue, mutableGlobals, referenceTypes, saturatedFloatToInt, signExtensions, tailCall, typedFunctionReferences, wideArithmetic, jspi, typeReflection, streamingCompilation, jsStringBuiltins`, plus `maxMemoryPages` (largest 32-bit `WebAssembly.Memory` maximum the engine accepts; 65536 = 4 GiB) |
+| `apis` | Presence checks: `webgpu, webgl2, webnn, opfs` (getDirectory resolved), `persistedStorage, indexedDB, cacheApi, serviceWorker, webWorkers, offscreenCanvas, webLocks, broadcastChannel, wakeLock, computePressure, performanceMemory, measureUserAgentSpecificMemory, schedulerYield, webCodecs, audioWorklet, mediaDevices, webTransport`, and the Chrome Built-in AI `availability()` verdicts `promptApi, summarizerApi, translatorApi` (en→es), `languageDetectorApi` where those globals exist |
+| `storage.usageDetails` | Per-storage-system usage where the browser breaks it down |
+| `power.chargingTimeSec` / `dischargingTimeSec` | Battery API times (finite values only) |
+| `network` | `{ supported, effectiveType?, type?, downlinkMbps?, rttMs?, saveData?, online? }` from the Network Information API (Chromium; `online` everywhere) |
+| `display` | `{ width, height, availWidth, availHeight, dpr, colorDepth, orientation, viewportWidth, viewportHeight, hdr, wideGamut, isExtended, prefersReducedMotion, prefersColorScheme }` (superset of `screen`) |
+| `locale` | `{ timeZone, timeZoneOffsetMinutes, locale, calendar }` from `Intl` |
+| `pageOrigin` / `visibilityState` | Origin the run executed on (production vs local) and tab visibility at capture |
+
+Note: `hardware.coresClamped` in files produced before bench 0.3.0 is `true` for every Chromium run (the label compared the UA-CH brand name "Google Chrome" against "Chrome"); Chromium reports real logical cores, so treat those values as unclamped when `browser.source` is `ua-ch`.
 
 ## `cells[]`
 
@@ -30,6 +53,7 @@ Browser identity with provenance (`ua-ch` on Chromium; `ua-parse` elsewhere with
 | --- | --- |
 | `cellId` | `runtimeId/benchModelId/workloadId` |
 | `runtimeId` | `transformers-webgpu \| transformers-wasm \| webllm \| wllama \| litert \| chrome-ai \| mediapipe` |
+| `runtimeVersion` | Version of the runtime package that produced the cell (since bench 0.3.0; Chrome Built-in AI has none - the browser version is its identity) |
 | `model` | Static model reference (provider model id, quantization, declared size, URL) |
 | `workloadId` / `workloadKind` | e.g. `chat-pp128-tg128` / `llm-generate` |
 | `resolvedBackend` | Backend actually used (probed, never the requested one) |
@@ -48,7 +72,7 @@ Browser identity with provenance (`ua-ch` on Chromium; `ua-parse` elsewhere with
 - **Decode chars/s** = `(Σ chunk chars − first chunk chars) / (t_last − t_first) × 1000` - endpoints-based, first token excluded (MLPerf Client TPS definition).
 - **Tokens/s** - apply the model's tokenizer to `text` post-hoc; provider-reported `providerUsage` is auxiliary only (its `fidelity` field says why: `estimated` or `chunk-count`).
 
-`index/summary.json` is an array of light per-run summaries (`RunIndexEntry` in [`apps/ui/src/lib/bench/store.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/apps/ui/src/lib/bench/store.ts)) used to render the leaderboard without fetching every run file.
+`index/summary.json` is an array of light per-run summaries (`RunIndexEntry` in [`apps/ui/src/lib/bench/store.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/apps/ui/src/lib/bench/store.ts)) used to render the leaderboard without fetching every run file. Entries written since bench 0.3.0 also carry the run's disclosed device identity (`engine`, `osVersion`, `architecture`, `gpuArchitecture`, `gpuModel`, `deviceType`, `deviceModel`, `cores`, `deviceMemoryGB`, `jsHeapSizeLimitBytes`, `storageQuotaBytes`, `crossOriginIsolated`, `webgpu`, `timerResolutionUs`, `webdriver`), `harnessVersion`, `runtimeVersions`, `userReportedDevice`, and each cell's `runtimeVersion`, so cohort analyses can run on the index alone.
 
 ## Protocol versions
 
