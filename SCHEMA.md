@@ -1,12 +1,12 @@
 # Run file schema
 
-Every file under `runs/` and `quarantine/` is one `BenchRunResult` JSON object, produced by [`@localmode/bench`](https://github.com/LocalMode-AI/LocalMode/tree/main/packages/bench) (current: schema version 2, protocol `localmode-bench/3`; files record the version they were produced under, and archived runs are never re-scored). The TypeScript source of truth is [`packages/bench/src/types.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/packages/bench/src/types.ts); the executable validator is `validateRunShape()` / `validateSubmission()` in the same package.
+Every file under `runs/` and `quarantine/` is one `BenchRunResult` JSON object, produced by [`@localmode/bench`](https://github.com/LocalMode-AI/LocalMode/tree/main/packages/bench) (current: schema version 2, protocol `localmode-bench/4`; files record the version they were produced under, and archived runs are never re-scored). The TypeScript source of truth is [`packages/bench/src/types.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/packages/bench/src/types.ts); the executable validator is `validateRunShape()` / `validateSubmission()` in the same package.
 
 ## Top level
 
 | Field | Type | Meaning |
 | --- | --- | --- |
-| `protocol` | `"localmode-bench/3"` (older files: `"localmode-bench/1"`, `"localmode-bench/2"`) | Versioned protocol identifier |
+| `protocol` | `"localmode-bench/4"` (older files: `"localmode-bench/1"`, `"localmode-bench/2"`, `"localmode-bench/3"`) | Versioned protocol identifier |
 | `schemaVersion` | `2` (older files: `1`) | Result JSON schema version |
 | `runId` | string | UUID of the run (also the filename) |
 | `createdAt` | ISO 8601 string | UTC timestamp |
@@ -57,7 +57,7 @@ Note: `hardware.coresClamped` in files produced before bench 0.3.0 is `true` for
 | `model` | Static model reference (provider model id, quantization, declared size, URL) |
 | `workloadId` / `workloadKind` | e.g. `chat-pp128-tg128` / `llm-generate` |
 | `resolvedBackend` | Backend actually used (probed, never the requested one). For the wllama lanes since v3 it follows llama.cpp's own `offloaded N/M layers to GPU` load report |
-| `runtimeConfig` | Since bench 0.5.0: the adapter's post-load configuration record, per cell (wllama: `n_threads`, `n_gpu_layers` requested, `offloadedLayers` "N/M", `cache_prompt`; Transformers.js: `device`, `dtype`) |
+| `runtimeConfig` | Since bench 0.5.0: the adapter's post-load configuration record, per cell (wllama: `n_threads`, `n_gpu_layers` requested, `webgpu_adapter`, `offloadedLayers` "N/M", `cache_prompt`, and since v4 `mmproj: false` on language lanes; Transformers.js: `device`, `dtype`, `worker`) |
 | `load` | Download/cache phase: `cached` (cold=false / warm=true), start/end timestamps, progress milestones |
 | `warmupMs` | Untimed first-inference readiness (engine init + shader/JIT compile). Cold start = load + warmup |
 | `iterations` | LLM: `{ startT, chunks: [{t, c}], endT, text, providerUsage?, finishReason, gates }` - per-chunk wall-clock trace + full generated text. Embedding: `{ startT, endT, count, dimensions, gates }` |
@@ -79,6 +79,7 @@ Note: `hardware.coresClamped` in files produced before bench 0.3.0 is `true` for
 
 ## Protocol versions
 
+- **`localmode-bench/4`** (2026-09-20) - the llama.cpp lanes (`wllama`, `wllama-webgpu`) load every language model as text only (`runtimeConfig.mmproj: false`). Under v3 the Gemma 4 E2B pairing also loaded the 557 MB vision projector the provider catalog lists for it: unused by the text-only workloads, downloaded and CLIP-warmed inside the untimed warmup, it turned wllama's model cache off for the two-file source (the warmup and the warm reload re-downloaded the 3.46 GB weights) and did not fit the CPU lane's 4 GB wasm heap (all three `wllama/gemma-4-e2b` cells errored on every Thorough run). Other pairings measure exactly as under v3. wllama `warm-reload` cells carry `offloadedLayers: "unreported"` and the lane's requested backend in every version: the warm reload times the provider's preload path (an OPFS cache probe), and llama.cpp loads in the untimed warmup of the timed cells. Schema and plausibility rules unchanged.
 - **`localmode-bench/3`** (2026-09-20) - the wllama lane split into `wllama` (llama.cpp WASM on the CPU, `n_gpu_layers: 0`) and `wllama-webgpu` (every layer offloaded) over the same GGUF files, after llama.cpp's load log showed the v2 lane offloading to WebGPU by default on every WebGPU-capable browser while the files recorded `wasm`; cells carry `runtimeConfig`; the recorded backend follows llama.cpp's offload report. Schema and plausibility rules unchanged. Read archived v2 wllama cells as WebGPU wherever `environment.gpu.available` is true.
 - **`localmode-bench/2`** (2026-09-19) - TTFT/decode derived only from genuinely incremental chunk traces (non-incremental lanes report an end-to-end rate via the `totalMs`/`overallCharsPerSec` summaries); quality lane: 48-token budget, reasoning-block stripping, uniform per-pairing no-think suffixes, raw outputs + parse rate stored; degenerate-output gate (< 16 generated chars invalidates the cell); every runtime receives the prompt as a single templated user turn with cross-request prompt caching disabled; error causes preserved; deterministic runtime execution order for reproducibility.
 - **`localmode-bench/1`** (2026-09-18) - initial public protocol.
