@@ -1,12 +1,12 @@
 # Run file schema
 
-Every file under `runs/` and `quarantine/` is one `BenchRunResult` JSON object, produced by [`@localmode/bench`](https://github.com/LocalMode-AI/LocalMode/tree/main/packages/bench) (current: schema version 2, protocol `localmode-bench/2`; files record the version they were produced under, and archived runs are never re-scored). The TypeScript source of truth is [`packages/bench/src/types.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/packages/bench/src/types.ts); the executable validator is `validateRunShape()` / `validateSubmission()` in the same package.
+Every file under `runs/` and `quarantine/` is one `BenchRunResult` JSON object, produced by [`@localmode/bench`](https://github.com/LocalMode-AI/LocalMode/tree/main/packages/bench) (current: schema version 2, protocol `localmode-bench/3`; files record the version they were produced under, and archived runs are never re-scored). The TypeScript source of truth is [`packages/bench/src/types.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/packages/bench/src/types.ts); the executable validator is `validateRunShape()` / `validateSubmission()` in the same package.
 
 ## Top level
 
 | Field | Type | Meaning |
 | --- | --- | --- |
-| `protocol` | `"localmode-bench/2"` (older files: `"localmode-bench/1"`) | Versioned protocol identifier |
+| `protocol` | `"localmode-bench/3"` (older files: `"localmode-bench/1"`, `"localmode-bench/2"`) | Versioned protocol identifier |
 | `schemaVersion` | `2` (older files: `1`) | Result JSON schema version |
 | `runId` | string | UUID of the run (also the filename) |
 | `createdAt` | ISO 8601 string | UTC timestamp |
@@ -15,7 +15,7 @@ Every file under `runs/` and `quarantine/` is one `BenchRunResult` JSON object, 
 | `environment` | object | Full environment capture (see below) |
 | `fingerprint` | object | Deterministic matmul calibration microbenchmark (`mflops`, `iterations`, `durationMs`, `checksum`) |
 | `cells` | array | One entry per (runtime × model × workload) cell (see below) |
-| `events` | array | Suite-level trace events (`suite-start`, `visibility-hidden`, `wakelock-released`, `pressure-change`, …) with timestamps. `pressure-change` is recorded per one-second sample in files produced before bench 0.4.0 and on state transitions only afterwards |
+| `events` | array | Suite-level trace events (`suite-start`, `visibility-hidden`, `wakelock-released`, `pressure-change`, `cell-timeout`, `cell-retry`, `iteration-redo`, …) with timestamps. `pressure-change` is recorded per one-second sample in files produced before bench 0.4.0 and on state transitions only afterwards |
 | `clientSummaries` | array? | Client-computed summaries (advisory; the server recomputes from traces) |
 | `nonce` | string? | Server-issued session nonce (verified tier) |
 | `digest` | string | SHA-256 hex of the canonical JSON of this object without `digest` |
@@ -52,17 +52,20 @@ Note: `hardware.coresClamped` in files produced before bench 0.3.0 is `true` for
 | Field | Meaning |
 | --- | --- |
 | `cellId` | `runtimeId/benchModelId/workloadId` |
-| `runtimeId` | `transformers-webgpu \| transformers-wasm \| webllm \| wllama \| litert \| chrome-ai \| mediapipe` |
+| `runtimeId` | `transformers-webgpu \| transformers-wasm \| webllm \| wllama \| wllama-webgpu \| litert \| chrome-ai \| mediapipe`. Since `localmode-bench/3`, `wllama` is llama.cpp on the CPU (`n_gpu_layers: 0`) and `wllama-webgpu` offloads every layer to WebGPU; in v1/v2 files the single `wllama` lane ran on WebGPU wherever `environment.gpu.available` is true while recording `resolvedBackend: "wasm"` (wllama 3.5's default offload, unnoticed by the harness) |
 | `runtimeVersion` | Version of the runtime package that produced the cell (since bench 0.3.0; Chrome Built-in AI has none - the browser version is its identity) |
 | `model` | Static model reference (provider model id, quantization, declared size, URL) |
 | `workloadId` / `workloadKind` | e.g. `chat-pp128-tg128` / `llm-generate` |
-| `resolvedBackend` | Backend actually used (probed, never the requested one) |
+| `resolvedBackend` | Backend actually used (probed, never the requested one). For the wllama lanes since v3 it follows llama.cpp's own `offloaded N/M layers to GPU` load report |
+| `runtimeConfig` | Since bench 0.5.0: the adapter's post-load configuration record, per cell (wllama: `n_threads`, `n_gpu_layers` requested, `offloadedLayers` "N/M", `cache_prompt`; Transformers.js: `device`, `dtype`) |
 | `load` | Download/cache phase: `cached` (cold=false / warm=true), start/end timestamps, progress milestones |
 | `warmupMs` | Untimed first-inference readiness (engine init + shader/JIT compile). Cold start = load + warmup |
 | `iterations` | LLM: `{ startT, chunks: [{t, c}], endT, text, providerUsage?, finishReason, gates }` - per-chunk wall-clock trace + full generated text. Embedding: `{ startT, endT, count, dimensions, gates }` |
 | `memory` | Bytes at protocol points (`baseline`/`postLoad`/`postRun`, and since v2 `atError` for cells that failed) + which API measured them |
 | `quality` | Optional fidelity-lane score (tinyMMLU accuracy or STS-B Spearman). Since v2, MMLU cells also carry raw per-item `outputs` (capped at 400 chars each) and a `parseRate` (fraction of parseable answers; a low value marks a format-limited score), so scores are recomputable |
 | `status` / `invalidReasons` | `ok \| invalid \| error \| skipped`. Since v2 a timed LLM iteration generating fewer than 16 chars is gated `degenerate-output` and the cell is `invalid`. `skipped` cells carry the reason in `invalidReasons` (`runtime unavailable: ...`, `lane disabled by the submitter`); since bench 0.4.0 every cell a suite defines is present, so a suite label describes what was attempted and a skipped cell says why it was not |
+| `discardedIterations` | Since bench 0.5.0: timed iterations the tab was hidden during, kept with their gates (`started-hidden`, `hidden-during-run`) and never scored; the runner waited for the tab and repeated each of them (`iteration-redo` trace event) |
+| `attempts` | Since bench 0.5.0: failed attempts that preceded the recorded outcome, oldest first (`{ error, at }`); the runner retries a cell up to twice after a watchdog timeout or a provider error and never silently |
 | `error` | `{ name, message, cause?, causeName?, causeStack? }` for `error` cells; since v2 `cause` carries the wrapped provider error's message, and since bench 0.4.0 `causeName` its name and `causeStack` its stack (capped at 4,000 characters; a WASM abort such as wllama's `RuntimeError` "(ABORT) " names its native frame only there) |
 | `status` | `ok \| invalid \| error \| skipped` - invalid cells carry `invalidReasons`, never silent retries |
 
@@ -76,6 +79,7 @@ Note: `hardware.coresClamped` in files produced before bench 0.3.0 is `true` for
 
 ## Protocol versions
 
+- **`localmode-bench/3`** (2026-09-20) - the wllama lane split into `wllama` (llama.cpp WASM on the CPU, `n_gpu_layers: 0`) and `wllama-webgpu` (every layer offloaded) over the same GGUF files, after llama.cpp's load log showed the v2 lane offloading to WebGPU by default on every WebGPU-capable browser while the files recorded `wasm`; cells carry `runtimeConfig`; the recorded backend follows llama.cpp's offload report. Schema and plausibility rules unchanged. Read archived v2 wllama cells as WebGPU wherever `environment.gpu.available` is true.
 - **`localmode-bench/2`** (2026-09-19) - TTFT/decode derived only from genuinely incremental chunk traces (non-incremental lanes report an end-to-end rate via the `totalMs`/`overallCharsPerSec` summaries); quality lane: 48-token budget, reasoning-block stripping, uniform per-pairing no-think suffixes, raw outputs + parse rate stored; degenerate-output gate (< 16 generated chars invalidates the cell); every runtime receives the prompt as a single templated user turn with cross-request prompt caching disabled; error causes preserved; deterministic runtime execution order for reproducibility.
 - **`localmode-bench/1`** (2026-09-18) - initial public protocol.
 

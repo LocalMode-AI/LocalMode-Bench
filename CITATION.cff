@@ -22,6 +22,8 @@ abstract: >-
   Community-submitted benchmark runs measuring LLM and embedding inference
   across browser AI runtimes (WebLLM, wllama, Transformers.js, LiteRT,
   Chrome Built-in AI, MediaPipe) on real consumer devices, under the
-  versioned protocol localmode-bench/1. Each run contains raw
-  per-chunk timing traces, a full environment capture, and a SHA-256
-  digest, so all published statistics are independently recomputable.
+  versioned LocalMode Bench protocol (each run file records the protocol
+  version it was measured under; localmode-bench/3 is current). Each run
+  contains raw per-chunk timing traces, a full environment capture, and a
+  SHA-256 digest, so all published statistics are independently
+  recomputable.
