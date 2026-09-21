@@ -17,8 +17,9 @@ Every file under `runs/` and `quarantine/` is one `BenchRunResult` JSON object, 
 | `cells` | array | One entry per (runtime × model × workload) cell (see below) |
 | `events` | array | Suite-level trace events (`suite-start`, `visibility-hidden`, `wakelock-released`, `pressure-change`, `cell-timeout`, `cell-retry`, `iteration-redo`, …) with timestamps. `pressure-change` is recorded per one-second sample in files produced before bench 0.4.0 and on state transitions only afterwards |
 | `clientSummaries` | array? | Client-computed summaries (advisory; the server recomputes from traces) |
-| `nonce` | string? | Server-issued session nonce (verified tier) |
-| `digest` | string | SHA-256 hex of the canonical JSON of this object without `digest` |
+| `nonce` | absent | The submission carried a server-issued session nonce; the server strips it before publishing (since schema 3; older files may still carry one) |
+| `digest` | string | SHA-256 hex of the canonical JSON of this object without `digest` and `nonce` (files published before schema 3 were digested with the nonce included; `verifyRunDigest` in `@localmode/bench` accepts both) |
+| `scrubbedAt` | string? | ISO time at which the file was rewritten by the publication scrub (fields removed under schema 3, digest recomputed); absent when the file is exactly what the client submitted |
 
 ## `environment`
 
@@ -39,10 +40,10 @@ Since `@localmode/bench` 0.3.0 (additive optional fields; the schema version is 
 | `flags.secureContext` / `flags.wasm` | Secure context; the WebAssembly proposal matrix probed by validating canonical modules (the wasm-feature-detect 1.9.0 detection modules): `simd, relaxedSimd, threads, bulkMemory, exceptions, exceptionsFinal, extendedConst, gc, memory64, multiMemory, multiValue, mutableGlobals, referenceTypes, saturatedFloatToInt, signExtensions, tailCall, typedFunctionReferences, wideArithmetic, jspi, typeReflection, streamingCompilation, jsStringBuiltins`, plus `maxMemoryPages` (largest 32-bit `WebAssembly.Memory` maximum the engine accepts; 65536 = 4 GiB) |
 | `apis` | Presence checks: `webgpu, webgl2, webnn, opfs` (getDirectory resolved), `persistedStorage, indexedDB, cacheApi, serviceWorker, webWorkers, offscreenCanvas, webLocks, broadcastChannel, wakeLock, computePressure, performanceMemory, measureUserAgentSpecificMemory, schedulerYield, webCodecs, audioWorklet, mediaDevices, webTransport`, and the Chrome Built-in AI `availability()` verdicts `promptApi, summarizerApi, translatorApi` (en→es), `languageDetectorApi` where those globals exist |
 | `storage.usageDetails` | Per-storage-system usage where the browser breaks it down |
-| `power.chargingTimeSec` / `dischargingTimeSec` | Battery API times (finite values only) |
+| `power` | `{ batterySupported, charging?, level? }`; `level` is rounded to the quarter since schema 3 (the exact percentage and the Battery API times were removed: they track a device) |
 | `network` | `{ supported, effectiveType?, type?, downlinkMbps?, rttMs?, saveData?, online? }` from the Network Information API (Chromium; `online` everywhere) |
-| `display` | `{ width, height, availWidth, availHeight, dpr, colorDepth, orientation, viewportWidth, viewportHeight, hdr, wideGamut, isExtended, prefersReducedMotion, prefersColorScheme }` (superset of `screen`) |
-| `locale` | `{ timeZone, timeZoneOffsetMinutes, locale, calendar }` from `Intl` |
+| `display` | `{ width, height, availWidth, availHeight, dpr, colorDepth, orientation, viewportWidth, viewportHeight, hdr, wideGamut, isExtended }` (superset of `screen`; the two display preferences were removed in schema 3) |
+| `locale` | `{ locale }`, the BCP 47 tag only, since schema 3 (the time zone, UTC offset, and calendar place a device in a city and are not captured; `languages` was removed for the same reason) |
 | `pageOrigin` / `visibilityState` | Origin the run executed on (production vs local) and tab visibility at capture |
 
 Note: `hardware.coresClamped` in files produced before bench 0.3.0 is `true` for every Chromium run (the label compared the UA-CH brand name "Google Chrome" against "Chrome"); Chromium reports real logical cores, so treat those values as unclamped when `browser.source` is `ua-ch`.
@@ -76,6 +77,12 @@ Note: `hardware.coresClamped` in files produced before bench 0.3.0 is `true` for
 - **Tokens/s** - apply the model's tokenizer to `text` post-hoc; provider-reported `providerUsage` is auxiliary only (its `fidelity` field says why: `estimated` or `chunk-count`).
 
 `index/summary.json` is an array of light per-run summaries (`RunIndexEntry` in [`apps/ui/src/lib/bench/store.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/apps/ui/src/lib/bench/store.ts)) used to render the leaderboard without fetching every run file. Entries written since bench 0.3.0 also carry the run's disclosed device identity (`engine`, `osVersion`, `architecture`, `gpuArchitecture`, `gpuModel`, `deviceType`, `deviceModel`, `cores`, `deviceMemoryGB`, `jsHeapSizeLimitBytes`, `storageQuotaBytes`, `crossOriginIsolated`, `webgpu`, `timerResolutionUs`, `webdriver`), `harnessVersion`, `runtimeVersions`, `userReportedDevice`, and each cell's `runtimeVersion`, so cohort analyses can run on the index alone.
+
+## Schema versions
+
+- **3** (2026-09-21) - privacy pass. Not captured any more: `locale.timeZone`, `timeZoneOffsetMinutes`, `calendar`, `languages`, `power.chargingTimeSec` / `dischargingTimeSec`, `display.prefersReducedMotion` / `prefersColorScheme`; `power.level` rounded to the quarter; the submission nonce is never published and the digest no longer covers it. Every file published earlier (all from the maintainers' own devices) was rewritten by `tools/scrub-publication.mjs` on 2026-09-21: the fields above removed, `schemaVersion` raised to 3, the digest recomputed, `scrubbedAt` stamped. No measurement changed; the protocol stays `localmode-bench/4`.
+- **2** (2026-09-19) - protocol v2 fields (`streamIncremental`, `overallCharsPerSec`, quality raw outputs).
+- **1** (2026-09-18) - initial.
 
 ## Protocol versions
 
