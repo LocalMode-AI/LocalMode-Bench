@@ -1,0 +1,54 @@
+### session_start_utc
+2026-09-22T07:42:42Z (first command of the session)
+### date -u (environment capture)
+Tue Sep 22 07:43:31 UTC 2026
+### sw_vers
+ProductName:		macOS
+ProductVersion:		26.5.2
+BuildVersion:		25F84
+### uname -m
+arm64
+### sysctl -n machdep.cpu.brand_string
+Apple M1 Pro
+### sysctl hw.*
+hw.ncpu: 10
+hw.physicalcpu: 10
+hw.logicalcpu: 10
+hw.perflevel0.physicalcpu: 8
+hw.perflevel1.physicalcpu: 2
+hw.perflevel0.name: Performance
+hw.perflevel1.name: Efficiency
+hw.memsize: 34359738368
+### system_profiler SPDisplaysDataType (filtered)
+      Chipset Model: Apple M1 Pro
+      Total Number of Cores: 16
+      Metal Support: Metal 4
+### pmset -g batt
+Now drawing from 'AC Power'
+ -InternalBattery-0 (id=25690211)	76%; AC attached; not charging present: true
+### pmset -g therm
+Note: No thermal warning level has been recorded
+Note: No performance warning level has been recorded
+Note: No CPU power status has been recorded
+### xcode-select -p
+/Library/Developer/CommandLineTools
+### xcodebuild -version
+### brew --version
+Homebrew 6.0.12
+### brew install llama.cpp (step 2)
+llama.cpp 0.4.1 (homebrew/core, poured from arm64_tahoe bottle), ggml 0.24.0
+/opt/homebrew/bin/llama-bench
+### llama-bench --help | head -5
+load_backend: loaded BLAS backend from /opt/homebrew/Cellar/ggml/0.24.0/libexec/libggml-blas.so
+ggml_metal_device_init: tensor API disabled for pre-M5 and pre-A19 devices
+ggml_metal_library_init: using embedded metal library
+ggml_metal_library_compile_all: compiled 'fa' library in 0.013 sec
+ggml_metal_library_compile_all: compiled 'mul_mv' library in 0.004 sec
+### llama-bench build line (from -oe md output): build: b29c606e2 (10964)
+### pmset -g therm (after the run, 2026-09-22T08:19:36Z)
+Note: No thermal warning level has been recorded
+Note: No performance warning level has been recorded
+Note: No CPU power status has been recorded
+### pmset -g batt (after the run)
+Now drawing from 'AC Power'
+ -InternalBattery-0 (id=25690211)	76%; AC attached; not charging present: true

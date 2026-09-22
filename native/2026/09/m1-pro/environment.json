@@ -1,0 +1,79 @@
+{
+  "captured_utc": "Tue Sep 22 07:43:31 UTC 2026",
+  "session_start_utc": "2026-09-22T07:42:42Z (first command of the session)",
+  "os": {
+    "product_name": "macOS",
+    "product_version": "26.5.2",
+    "build_version": "25F84",
+    "uname_m": "arm64"
+  },
+  "cpu": {
+    "brand_string": "Apple M1 Pro",
+    "ncpu": 10,
+    "physicalcpu": 10,
+    "logicalcpu": 10,
+    "perflevel0": {
+      "name": "Performance",
+      "physicalcpu": 8
+    },
+    "perflevel1": {
+      "name": "Efficiency",
+      "physicalcpu": 2
+    }
+  },
+  "memory_bytes": 34359738368,
+  "gpu": {
+    "chipset_model": "Apple M1 Pro",
+    "total_cores": 16,
+    "metal_support": "Metal 4"
+  },
+  "power": {
+    "raw": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=25690211)\t76%; AC attached; not charging present: true",
+    "power_source": "AC Power",
+    "percent": 76
+  },
+  "thermal_at_start": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+  "toolchain": {
+    "xcode_select_path": "/Library/Developer/CommandLineTools",
+    "xcodebuild_version": null,
+    "homebrew_version": "Homebrew 6.0.12"
+  },
+  "llama_cpp": {
+    "install_route": "brew",
+    "command": "brew install llama.cpp",
+    "formula": "homebrew/core llama.cpp",
+    "version": "0.4.1",
+    "poured_from_bottle": true,
+    "bottle_tag": "arm64_tahoe",
+    "ggml_dependency_version": "0.24.0",
+    "llama_bench_path": "/opt/homebrew/bin/llama-bench",
+    "help_head_note": "llama-bench --help first prints backend load lines: BLAS backend loaded; ggml_metal_device_init: tensor API disabled for pre-M5 and pre-A19 devices; embedded metal library; Metal 'fa' and 'mul_mv' libraries compiled on first launch",
+    "defaults_from_help": {
+      "-r": 5,
+      "-t": 8,
+      "-ngl": -1,
+      "-b": 2048,
+      "-ub": 512,
+      "-fa": "auto",
+      "-ctk": "f16",
+      "-ctv": "f16",
+      "-embd": 0,
+      "-d": 0
+    },
+    "build_line": "build: b29c606e2 (10964)",
+    "build_commit": "b29c606e2",
+    "build_number": 10964,
+    "cpu_info_reported": "Accelerate, Apple M1 Pro",
+    "gpu_info_reported": "Apple M1 Pro",
+    "backends_reported": "BLAS,MTL"
+  },
+  "timeout_mechanism": "perl -e 'alarm shift; exec @ARGV' 1200 llama-bench ... (SIGALRM after 20 min; coreutils timeout not installed)",
+  "keep_awake": "caffeinate -dims wrapping the whole run script",
+  "background_processes_at_start": "Chrome quit before the run (no localmode.ai/bench/run tab was open among its tabs); Safari and Firefox not running. Remaining non-system CPU users at launch: the terminal emulator (~5% of one core) and the CLI agent driving the session (~10% of one core). Load average had fallen from 20 (Chrome open) to about 3 before the first measurement.",
+  "thermal_at_end": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+  "power_at_end": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=25690211)\t76%; AC attached; not charging present: true",
+  "measurement_run_utc": {
+    "start": "2026-09-22T07:51:12Z",
+    "end": "2026-09-22T08:18:34Z"
+  }
+}
