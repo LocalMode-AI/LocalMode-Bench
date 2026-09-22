@@ -58,7 +58,7 @@ Note: `hardware.coresClamped` in files produced before bench 0.3.0 is `true` for
 | `model` | Static model reference (provider model id, quantization, declared size, URL) |
 | `workloadId` / `workloadKind` | e.g. `chat-pp128-tg128` / `llm-generate` |
 | `resolvedBackend` | Backend actually used (probed, never the requested one). For the wllama lanes since v3 it follows llama.cpp's own `offloaded N/M layers to GPU` load report |
-| `runtimeConfig` | Since bench 0.5.0: the adapter's post-load configuration record, per cell (wllama: `n_threads`, `n_gpu_layers` requested, `webgpu_adapter`, `offloadedLayers` "N/M", `cache_prompt`, and since v4 `mmproj: false` on language lanes; Transformers.js: `device`, `dtype`, `worker`) |
+| `runtimeConfig` | Since bench 0.5.0: the adapter's post-load configuration record, per cell (wllama: `n_threads` requested, `n_gpu_layers` requested, `webgpu_adapter`, `offloadedLayers` "N/M", `cache_prompt`, since v4 `mmproj: false` on language lanes, and, on runs whose `harness.runtimeVersions["@localmode/wllama"]` is 3.4.2 or later, `multithread` and `n_threads_used`, the pool wllama actually built from its own `isMultithread()` / `getNumThreads()`, so a lane that fell back to one thread says so; Transformers.js: `device`, `dtype`, `worker`) |
 | `load` | Download/cache phase: `cached` (cold=false / warm=true), start/end timestamps, progress milestones |
 | `warmupMs` | Untimed first-inference readiness (engine init + shader/JIT compile). Cold start = load + warmup |
 | `iterations` | LLM: `{ startT, chunks: [{t, c}], endT, text, providerUsage?, finishReason, gates }` - per-chunk wall-clock trace + full generated text. Embedding: `{ startT, endT, count, dimensions, gates }` |
