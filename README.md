@@ -15,6 +15,7 @@ Open dataset of community-submitted [LocalMode Bench](https://localmode.ai/bench
 | `runs/YYYY/MM/<runId>.json` | Verified submissions (ran on the official site, passed all integrity rules) |
 | `quarantine/YYYY/MM/<runId>.json` | Submissions flagged by the published integrity rules - kept public and auditable, hidden from the leaderboard |
 | `index/summary.json` | Machine-written leaderboard index (light per-run summaries). **Do not edit by hand** - it is rebuilt by the submission API |
+| `native/YYYY/MM/<device>/` | Native `llama-bench` baselines on lab machines that also have browser runs: the same GGUF files and workload shapes as the llama.cpp lanes, run outside the browser (CPU thread sweep and the platform GPU backend), with every result row, the exact commands, the toolchain build and the machine's own capture. Maintainer-committed, not written by the submission API; not part of the leaderboard |
 
 Files are written by the submission API at [localmode.ai/bench](https://localmode.ai/bench); this repository accepts no direct pull requests for run data (PRs improving documentation are welcome).
 
