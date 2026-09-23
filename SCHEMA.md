@@ -1,13 +1,13 @@
 # Run file schema
 
-Every file under `runs/` and `quarantine/` is one `BenchRunResult` JSON object, produced by [`@localmode/bench`](https://github.com/LocalMode-AI/LocalMode/tree/main/packages/bench) (current: schema version 2, protocol `localmode-bench/4`; files record the version they were produced under, and archived runs are never re-scored). The TypeScript source of truth is [`packages/bench/src/types.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/packages/bench/src/types.ts); the executable validator is `validateRunShape()` / `validateSubmission()` in the same package.
+Every file under `runs/` and `quarantine/` is one `BenchRunResult` JSON object, produced by [`@localmode/bench`](https://github.com/LocalMode-AI/LocalMode/tree/main/packages/bench) (current: schema version 3, protocol `localmode-bench/5`; files record the protocol they were measured under, and archived runs are never re-scored). The TypeScript source of truth is [`packages/bench/src/types.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/packages/bench/src/types.ts); the executable validator is `validateRunShape()` / `validateSubmission()` in the same package.
 
 ## Top level
 
 | Field | Type | Meaning |
 | --- | --- | --- |
 | `protocol` | `"localmode-bench/5"` (older files: `"localmode-bench/1"` to `"localmode-bench/4"`; the leaderboard shows v5 and v4 rows side by side, never mixed) | Versioned protocol identifier |
-| `schemaVersion` | `2` (older files: `1`) | Result JSON schema version |
+| `schemaVersion` | `3` (older files: `1` and `2` were rewritten to 3 by the scrub on 2026-09-21; see Schema versions) | Result JSON schema version |
 | `runId` | string | UUID of the run (also the filename) |
 | `createdAt` | ISO 8601 string | UTC timestamp |
 | `harness` | `{ name, version, appVersion?, runtimeVersions?, commit? }` | Harness identity. Since bench 0.3.0 `runtimeVersions` maps each runtime package the host bundled to its version (e.g. `"@huggingface/transformers": "4.2.0"`, `"@wllama/wllama": "3.5.1"` - the CDN pin that executes) and `commit` is the host build's git commit when exposed |
@@ -64,7 +64,7 @@ Note: `hardware.coresClamped` in files produced before bench 0.3.0 is `true` for
 | `iterations` | LLM: `{ startT, chunks: [{t, c}], endT, text, providerUsage?, finishReason, gates }` - per-chunk wall-clock trace + full generated text. Embedding: `{ startT, endT, count, dimensions, gates }` |
 | `memory` | Bytes at protocol points (`baseline`/`postLoad`/`postRun`, and since v2 `atError` for cells that failed) + which API measured them |
 | `quality` | Optional fidelity-lane score (tinyMMLU accuracy or STS-B Spearman). Since v2, MMLU cells also carry raw per-item `outputs` (capped at 400 chars each) and a `parseRate` (fraction of parseable answers; a low value marks a format-limited score), so scores are recomputable |
-| `status` / `invalidReasons` | `ok \| invalid \| error \| skipped`. Since v2 a timed LLM iteration generating fewer than 16 chars is gated `degenerate-output` and the cell is `invalid`. `skipped` cells carry the reason in `invalidReasons` (`runtime unavailable: ...`, `lane disabled by the submitter`); since bench 0.4.0 every cell a suite defines is present, so a suite label describes what was attempted and a skipped cell says why it was not |
+| `status` / `invalidReasons` | `ok \| invalid \| error \| skipped`. Since v2 a timed LLM iteration generating fewer than 16 chars is gated `degenerate-output` and the cell is `invalid`. The gate checks length only, not coherence: the Adreno 830 `wllama-webgpu` SmolLM2 chat cells are `ok` although their `text` is incoherent (see Known device limitation in the [README](./README.md)). `skipped` cells carry the reason in `invalidReasons` (`runtime unavailable: ...`, `lane disabled by the submitter`); since bench 0.4.0 every cell a suite defines is present, so a suite label describes what was attempted and a skipped cell says why it was not |
 | `discardedIterations` | Since bench 0.5.0: timed iterations the tab was hidden during, kept with their gates (`started-hidden`, `hidden-during-run`) and never scored; the runner waited for the tab and repeated each of them (`iteration-redo` trace event) |
 | `attempts` | Since bench 0.5.0: failed attempts that preceded the recorded outcome, oldest first (`{ error, at }`); the runner retries a cell up to twice after a watchdog timeout or a provider error and never silently |
 | `error` | `{ name, message, cause?, causeName?, causeStack? }` for `error` cells; since v2 `cause` carries the wrapped provider error's message, and since bench 0.4.0 `causeName` its name and `causeStack` its stack (capped at 4,000 characters; a WASM abort such as wllama's `RuntimeError` "(ABORT) " names its native frame only there) |

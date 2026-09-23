@@ -25,6 +25,8 @@ Every submission carries a server-issued session nonce and a canonical-JSON SHA-
 
 Known limits, stated honestly: background native load, virtual machines, and browser flags cannot be detected from inside a page. The min-3-submissions rule and median-of-medians aggregation bound their influence.
 
+Known device limitation: on the Galaxy Z Fold 7 (Adreno 830, Chrome 153 on Android) the llama.cpp WebGPU lane (`wllama-webgpu`) generates incoherent SmolLM2 text. All 18 timed chat iterations recorded on that phone across six runs and three protocol versions are strings of isolated letters and word fragments, and the lane's MMLU cell fails in every run with "Invalid typed array length". The WASM lane and every other runtime on the same phone produce coherent text, and no other device in the dataset shows this. The degenerate-output gate is length-based and 17 of the 18 iterations pass it, so those cells are `ok` and the `android/adreno-830` `wllama-webgpu` SmolLM2 `chat-pp128-tg128` rows (v4 and v5, plus a v2 `android/adreno-830` `wllama` row from before the lane split) are kept: they time a backend that is not producing a usable answer. Each iteration's `text` is in the run files, so anyone can check it. An output-coherence check would be a protocol change and is reserved for a future version.
+
 ## Reproduce / analyze
 
 The reference implementation is the MIT-licensed [`@localmode/bench`](https://github.com/LocalMode-AI/LocalMode/tree/main/packages/bench) package in the LocalMode monorepo. To rebuild every statistic from this dataset:
@@ -49,6 +51,9 @@ See [CITATION.cff](./CITATION.cff). If you use this data in academic work, pleas
 files the browser wllama lanes use, with the protocol's workload shape (pp128
 and pp512 prefill, tg128 decode, 5 repetitions) in a GPU arm (Metal, `-ngl 99`)
 and a CPU arm (`-ngl 0`, the comparator for the WASM lane). It needs a
-`llama-bench` binary on `PATH`; the published baselines use llama.cpp commit
-`60b06ab` built from source. Never run it while a browser benchmark runs on
-the same machine.
+`llama-bench` binary on `PATH`. Each baseline folder's `README.md` and
+`environment.json` record the exact llama.cpp build used on that device
+(commit, build number, install route, backends); the M1 Pro baseline
+(`native/2026/09/m1-pro/`) used the Homebrew llama.cpp 0.4.1 bottle
+(`arm64_tahoe`), build `b29c606e2` (10964), backends `BLAS,MTL`. Never run it
+while a browser benchmark runs on the same machine.
