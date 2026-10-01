@@ -61,3 +61,11 @@ and a CPU arm (`-ngl 0`, the comparator for the WASM lane). It needs a
 (`native/2026/09/m1-pro/`) used the Homebrew llama.cpp 0.4.1 bottle
 (`arm64_tahoe`), build `b29c606e2` (10964), backends `BLAS,MTL`. Never run it
 while a browser benchmark runs on the same machine.
+
+| folder | machine | llama.cpp build | configurations |
+| --- | --- | --- | --- |
+| `native/2026/09/m1-pro/` | MacBook Pro, Apple M1 Pro (8 P + 2 E cores), 32 GB, macOS 26.5.2 | Homebrew 0.4.1 bottle, `b29c606e2` (10964), `BLAS,MTL` | CPU `-t 10, 8, 6, 4`; Metal `-ngl 99` |
+| `native/2026/10/ryzen-9800x3d/` | Desktop, AMD Ryzen 7 9800X3D (8 cores, 16 threads), 96 GB, integrated Radeon (2 CUs), Windows 11 25H2 (26200.9457), AMD Software 26.8.1 | local MSVC builds at `b29c606e2` (10964): CPU-only (`GGML_NATIVE`, AVX-512) and Vulkan | CPU `-t 16, 12, 8, 4`; Vulkan `-ngl 99 -t 8` |
+| `native/2026/10/core-ultra-165h/` | Dell XPS 13 9340, Intel Core Ultra 7 165H (6 P + 8 E + 2 LP-E cores, 22 threads), 16 GB, Arc iGPU, CachyOS kernel 7.0.3-1, Mesa 26.2.3 | local GCC builds at `b29c606e2` (10964): CPU-only (`-march=native`) and Vulkan (ANV) | CPU `-t 22, 16, 11, 6, 4` and `-t 6` pinned one per P-core; Vulkan `-ngl 99 -t 11` |
+
+Each folder's `README.md` records the exact commands, the waits, the machine's state and every failure. The bge-small embedding run (`-embd 1 -p 48,1536`) aborts at `pp1536` on all three machines at this commit (`encoder requires n_ubatch >= n_tokens`), after `pp48` completes; the two newer folders add a `-p 512` embedding run inside the default micro-batch. The Core Ultra Vulkan rows ran on Mesa 26.2.3, not the 26.0.6 of that machine's browser runs.
