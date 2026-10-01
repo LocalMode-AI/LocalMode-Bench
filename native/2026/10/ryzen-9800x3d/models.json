@@ -1,0 +1,81 @@
+{
+  "description": "GGUF files measured by the native baseline for the LocalMode Bench methodology on an AMD Ryzen 7 9800X3D. Downloaded with curl.exe -L --fail -o <file> <url>; sha256 from (Get-FileHash -Algorithm SHA256 <file>).Hash.ToLower(). expected_bytes is the browser harness catalog value; expected_sha256 is the value the M1 Pro baseline recorded for the same URL.",
+  "all_match": true,
+  "models": [
+    {
+      "bench_model_id": "smollm2-135m",
+      "file": "SmolLM2-135M-Instruct-Q4_K_M.gguf",
+      "url": "https://huggingface.co/bartowski/SmolLM2-135M-Instruct-GGUF/resolve/main/SmolLM2-135M-Instruct-Q4_K_M.gguf",
+      "expected_bytes": 105454432,
+      "actual_bytes": 105454432,
+      "bytes_match": true,
+      "expected_sha256": "2e8040ceae7815abe0dcb3540b9995eaa1fa0d2ca9e797d0a635ae4433c68c2d",
+      "actual_sha256": "2e8040ceae7815abe0dcb3540b9995eaa1fa0d2ca9e797d0a635ae4433c68c2d",
+      "sha256_match": true,
+      "download_started_utc": "2026-10-01T01:04:38.0151341Z",
+      "download_seconds": 2.6,
+      "download_attempts": 1,
+      "curl_exit": 0
+    },
+    {
+      "bench_model_id": "qwen3-0.6b",
+      "file": "Qwen3-0.6B-Q4_K_M.gguf",
+      "url": "https://huggingface.co/unsloth/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf",
+      "expected_bytes": 396705472,
+      "actual_bytes": 396705472,
+      "bytes_match": true,
+      "expected_sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+      "actual_sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+      "sha256_match": true,
+      "download_started_utc": "2026-10-01T01:04:40.7837701Z",
+      "download_seconds": 7.9,
+      "download_attempts": 1,
+      "curl_exit": 0
+    },
+    {
+      "bench_model_id": "llama-3.2-1b",
+      "file": "Llama-3.2-1B-Instruct-Q4_K_M.gguf",
+      "url": "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf",
+      "expected_bytes": 807694464,
+      "actual_bytes": 807694464,
+      "bytes_match": true,
+      "expected_sha256": "6f85a640a97cf2bf5b8e764087b1e83da0fdb51d7c9fab7d0fece9385611df83",
+      "actual_sha256": "6f85a640a97cf2bf5b8e764087b1e83da0fdb51d7c9fab7d0fece9385611df83",
+      "sha256_match": true,
+      "download_started_utc": "2026-10-01T01:04:49.0499033Z",
+      "download_seconds": 14.3,
+      "download_attempts": 1,
+      "curl_exit": 0
+    },
+    {
+      "bench_model_id": "gemma-4-e2b",
+      "file": "google_gemma-4-E2B-it-Q4_K_M.gguf",
+      "url": "https://huggingface.co/bartowski/google_gemma-4-E2B-it-GGUF/resolve/main/google_gemma-4-E2B-it-Q4_K_M.gguf",
+      "expected_bytes": 3462680032,
+      "actual_bytes": 3462680032,
+      "bytes_match": true,
+      "expected_sha256": "923c4c86177d2ee173a7f5b4fa3d0ac65f5962ab15e6d6a5bc250aec4fd7bf7e",
+      "actual_sha256": "923c4c86177d2ee173a7f5b4fa3d0ac65f5962ab15e6d6a5bc250aec4fd7bf7e",
+      "sha256_match": true,
+      "download_started_utc": "2026-10-01T01:05:04.1204181Z",
+      "download_seconds": 93.4,
+      "download_attempts": 1,
+      "curl_exit": 0
+    },
+    {
+      "bench_model_id": "bge-small-en",
+      "file": "bge-small-en-v1.5-q8_0.gguf",
+      "url": "https://huggingface.co/CompendiumLabs/bge-small-en-v1.5-gguf/resolve/main/bge-small-en-v1.5-q8_0.gguf",
+      "expected_bytes": 36806944,
+      "actual_bytes": 36806944,
+      "bytes_match": true,
+      "expected_sha256": "ec38e8da142596baa913124ae50550de284b6916bf59577ef2f0cb9660c2f514",
+      "actual_sha256": "ec38e8da142596baa913124ae50550de284b6916bf59577ef2f0cb9660c2f514",
+      "sha256_match": true,
+      "download_started_utc": "2026-10-01T01:06:40.9488009Z",
+      "download_seconds": 1.5,
+      "download_attempts": 1,
+      "curl_exit": 0
+    }
+  ]
+}

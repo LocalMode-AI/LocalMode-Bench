@@ -1,0 +1,177 @@
+{
+  "description": "Native baseline for the LocalMode Bench methodology: llama-bench on an AMD Ryzen 7 9800X3D. Parsed facts; raw command output is in environment.txt.",
+  "wall_clock_utc": {
+    "session_start": "2026-10-01T00:59:46.4938766Z",
+    "environment_capture": "2026-10-01T01:00:02.9528499Z",
+    "measurement_start": "2026-10-01T01:16:43.5411011Z",
+    "measurement_end": "2026-10-01T01:57:56.4567212Z",
+    "session_end": "2026-10-01T02:02:47.3894808Z"
+  },
+  "machine": {
+    "form_factor": "desktop",
+    "power_source": "mains (Win32_Battery: no battery present)",
+    "cpu": {
+      "name": "AMD Ryzen 7 9800X3D 8-Core Processor",
+      "microarchitecture": "Zen 5",
+      "cores": 8,
+      "logical_processors": 16,
+      "environment_processor_count": 16,
+      "efficiency_cores": 0,
+      "smt": true,
+      "max_clock_mhz": 4700,
+      "l2_cache_kb": 8192,
+      "l3_cache_kb": 98304
+    },
+    "ram_bytes": 100455010304,
+    "ram_nominal": "96 GB",
+    "gpu": {
+      "name": "AMD Radeon(TM) Graphics",
+      "type": "integrated (no discrete GPU)",
+      "video_processor": "AMD Radeon Graphics Processor (0x13C0)",
+      "description_from_brief": "2 compute units, RDNA 2, 2 GB VRAM carve-out",
+      "driver_version": "32.0.21045.5002",
+      "driver_date": "8/16/2026",
+      "amd_software_adrenalin_edition": "26.8.1",
+      "amd_software_version_source": "Installed-programs entry 'AMD Software', DisplayVersion 26.8.1 (the AMD Software GUI was not opened); vulkaninfo driverInfo also reads '26.8.1 (AMD proprietary shader compiler)'"
+    }
+  },
+  "os": {
+    "caption": "Microsoft Windows 11 Pro",
+    "version": "10.0.26200",
+    "display_version": "25H2",
+    "build": 26200,
+    "ubr": 9457,
+    "architecture": "64-bit"
+  },
+  "shell": "Windows PowerShell 5.1.26100.9444 (PowerShell 7 not installed)",
+  "power_plan": {
+    "before": { "guid": "381b4222-f694-41f0-9685-ff5bb260df2e", "name": "Balanced" },
+    "during": { "guid": "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c", "name": "High performance", "how": "powercfg /setactive SCHEME_MIN (High performance already existed; no plan created)" },
+    "after": { "guid": "381b4222-f694-41f0-9685-ff5bb260df2e", "name": "Balanced", "how": "powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e" },
+    "available": ["Balanced", "Ultimate Performance", "High performance", "Power saver"]
+  },
+  "keep_awake": {
+    "brief_snippet_result": "Failed in Windows PowerShell 5.1: Cannot convert argument \"esFlags\", with value: \"-2147483645\", for \"SetThreadExecutionState\" to type \"System.UInt32\": \"Cannot convert value \"-2147483645\" to type \"System.UInt32\". Error: \"Value was either too large or too small for a UInt32.\"\"",
+    "workaround": "Helper process called SetThreadExecutionState([uint32]0x80000003) at 2026-10-01T01:17:23.49Z (returned 0x80000000, success) and SetThreadExecutionState([uint32]0x80000000) when the orchestrator exited at 2026-10-01T01:57:59.76Z.",
+    "uncovered_interval": "2026-10-01T01:16:43.54Z to 01:17:23.49Z (40 s; invocation 4a_smollm2-135m_cpu_t16 ran 01:16:47 to 01:16:55 in it)"
+  },
+  "ambient": {
+    "browsers": "No Chrome/Edge window open (no localmode.ai/bench/run tab); 36 chrome and 7 msedge background processes stopped; Get-Process chrome, msedge, firefox returned nothing before and during the run.",
+    "windows_update": "Not downloading or installing (BITS stopped, no TiWorker/TrustedInstaller/MoUsoCoreWorker process). wuauserv was Stopped at the start and Running before measurement (trigger-started by the installs).",
+    "defender_realtime_protection": true,
+    "defender_note": "Microsoft Defender real-time protection left on, no exclusions. Its scanning of freshly downloaded and built files can slow the downloads, the build and the first read of each model; llama-bench loads the model and runs a warmup before timing, so this does not enter the measurements.",
+    "other_processes_top_cpu_before_measurement": ["HYTE.Nexus.Service", "explorer", "claude (desktop app, 4 processes)", "AUEPMaster", "MSIAfterburner", "DCv2", "HYTE Nexus", "NortonUI", "StartMenuExperienceHost", "svchost", "nvcontainer"],
+    "idle_total_cpu_percent_before_measurement": [8.2, 6.8, 7.2]
+  },
+  "clock_witness": {
+    "counter": "\\Processor Information(_Total)\\% Processor Performance and \\Processor Information(_Total)\\Processor Frequency, 3 samples at 1 s",
+    "processor_frequency_mhz_all_samples": 4700,
+    "samples": [
+      { "utc": "2026-10-01T01:00:06Z", "label": "environment capture (Balanced plan)", "pct_processor_performance": [83.35, 85.26, 82.49] },
+      { "utc": "2026-10-01T01:16:43Z", "label": "4a smollm2-135m (seconds after the smoke tests)", "pct_processor_performance": [108.02, 110.18, 108.98] },
+      { "utc": "2026-10-01T01:20:47Z", "label": "4a qwen3-0.6b", "pct_processor_performance": [84.06, 84.36, 85.77] },
+      { "utc": "2026-10-01T01:25:41Z", "label": "4a llama-3.2-1b", "pct_processor_performance": [85.87, 86.17, 85.64] },
+      { "utc": "2026-10-01T01:31:43Z", "label": "4a gemma-4-e2b", "pct_processor_performance": [85.83, 84.34, 83.41] },
+      { "utc": "2026-10-01T01:40:53Z", "label": "4b smollm2-135m", "pct_processor_performance": [84.03, 82.39, 83.97] },
+      { "utc": "2026-10-01T01:43:26Z", "label": "4b qwen3-0.6b", "pct_processor_performance": [83.67, 84.94, 85.94] },
+      { "utc": "2026-10-01T01:46:27Z", "label": "4b llama-3.2-1b", "pct_processor_performance": [83.92, 84.68, 83.36] },
+      { "utc": "2026-10-01T01:50:04Z", "label": "4b gemma-4-e2b", "pct_processor_performance": [84.51, 84.37, 87.62] },
+      { "utc": "2026-10-01T01:55:48Z", "label": "4c bge-small-en", "pct_processor_performance": [87.63, 89.45, 85.72] },
+      { "utc": "2026-10-01T01:57:56Z", "label": "final, after restoring the Balanced plan", "pct_processor_performance": [99.81, 85.15, 82.67] }
+    ],
+    "note": "Every sample except the first in 4a was taken after a 120 s idle wait, so it shows the idle clock, not the clock under load; the 108-110 reading was taken seconds after the smoke tests."
+  },
+  "toolchain": {
+    "git": "2.55.0.windows.5 (winget Git.Git)",
+    "cmake": "4.4.3 (winget Kitware.CMake)",
+    "visual_studio_build_tools": "Visual Studio Build Tools 2022 17.14.41 (September 2026), installationVersion 17.14.37710.0 (winget Microsoft.VisualStudio.2022.BuildTools, workload VCTools plus the clang components)",
+    "msvc_toolset": "14.44.35207",
+    "compiler": "MSVC 19.44.35229.0 (C and CXX, as printed by the configure log)",
+    "generator": "Visual Studio 17 2022 (multi-config; Release selected with --config Release)",
+    "windows_sdk": "10.0.26100.0",
+    "openmp": "MSVC -openmp (version 2.0)",
+    "vulkan_sdk": "1.4.363.0 (winget KhronosGroup.VulkanSDK)",
+    "glslc": "shaderc v2026.4, spirv-tools v2026.4 v2022.4-1347-gef96ed76, glslang 11.1.0-1566-ge1b562a8",
+    "python": "not installed (not needed)",
+    "clangcl_fallback_used": false
+  },
+  "llama_cpp": {
+    "repository": "https://github.com/ggml-org/llama.cpp",
+    "commit": "b29c606e28a01b1bc8c1351026a0fa6e616bf6c4",
+    "git_describe_tags_always": "v0.4.1",
+    "tags_at_commit": ["b10964", "b10964-b10964-b29c606", "v0.4.1"],
+    "rev_list_count": 10964,
+    "commit_date": "2026-09-14T17:01:05+03:00",
+    "commit_subject": "llama.cpp : bump version to 0.4.1 (#28900)",
+    "full_history_clone": true,
+    "same_as_m1_pro_baseline": true,
+    "ggml_version": "0.24.0",
+    "builds": {
+      "cpu": {
+        "directory": "build-cpu",
+        "configure": "cmake -B build-cpu",
+        "build": "cmake --build build-cpu --config Release -j 16 --target llama-bench",
+        "configure_rc": 0,
+        "build_rc": 0,
+        "build_seconds": 39,
+        "options_not_at_default": "none (LLAMA_CURL not needed; no -D flags)",
+        "GGML_NATIVE": "ON",
+        "GGML_AVX512": "OFF (cache value; GGML_NATIVE=ON detects the CPU instead)",
+        "GGML_VULKAN": "OFF",
+        "GGML_BLAS": "OFF",
+        "GGML_OPENMP": "ON",
+        "GGML_LLAMAFILE": "ON",
+        "GGML_CPU_REPACK": "ON",
+        "CMAKE_BUILD_TYPE": "not in the cache (multi-config generator); Release",
+        "GGML_AVAILABLE_BACKENDS": "ggml-cpu",
+        "cpu_feature_line": "-- Adding CPU backend variant ggml-cpu: /arch:AVX512 GGML_AVX512",
+        "cpu_feature_tests": "HAS_AVX_1, HAS_AVX2_1, HAS_FMA_1, HAS_AVX512_1: Success",
+        "llama_bench_build_line": "build: b29c606e2 (10964)",
+        "json_build_commit": "b29c606e2",
+        "json_build_number": 10964
+      },
+      "vulkan": {
+        "directory": "build-vulkan",
+        "configure": "cmake -B build-vulkan -DGGML_VULKAN=ON",
+        "build": "cmake --build build-vulkan --config Release -j 16 --target llama-bench",
+        "configure_rc": 0,
+        "build_rc": 0,
+        "build_seconds": 96,
+        "options_not_at_default": "GGML_VULKAN=ON",
+        "GGML_NATIVE": "ON",
+        "GGML_AVX512": "OFF (cache value; GGML_NATIVE=ON detects the CPU instead)",
+        "GGML_VULKAN": "ON",
+        "GGML_BLAS": "OFF",
+        "GGML_OPENMP": "ON",
+        "CMAKE_BUILD_TYPE": "not in the cache (multi-config generator); Release",
+        "GGML_AVAILABLE_BACKENDS": "ggml-cpu;ggml-vulkan",
+        "cpu_feature_line": "-- Adding CPU backend variant ggml-cpu: /arch:AVX512 GGML_AVX512",
+        "vulkan_configure_lines": ["Found Vulkan: .../Lib/vulkan-1.lib (found version \"1.4.363\") found components: glslc glslangValidator", "GL_KHR_cooperative_matrix supported by glslc", "GL_NV_cooperative_matrix2 supported by glslc", "GL_EXT_integer_dot_product supported by glslc", "GL_EXT_bfloat16 supported by glslc", "Including Vulkan backend"],
+        "llama_bench_build_line": "build: b29c606e2 (10964)",
+        "json_build_commit": "b29c606e2",
+        "json_build_number": 10964
+      }
+    },
+    "llama_bench_context_size_option": "absent (no -c / --ctx-size; -fitc/--fit-ctx exists but only applies with --fit-target, which is off); nothing added",
+    "llama_bench_embeddings_option": "-embd, --embeddings <0|1> present"
+  },
+  "vulkan": {
+    "vulkaninfo_instance_version": "1.4.363",
+    "devices": [
+      {
+        "index": 0,
+        "deviceName": "AMD Radeon(TM) Graphics",
+        "deviceType": "PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU",
+        "driverName": "AMD proprietary driver",
+        "driverInfo": "26.8.1 (AMD proprietary shader compiler)",
+        "apiVersion": "1.4.315",
+        "driverVersion": "2.0.353",
+        "conformanceVersion": "1.4.0.0"
+      }
+    ],
+    "ggml_vulkan_found": "ggml_vulkan: Found 1 Vulkan devices:",
+    "ggml_vulkan_device_line": "ggml_vulkan: 0 = AMD Radeon(TM) Graphics (AMD proprietary driver) | uma: 1 | fp16: 1 | bf16: 0 | fp4: 0 | warp size: 32 | shared memory: 32768 | int dot: 1 | matrix cores: none",
+    "GGML_VK_VISIBLE_DEVICES": "not set (device 0 is the integrated Radeon)"
+  },
+  "display_driver_events": "none (System log, ProviderName matching amdkmdag|Display, since session start; checked 2026-10-01T01:55:48Z after section 4b)"
+}

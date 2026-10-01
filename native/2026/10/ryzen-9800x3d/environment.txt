@@ -1,0 +1,812 @@
+# Environment: native baseline for the LocalMode Bench methodology, AMD Ryzen 7 9800X3D
+# Raw command output. Shell: Windows PowerShell 5.1 (PowerShell 7 not installed). Session start (UTC): 2026-10-01T00:59:46.4938766Z
+# Get-Counter paths are shown without the leading \\<computer name> prefix.
+
+## Step 1: environment capture (before installing anything)
+
+### (Get-Date).ToUniversalTime().ToString('o')  # Windows PowerShell 5.1 (pwsh not installed)
+2026-10-01T01:00:02.9528499Z
+
+### $PSVersionTable.PSVersion
+5.1.26100.9444
+
+### Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, BuildNumber, OSArchitecture
+
+
+Caption        : Microsoft Windows 11 Pro
+Version        : 10.0.26200
+BuildNumber    : 26200
+OSArchitecture : 64-bit
+
+### Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' | Select-Object DisplayVersion, CurrentBuild, UBR
+
+
+DisplayVersion : 25H2
+CurrentBuild   : 26200
+UBR            : 9457
+
+### Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed, L2CacheSize, L3CacheSize
+
+
+Name                      : AMD Ryzen 7 9800X3D 8-Core Processor           
+NumberOfCores             : 8
+NumberOfLogicalProcessors : 16
+MaxClockSpeed             : 4700
+L2CacheSize               : 8192
+L3CacheSize               : 98304
+
+### [Environment]::ProcessorCount
+16
+
+### (Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory
+100455010304
+
+### Get-CimInstance Win32_VideoController | Select-Object Name, DriverVersion, DriverDate, VideoProcessor
+
+
+Name           : AMD Radeon(TM) Graphics
+DriverVersion  : 32.0.21045.5002
+DriverDate     : 8/16/2026 <time of day removed>
+VideoProcessor : AMD Radeon Graphics Processor (0x13C0)
+
+### powercfg /getactivescheme
+Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+
+### powercfg /list
+
+Existing Power Schemes (* Active)
+-----------------------------------
+Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced) *
+Power Scheme GUID: <machine-generated GUID removed>  (Ultimate Performance)
+Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance)
+Power Scheme GUID: a1841308-3541-4fab-bc81-f71556f20b4a  (Power saver)
+
+### Get-Counter '\Processor Information(_Total)\% Processor Performance','\Processor Information(_Total)\Processor Frequency' -SampleInterval 1 -MaxSamples 3
+2026-10-01T01:00:06.0446235Z  \processor information(_total)\% processor performance  83.35
+2026-10-01T01:00:06.0446235Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:00:07.0768184Z  \processor information(_total)\% processor performance  85.26
+2026-10-01T01:00:07.0768184Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:00:08.0870883Z  \processor information(_total)\% processor performance  82.49
+2026-10-01T01:00:08.0870883Z  \processor information(_total)\processor frequency  4,700.00
+
+### git --version; cmake --version; py -3 --version
+git : not installed at environment capture
+cmake : not installed at environment capture
+py : not installed at environment capture
+
+### Get-ItemProperty 'HKLM:\SOFTWARE\AMD\CN' | Select-Object RadeonSoftwareVersion, DriverVersion  # AMD Software version as stored by the installer
+
+
+RadeonSoftwareVersion : 
+RadeonSoftwareEdition : 
+DriverVersion         : 32.0.21045.5002
+
+### Power source (Win32_Battery)
+no battery present (desktop on mains power)
+
+### Get-ItemProperty HKLM:\...\Uninstall\* | Where-Object DisplayName -match 'AMD Software' | Select-Object DisplayName, DisplayVersion   # AMD Software GUI not opened
+DisplayName  : AMD Software
+DisplayVersion : 26.8.1
+
+### Get-Process | Sort-Object CPU -Descending | Select-Object -First 15 Name, CPU, WorkingSet64   # 2026-10-01T01:00Z, before closing the browsers
+Name                     CPU WorkingSet64
+----                     --- ------------
+HYTE.Nexus.Service        91    121602048
+chrome                    72    522539008
+claude             38.515625    256442368
+AUEPMaster         31.234375     21921792
+explorer             30.8125    555831296
+chrome             26.328125    676216832
+claude              20.90625    559509504
+HYTE Nexus          19.65625     60825600
+MSIAfterburner       15.6875     10473472
+DCv2                15.40625    109883392
+chrome              11.71875    259686400
+chrome              11.15625    196816896
+claude             10.578125    250834944
+NortonUI             9.28125     59166720
+chrome               8.515625     68284416
+
+### Browsers
+Get-Process chrome, msedge, firefox: 36 chrome and 7 msedge processes, none with a window (no localmode.ai/bench/run tab open); all stopped with Stop-Process -Force. Get-Process chrome, msedge, firefox afterwards: nothing.
+Windows Update: Get-Service wuauserv -> Stopped, BITS -> Stopped at the start; no TiWorker/TrustedInstaller/MoUsoCoreWorker process. Before measuring, wuauserv was Running (trigger-started during the installs) but BITS was Stopped and no update worker process was running.
+
+### Get-MpComputerStatus | Select-Object RealTimeProtectionEnabled, AntivirusEnabled, AMServiceEnabled   # after the run
+RealTimeProtectionEnabled : True
+AntivirusEnabled          : True
+AMServiceEnabled          : True
+
+## Step 2: toolchain (installed with winget during the session) and builds
+
+### Installed versions
+git --version              -> git version 2.55.0.windows.5   (winget install --id Git.Git -e)
+cmake --version            -> cmake version 4.4.3              (winget install --id Kitware.CMake -e)
+Visual Studio Build Tools  -> Visual Studio Build Tools 2022 17.14.41 (September 2026), installationVersion 17.14.37710.0
+                              (winget install --id Microsoft.VisualStudio.2022.BuildTools -e --override "--quiet --wait --norestart --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Llvm.Clang --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset --includeRecommended")
+                              MSVC toolset 14.44.35207; the clang components were installed for the ClangCL fallback, which was not needed
+Windows SDK                -> 10.0.26100.0 (selected by CMake)
+Vulkan SDK                 -> 1.4.363.0 (winget install --id KhronosGroup.VulkanSDK -e), VULKAN_SDK=C:\VulkanSDK\1.4.363.0
+glslc --version            -> shaderc v2026.4 v2026.4 / spirv-tools v2026.4 v2022.4-1347-gef96ed76 / glslang 11.1.0-1566-ge1b562a8
+py -3 --version            -> Python not installed (not needed; results assembled with PowerShell)
+
+### git clone https://github.com/ggml-org/llama.cpp; git checkout b29c606e2; git rev-parse HEAD; git describe --tags --always; git rev-list --count HEAD
+b29c606e28a01b1bc8c1351026a0fa6e616bf6c4
+v0.4.1
+10964
+
+### git tag --points-at HEAD; git describe --tags --always --match "b*"; git log -1 --format="%H %cI %s"
+b10964
+b10964-b10964-b29c606
+v0.4.1
+b10964
+b29c606e28a01b1bc8c1351026a0fa6e616bf6c4 2026-09-14T17:01:05+03:00 llama.cpp : bump version to 0.4.1 (#28900)
+
+### cmake -B build-cpu   # configure log, selected lines (rc=0)
+-- Building for: Visual Studio 17 2022
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- The C compiler identification is MSVC 19.44.35229.0
+-- The CXX compiler identification is MSVC 19.44.35229.0
+-- The ASM compiler identification is MSVC
+-- CMAKE_SYSTEM_PROCESSOR: AMD64
+-- GGML_SYSTEM_ARCH: x86
+-- Found OpenMP_C: -openmp (found version "2.0")
+-- Found OpenMP_CXX: -openmp (found version "2.0")
+-- Found OpenMP: TRUE (found version "2.0")
+-- Including CPU backend
+-- x86 detected
+-- Performing Test HAS_AVX_1
+-- Performing Test HAS_AVX_1 - Success
+-- Performing Test HAS_AVX2_1
+-- Performing Test HAS_AVX2_1 - Success
+-- Performing Test HAS_FMA_1
+-- Performing Test HAS_FMA_1 - Success
+-- Performing Test HAS_AVX512_1
+-- Performing Test HAS_AVX512_1 - Success
+-- Adding CPU backend variant ggml-cpu: /arch:AVX512 GGML_AVX512
+-- ggml version: 0.24.0
+-- ggml commit:  b29c606e2
+-- Could NOT find OpenSSL, try to set the path to OpenSSL root folder in the system variable OPENSSL_ROOT_DIR (missing: OPENSSL_CRYPTO_LIBRARY OPENSSL_INCLUDE_DIR) 
+  OpenSSL not found, HTTPS support disabled
+-- Configuring done (22.8s)
+-- Generating done (2.3s)
+
+### Select-String -Path build-cpu\CMakeCache.txt -Pattern '^(GGML_|LLAMA_|CMAKE_BUILD_TYPE|CMAKE_GENERATOR|CMAKE_CXX_COMPILER:)'   # lines with a user-profile path removed; CMAKE_BUILD_TYPE and CMAKE_CXX_COMPILER are absent because the Visual Studio generator is multi-config (Release chosen with --config Release)
+GGML_ACCELERATE:BOOL=ON
+GGML_ALL_WARNINGS_3RD_PARTY:BOOL=OFF
+GGML_AVX:BOOL=OFF
+GGML_AVX2:BOOL=OFF
+GGML_AVX512:BOOL=OFF
+GGML_AVX512_BF16:BOOL=OFF
+GGML_AVX512_VBMI:BOOL=OFF
+GGML_AVX512_VNNI:BOOL=OFF
+GGML_AVX_VNNI:BOOL=OFF
+GGML_BACKEND_DIR:PATH=
+GGML_BACKEND_DL:BOOL=OFF
+GGML_BIN_INSTALL_DIR:PATH=bin
+GGML_BLAS:BOOL=OFF
+GGML_BLAS_VENDOR:STRING=Generic
+GGML_BMI2:BOOL=OFF
+GGML_BUILD_EXAMPLES:BOOL=OFF
+GGML_BUILD_TESTS:BOOL=OFF
+GGML_CCACHE:BOOL=ON
+GGML_CCACHE_FOUND:FILEPATH=GGML_CCACHE_FOUND-NOTFOUND
+GGML_CPU:BOOL=ON
+GGML_CPU_ALL_VARIANTS:BOOL=OFF
+GGML_CPU_ARM_ARCH:STRING=
+GGML_CPU_HBM:BOOL=OFF
+GGML_CPU_KLEIDIAI:BOOL=OFF
+GGML_CPU_POWERPC_CPUTYPE:STRING=
+GGML_CPU_REPACK:BOOL=ON
+GGML_CUDA:BOOL=OFF
+GGML_CUDA_COMPRESSION_MODE:STRING=size
+GGML_CUDA_FA:BOOL=ON
+GGML_CUDA_FA_ALL_QUANTS:BOOL=OFF
+GGML_CUDA_FA_QUANTS:STRING=q4_0-q4_0;q8_0-q8_0;f16-f16;bf16-bf16
+GGML_CUDA_FORCE_CUBLAS:BOOL=OFF
+GGML_CUDA_FORCE_MMQ:BOOL=OFF
+GGML_CUDA_GRAPHS:BOOL=ON
+GGML_CUDA_NCCL:BOOL=ON
+GGML_CUDA_NO_PEER_COPY:BOOL=OFF
+GGML_CUDA_NO_VMM:BOOL=OFF
+GGML_ET:BOOL=OFF
+GGML_ET_SYSEMU:BOOL=OFF
+GGML_GPROF:BOOL=OFF
+GGML_HEXAGON:BOOL=OFF
+GGML_HIP:BOOL=OFF
+GGML_HIP_EXPORT_METRICS:BOOL=OFF
+GGML_HIP_GRAPHS:BOOL=ON
+GGML_HIP_MMQ_MFMA:BOOL=ON
+GGML_HIP_NO_VMM:BOOL=ON
+GGML_HIP_RCCL:BOOL=OFF
+GGML_INCLUDE_INSTALL_DIR:PATH=include
+GGML_LASX:BOOL=ON
+GGML_LIB_INSTALL_DIR:PATH=lib
+GGML_LLAMAFILE:BOOL=ON
+GGML_LSX:BOOL=ON
+GGML_LTO:BOOL=OFF
+GGML_METAL:BOOL=OFF
+GGML_METAL_EMBED_LIBRARY:BOOL=OFF
+GGML_METAL_MACOSX_VERSION_MIN:STRING=
+GGML_METAL_NDEBUG:BOOL=OFF
+GGML_METAL_SHADER_DEBUG:BOOL=OFF
+GGML_METAL_STD:STRING=
+GGML_METAL_TARGET_OS:STRING=macos
+GGML_MUSA:BOOL=OFF
+GGML_MUSA_GRAPHS:BOOL=OFF
+GGML_MUSA_MUDNN_COPY:BOOL=OFF
+GGML_NATIVE:BOOL=ON
+GGML_OPENCL:BOOL=OFF
+GGML_OPENCL_EMBED_KERNELS:BOOL=ON
+GGML_OPENCL_PROFILING:BOOL=OFF
+GGML_OPENCL_TARGET_VERSION:STRING=300
+GGML_OPENCL_USE_ADRENO_KERNELS:BOOL=ON
+GGML_OPENMP:BOOL=ON
+GGML_OPENMP_FETCH:BOOL=OFF
+GGML_OPENVINO:BOOL=OFF
+GGML_RPC:BOOL=OFF
+GGML_RVV:BOOL=ON
+GGML_RV_ZFH:BOOL=ON
+GGML_RV_ZICBOP:BOOL=ON
+GGML_RV_ZIHINTPAUSE:BOOL=ON
+GGML_RV_ZVFBFWMA:BOOL=OFF
+GGML_RV_ZVFH:BOOL=ON
+GGML_SANITIZE_ADDRESS:BOOL=OFF
+GGML_SANITIZE_THREAD:BOOL=OFF
+GGML_SANITIZE_UNDEFINED:BOOL=OFF
+GGML_SCCACHE_FOUND:FILEPATH=GGML_SCCACHE_FOUND-NOTFOUND
+GGML_SCHED_MAX_COPIES:STRING=4
+GGML_SCHED_NO_REALLOC:BOOL=OFF
+GGML_SSE42:BOOL=OFF
+GGML_STATIC:BOOL=OFF
+GGML_SYCL:BOOL=OFF
+GGML_SYCL_DEVICE_ARCH:STRING=
+GGML_SYCL_DNN:BOOL=ON
+GGML_SYCL_F16:BOOL=OFF
+GGML_SYCL_GRAPH:BOOL=ON
+GGML_SYCL_HOST_MEM_FALLBACK:BOOL=ON
+GGML_SYCL_SUPPORT_LEVEL_ZERO_API:BOOL=ON
+GGML_SYCL_TARGET:STRING=INTEL
+GGML_VIRTGPU:BOOL=OFF
+GGML_VIRTGPU_BACKEND:BOOL=OFF
+GGML_VULKAN:BOOL=OFF
+GGML_VULKAN_CHECK_RESULTS:BOOL=OFF
+GGML_VULKAN_DEBUG:BOOL=OFF
+GGML_VULKAN_MEMORY_DEBUG:BOOL=OFF
+GGML_VULKAN_RUN_TESTS:BOOL=OFF
+GGML_VULKAN_SHADERS_GEN_TOOLCHAIN:FILEPATH=
+GGML_VULKAN_SHADER_DEBUG_INFO:BOOL=OFF
+GGML_VULKAN_VALIDATE:BOOL=OFF
+GGML_VXE:BOOL=ON
+GGML_WEBGPU:BOOL=OFF
+GGML_WEBGPU_CPU_PROFILE:BOOL=OFF
+GGML_WEBGPU_DEBUG:BOOL=OFF
+GGML_WEBGPU_GPU_PROFILE:BOOL=OFF
+GGML_WEBGPU_JSPI:BOOL=ON
+GGML_XTHEADVECTOR:BOOL=OFF
+GGML_ZDNN:BOOL=OFF
+GGML_ZENDNN:BOOL=OFF
+LLAMA_ALL_WARNINGS:BOOL=ON
+LLAMA_ALL_WARNINGS_3RD_PARTY:BOOL=OFF
+LLAMA_BIN_INSTALL_DIR:PATH=bin
+LLAMA_BUILD_APP:BOOL=ON
+LLAMA_BUILD_COMMON:BOOL=ON
+LLAMA_BUILD_EXAMPLES:BOOL=ON
+LLAMA_BUILD_IS_DEV:BOOL=ON
+LLAMA_BUILD_MTMD:BOOL=OFF
+LLAMA_BUILD_SERVER:BOOL=ON
+LLAMA_BUILD_TESTS:BOOL=ON
+LLAMA_BUILD_TOOLS:BOOL=ON
+LLAMA_BUILD_UI:BOOL=OFF
+LLAMA_FATAL_WARNINGS:BOOL=OFF
+LLAMA_INCLUDE_INSTALL_DIR:PATH=include
+LLAMA_LIB_INSTALL_DIR:PATH=lib
+LLAMA_LLGUIDANCE:BOOL=OFF
+LLAMA_OPENSSL:BOOL=ON
+LLAMA_SANITIZE_ADDRESS:BOOL=OFF
+LLAMA_SANITIZE_THREAD:BOOL=OFF
+LLAMA_SANITIZE_UNDEFINED:BOOL=OFF
+LLAMA_SUBPROCESS:BOOL=ON
+LLAMA_TESTS_INSTALL:BOOL=ON
+LLAMA_TOOLS_INSTALL:BOOL=ON
+LLAMA_UI_GZIP:BOOL=ON
+LLAMA_UI_HF_BUCKET:STRING=ggml-org/llama-ui
+LLAMA_USE_PREBUILT_UI:BOOL=ON
+LLAMA_USE_SYSTEM_GGML:BOOL=OFF
+LLAMA_WASM_MEM64:BOOL=ON
+ggml_IS_TOP_LEVEL:STATIC=OFF
+CMAKE_GENERATOR:INTERNAL=Visual Studio 17 2022
+CMAKE_GENERATOR_INSTANCE:INTERNAL=C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools
+CMAKE_GENERATOR_PLATFORM:INTERNAL=
+CMAKE_GENERATOR_TOOLSET:INTERNAL=
+GGML_AVAILABLE_BACKENDS:INTERNAL=ggml-cpu
+GGML_CUDA_COMPRESSION_MODE-STRINGS:INTERNAL=none;speed;balance;size
+GGML_OPENMP_ENABLED:INTERNAL=ON
+
+### cmake --build build-cpu --config Release -j 16 --target llama-bench   # rc=0; last lines, working-directory prefix shortened to <native-bench>
+  Building Custom Rule <native-bench>\llama.cpp/tools/llama-bench/CMakeLists.txt
+  main.cpp
+  llama-bench.vcxproj -> <native-bench>\llama.cpp\build-cpu\bin\Release\llama-bench.exe
+
+### cmake -B build-vulkan -DGGML_VULKAN=ON   # configure log, selected lines (rc=0)
+-- Building for: Visual Studio 17 2022
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- The C compiler identification is MSVC 19.44.35229.0
+-- The CXX compiler identification is MSVC 19.44.35229.0
+-- The ASM compiler identification is MSVC
+-- CMAKE_SYSTEM_PROCESSOR: AMD64
+-- GGML_SYSTEM_ARCH: x86
+-- Found OpenMP_C: -openmp (found version "2.0")
+-- Found OpenMP_CXX: -openmp (found version "2.0")
+-- Found OpenMP: TRUE (found version "2.0")
+-- Including CPU backend
+-- x86 detected
+-- Performing Test HAS_AVX_1
+-- Performing Test HAS_AVX_1 - Success
+-- Performing Test HAS_AVX2_1
+-- Performing Test HAS_AVX2_1 - Success
+-- Performing Test HAS_FMA_1
+-- Performing Test HAS_FMA_1 - Success
+-- Performing Test HAS_AVX512_1
+-- Performing Test HAS_AVX512_1 - Success
+-- Adding CPU backend variant ggml-cpu: /arch:AVX512 GGML_AVX512
+-- Found Vulkan: C:/VulkanSDK/1.4.363.0/Lib/vulkan-1.lib (found version "1.4.363") found components: glslc glslangValidator
+-- Vulkan found
+-- GL_KHR_cooperative_matrix supported by glslc
+-- GL_NV_cooperative_matrix2 supported by glslc
+-- GL_NV_cooperative_matrix_decode_vector supported by glslc
+-- GL_EXT_integer_dot_product supported by glslc
+-- GL_EXT_bfloat16 supported by glslc
+-- GL_EXT_float_e2m1 supported by glslc
+-- GL_EXT_float_e4m3 supported by glslc
+-- Including Vulkan backend
+-- ggml version: 0.24.0
+-- ggml commit:  b29c606e2
+-- Could NOT find OpenSSL, try to set the path to OpenSSL root folder in the system variable OPENSSL_ROOT_DIR (missing: OPENSSL_CRYPTO_LIBRARY OPENSSL_INCLUDE_DIR) 
+  OpenSSL not found, HTTPS support disabled
+-- Configuring done (22.7s)
+-- Generating done (2.5s)
+
+### Select-String -Path build-vulkan\CMakeCache.txt -Pattern '^(GGML_|LLAMA_|CMAKE_BUILD_TYPE|CMAKE_GENERATOR|CMAKE_CXX_COMPILER:)'   # lines with a user-profile path removed; CMAKE_BUILD_TYPE and CMAKE_CXX_COMPILER are absent because the Visual Studio generator is multi-config (Release chosen with --config Release)
+GGML_ACCELERATE:BOOL=ON
+GGML_ALL_WARNINGS_3RD_PARTY:BOOL=OFF
+GGML_AVX:BOOL=OFF
+GGML_AVX2:BOOL=OFF
+GGML_AVX512:BOOL=OFF
+GGML_AVX512_BF16:BOOL=OFF
+GGML_AVX512_VBMI:BOOL=OFF
+GGML_AVX512_VNNI:BOOL=OFF
+GGML_AVX_VNNI:BOOL=OFF
+GGML_BACKEND_DIR:PATH=
+GGML_BACKEND_DL:BOOL=OFF
+GGML_BIN_INSTALL_DIR:PATH=bin
+GGML_BLAS:BOOL=OFF
+GGML_BLAS_VENDOR:STRING=Generic
+GGML_BMI2:BOOL=OFF
+GGML_BUILD_EXAMPLES:BOOL=OFF
+GGML_BUILD_TESTS:BOOL=OFF
+GGML_CCACHE:BOOL=ON
+GGML_CCACHE_FOUND:FILEPATH=GGML_CCACHE_FOUND-NOTFOUND
+GGML_CPU:BOOL=ON
+GGML_CPU_ALL_VARIANTS:BOOL=OFF
+GGML_CPU_ARM_ARCH:STRING=
+GGML_CPU_HBM:BOOL=OFF
+GGML_CPU_KLEIDIAI:BOOL=OFF
+GGML_CPU_POWERPC_CPUTYPE:STRING=
+GGML_CPU_REPACK:BOOL=ON
+GGML_CUDA:BOOL=OFF
+GGML_CUDA_COMPRESSION_MODE:STRING=size
+GGML_CUDA_FA:BOOL=ON
+GGML_CUDA_FA_ALL_QUANTS:BOOL=OFF
+GGML_CUDA_FA_QUANTS:STRING=q4_0-q4_0;q8_0-q8_0;f16-f16;bf16-bf16
+GGML_CUDA_FORCE_CUBLAS:BOOL=OFF
+GGML_CUDA_FORCE_MMQ:BOOL=OFF
+GGML_CUDA_GRAPHS:BOOL=ON
+GGML_CUDA_NCCL:BOOL=ON
+GGML_CUDA_NO_PEER_COPY:BOOL=OFF
+GGML_CUDA_NO_VMM:BOOL=OFF
+GGML_ET:BOOL=OFF
+GGML_ET_SYSEMU:BOOL=OFF
+GGML_GPROF:BOOL=OFF
+GGML_HEXAGON:BOOL=OFF
+GGML_HIP:BOOL=OFF
+GGML_HIP_EXPORT_METRICS:BOOL=OFF
+GGML_HIP_GRAPHS:BOOL=ON
+GGML_HIP_MMQ_MFMA:BOOL=ON
+GGML_HIP_NO_VMM:BOOL=ON
+GGML_HIP_RCCL:BOOL=OFF
+GGML_INCLUDE_INSTALL_DIR:PATH=include
+GGML_LASX:BOOL=ON
+GGML_LIB_INSTALL_DIR:PATH=lib
+GGML_LLAMAFILE:BOOL=ON
+GGML_LSX:BOOL=ON
+GGML_LTO:BOOL=OFF
+GGML_METAL:BOOL=OFF
+GGML_METAL_EMBED_LIBRARY:BOOL=OFF
+GGML_METAL_MACOSX_VERSION_MIN:STRING=
+GGML_METAL_NDEBUG:BOOL=OFF
+GGML_METAL_SHADER_DEBUG:BOOL=OFF
+GGML_METAL_STD:STRING=
+GGML_METAL_TARGET_OS:STRING=macos
+GGML_MUSA:BOOL=OFF
+GGML_MUSA_GRAPHS:BOOL=OFF
+GGML_MUSA_MUDNN_COPY:BOOL=OFF
+GGML_NATIVE:BOOL=ON
+GGML_OPENCL:BOOL=OFF
+GGML_OPENCL_EMBED_KERNELS:BOOL=ON
+GGML_OPENCL_PROFILING:BOOL=OFF
+GGML_OPENCL_TARGET_VERSION:STRING=300
+GGML_OPENCL_USE_ADRENO_KERNELS:BOOL=ON
+GGML_OPENMP:BOOL=ON
+GGML_OPENMP_FETCH:BOOL=OFF
+GGML_OPENVINO:BOOL=OFF
+GGML_RPC:BOOL=OFF
+GGML_RVV:BOOL=ON
+GGML_RV_ZFH:BOOL=ON
+GGML_RV_ZICBOP:BOOL=ON
+GGML_RV_ZIHINTPAUSE:BOOL=ON
+GGML_RV_ZVFBFWMA:BOOL=OFF
+GGML_RV_ZVFH:BOOL=ON
+GGML_SANITIZE_ADDRESS:BOOL=OFF
+GGML_SANITIZE_THREAD:BOOL=OFF
+GGML_SANITIZE_UNDEFINED:BOOL=OFF
+GGML_SCCACHE_FOUND:FILEPATH=GGML_SCCACHE_FOUND-NOTFOUND
+GGML_SCHED_MAX_COPIES:STRING=4
+GGML_SCHED_NO_REALLOC:BOOL=OFF
+GGML_SSE42:BOOL=OFF
+GGML_STATIC:BOOL=OFF
+GGML_SYCL:BOOL=OFF
+GGML_SYCL_DEVICE_ARCH:STRING=
+GGML_SYCL_DNN:BOOL=ON
+GGML_SYCL_F16:BOOL=OFF
+GGML_SYCL_GRAPH:BOOL=ON
+GGML_SYCL_HOST_MEM_FALLBACK:BOOL=ON
+GGML_SYCL_SUPPORT_LEVEL_ZERO_API:BOOL=ON
+GGML_SYCL_TARGET:STRING=INTEL
+GGML_VIRTGPU:BOOL=OFF
+GGML_VIRTGPU_BACKEND:BOOL=OFF
+GGML_VULKAN:BOOL=ON
+GGML_VULKAN_CHECK_RESULTS:BOOL=OFF
+GGML_VULKAN_DEBUG:BOOL=OFF
+GGML_VULKAN_MEMORY_DEBUG:BOOL=OFF
+GGML_VULKAN_RUN_TESTS:BOOL=OFF
+GGML_VULKAN_SHADERS_GEN_TOOLCHAIN:FILEPATH=
+GGML_VULKAN_SHADER_DEBUG_INFO:BOOL=OFF
+GGML_VULKAN_VALIDATE:BOOL=OFF
+GGML_VXE:BOOL=ON
+GGML_WEBGPU:BOOL=OFF
+GGML_WEBGPU_CPU_PROFILE:BOOL=OFF
+GGML_WEBGPU_DEBUG:BOOL=OFF
+GGML_WEBGPU_GPU_PROFILE:BOOL=OFF
+GGML_WEBGPU_JSPI:BOOL=ON
+GGML_XTHEADVECTOR:BOOL=OFF
+GGML_ZDNN:BOOL=OFF
+GGML_ZENDNN:BOOL=OFF
+LLAMA_ALL_WARNINGS:BOOL=ON
+LLAMA_ALL_WARNINGS_3RD_PARTY:BOOL=OFF
+LLAMA_BIN_INSTALL_DIR:PATH=bin
+LLAMA_BUILD_APP:BOOL=ON
+LLAMA_BUILD_COMMON:BOOL=ON
+LLAMA_BUILD_EXAMPLES:BOOL=ON
+LLAMA_BUILD_IS_DEV:BOOL=ON
+LLAMA_BUILD_MTMD:BOOL=OFF
+LLAMA_BUILD_SERVER:BOOL=ON
+LLAMA_BUILD_TESTS:BOOL=ON
+LLAMA_BUILD_TOOLS:BOOL=ON
+LLAMA_BUILD_UI:BOOL=OFF
+LLAMA_FATAL_WARNINGS:BOOL=OFF
+LLAMA_INCLUDE_INSTALL_DIR:PATH=include
+LLAMA_LIB_INSTALL_DIR:PATH=lib
+LLAMA_LLGUIDANCE:BOOL=OFF
+LLAMA_OPENSSL:BOOL=ON
+LLAMA_SANITIZE_ADDRESS:BOOL=OFF
+LLAMA_SANITIZE_THREAD:BOOL=OFF
+LLAMA_SANITIZE_UNDEFINED:BOOL=OFF
+LLAMA_SUBPROCESS:BOOL=ON
+LLAMA_TESTS_INSTALL:BOOL=ON
+LLAMA_TOOLS_INSTALL:BOOL=ON
+LLAMA_UI_GZIP:BOOL=ON
+LLAMA_UI_HF_BUCKET:STRING=ggml-org/llama-ui
+LLAMA_USE_PREBUILT_UI:BOOL=ON
+LLAMA_USE_SYSTEM_GGML:BOOL=OFF
+LLAMA_WASM_MEM64:BOOL=ON
+Vulkan_GLSLANG_VALIDATOR_EXECUTABLE:FILEPATH=C:/VulkanSDK/1.4.363.0/Bin/glslangValidator.exe
+Vulkan_GLSLC_EXECUTABLE:FILEPATH=C:/VulkanSDK/1.4.363.0/Bin/glslc.exe
+Vulkan_INCLUDE_DIR:PATH=C:/VulkanSDK/1.4.363.0/include
+Vulkan_LIBRARY:FILEPATH=C:/VulkanSDK/1.4.363.0/Lib/vulkan-1.lib
+ggml_IS_TOP_LEVEL:STATIC=OFF
+CMAKE_GENERATOR:INTERNAL=Visual Studio 17 2022
+CMAKE_GENERATOR_INSTANCE:INTERNAL=C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools
+CMAKE_GENERATOR_PLATFORM:INTERNAL=
+CMAKE_GENERATOR_TOOLSET:INTERNAL=
+GGML_AVAILABLE_BACKENDS:INTERNAL=ggml-cpu;ggml-vulkan
+GGML_CUDA_COMPRESSION_MODE-STRINGS:INTERNAL=none;speed;balance;size
+GGML_OPENMP_ENABLED:INTERNAL=ON
+Vulkan_GLSLANG_VALIDATOR_EXECUTABLE-ADVANCED:INTERNAL=1
+Vulkan_GLSLC_EXECUTABLE-ADVANCED:INTERNAL=1
+Vulkan_INCLUDE_DIR-ADVANCED:INTERNAL=1
+Vulkan_LIBRARY-ADVANCED:INTERNAL=1
+
+### cmake --build build-vulkan --config Release -j 16 --target llama-bench   # rc=0; last lines, working-directory prefix shortened to <native-bench>
+  Building Custom Rule <native-bench>\llama.cpp/tools/llama-bench/CMakeLists.txt
+  main.cpp
+  llama-bench.vcxproj -> <native-bench>\llama.cpp\build-vulkan\bin\Release\llama-bench.exe
+
+### .\build-cpu\bin\Release\llama-bench.exe --help
+usage: .\build-cpu\bin\Release\llama-bench.exe [options]
+
+options:
+  -h, --help
+  --numa <distribute|isolate|numactl>         numa mode (default: disabled)
+  -r, --repetitions <n>                       number of times to repeat each test (default: 5)
+  --prio <-1|0|1|2|3>                         process/thread priority (default: 0)
+  --delay <0...N> (seconds)                   delay between each test (default: 0)
+  -o, --output <csv|json|jsonl|md|sql>        output format printed to stdout (default: md)
+  -oe, --output-err <csv|json|jsonl|md|sql>   output format printed to stderr (default: none)
+  --list-devices                              list available devices and exit
+  -v, --verbose                               verbose output
+  --progress                                  print test progress indicators
+  --no-warmup                                 skip warmup runs before benchmarking
+  -fitt, --fit-target <MiB>                   fit model to device memory with this margin per device in MiB (default: off)
+  -fitc, --fit-ctx <n>                        minimum ctx size for --fit-target (default: 4096)
+
+test parameters:
+  -m, --model <filename>                            (default: models/7B/ggml-model-q4_0.gguf)
+  -hf, -hfr, --hf-repo <user>/<model>[:quant]       Hugging Face model repository; quant is optional, case-insensitive
+                                                    default to Q4_K_M, or falls back to the first file in the repo if Q4_K_M doesn't exist.
+                                                    example: ggml-org/GLM-4.7-Flash-GGUF:Q4_K_M
+                                                    (default: unused)
+  -hff, --hf-file <file>                            Hugging Face model file. If specified, it will override the quant in --hf-repo
+                                                    (default: unused)
+  -hft, --hf-token <token>                          Hugging Face access token
+                                                    (default: value from HF_TOKEN environment variable)
+  --offline                                         Offline mode: forces use of cache, prevents network access
+                                                    (default: disabled)
+  -p, --n-prompt <n>                                (default: 512)
+  -n, --n-gen <n>                                   (default: 128)
+  -pg <pp,tg>                                       (default: )
+  -d, --n-depth <n>                                 (default: 0)
+  -b, --batch-size <n>                              (default: 2048)
+  -ub, --ubatch-size <n>                            (default: 512)
+  -ctk, --cache-type-k <t>                          (default: f16)
+  -ctv, --cache-type-v <t>                          (default: f16)
+  -t, --threads <n>                                 (default: 8)
+  -C, --cpu-mask <hex,hex>                          (default: 0x0)
+  --cpu-strict <0|1>                                (default: 0)
+  --poll <0...100>                                  (default: 50)
+  -ngl, --n-gpu-layers <n>                          (default: -1)
+  -ncmoe, --n-cpu-moe <n>                           (default: 0)
+  -sm, --split-mode <none|layer|row|tensor>         (default: layer)
+  -mg, --main-gpu <i>                               (default: 0)
+  -nkvo, --no-kv-offload <0|1>                      (default: 0)
+  -fa, --flash-attn <on|off|auto>                   (default: auto)
+  -dev, --device <dev0/dev1/...>                    (default: auto)
+  -lm, --load-mode <auto|none|mmap|mlock|mmap+mlock|dio> (default: auto)
+  -lzm, --lazy-mode <on|auto|off>                   (default: auto)
+  -embd, --embeddings <0|1>                         (default: 0)
+  -ts, --tensor-split <ts0/ts1/..>                  (default: 0)
+  -ot --override-tensor <tensor name pattern>=<buffer type>;...
+                                                    (default: disabled)
+  -nopo, --no-op-offload <0|1>                      (default: 0)
+  --no-host <0|1>                                   (default: 0)
+
+Multiple values can be given for each parameter by separating them with ','
+or by specifying the parameter multiple times. Ranges can be given as
+'first-last' or 'first-last+step' or 'first-last*mult'.
+
+### vulkaninfo --summary
+### vulkaninfo --summary (Vulkan SDK 1.4.363.0 Bin\vulkaninfoSDK.exe; deviceUUID/driverUUID/deviceLUID lines removed)
+vulkaninfoSDK.exe : ERROR: [Loader Message] Code 0 : loader_get_json: Failed to open JSON file C:\Program 
+Files\Rockstar Games\Social Club\SocialClubVulkanLayer.json
+At line:1 char:362
++ ... \1.4.363.0\Bin\vulkaninfoSDK.exe'; $t = & $exe --summary 2>&1 | Out-S ...
++                                             ~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ERROR: [Loader ...ulkanLayer.json:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING: [Loader Message] Code 0 : Layer VK_LAYER_RTSS uses API version 1.3 which is older than the application 
+specified API version of 1.4. May cause issues.
+==========
+VULKANINFO
+==========
+
+Vulkan Instance Version: 1.4.363
+
+
+Instance Extensions: count = 13
+-------------------------------
+VK_EXT_debug_report                    : extension revision 10
+VK_EXT_debug_utils                     : extension revision 2
+VK_EXT_swapchain_colorspace            : extension revision 5
+VK_KHR_device_group_creation           : extension revision 1
+VK_KHR_external_fence_capabilities     : extension revision 1
+VK_KHR_external_memory_capabilities    : extension revision 1
+VK_KHR_external_semaphore_capabilities : extension revision 1
+VK_KHR_get_physical_device_properties2 : extension revision 2
+VK_KHR_get_surface_capabilities2       : extension revision 1
+VK_KHR_portability_enumeration         : extension revision 1
+VK_KHR_surface                         : extension revision 25
+VK_KHR_win32_surface                   : extension revision 6
+VK_LUNARG_direct_driver_loading        : extension revision 1
+
+Instance Layers: count = 13
+---------------------------
+VK_LAYER_AMD_switchable_graphics  AMD switchable graphics layer                                                                                     1.4.315  version 1
+VK_LAYER_KHRONOS_profiles         Khronos Profiles layer                                                                                            1.4.363  version 1
+VK_LAYER_KHRONOS_shader_object    Khronos Shader object layer                                                                                       1.4.363  version 1
+VK_LAYER_KHRONOS_synchronization2 Khronos Synchronization2 layer                                                                                    1.4.363  version 1
+VK_LAYER_KHRONOS_validation       Khronos Validation Layer                                                                                          1.4.363  version 1
+VK_LAYER_LUNARG_api_dump          LunarG API dump layer                                                                                             1.4.363  version 2
+VK_LAYER_LUNARG_crash_diagnostic  Crash Diagnostic Layer is a crash/hang debugging tool that helps determines GPU progress in a Vulkan application. 1.4.360  version 1
+VK_LAYER_LUNARG_gfxreconstruct    GFXReconstruct Capture Layer Version 1.0.5                                                                        1.4.363  version 4194309
+VK_LAYER_LUNARG_monitor           Execution Monitoring Layer                                                                                        1.4.363  version 1
+VK_LAYER_LUNARG_screenshot        LunarG image capture layer                                                                                        1.4.363  version 1
+VK_LAYER_RTSS                     RTSS overlay hook bootstrap                                                                                       1.3.224  version 1
+VK_LAYER_VALVE_steam_fossilize    Steam Pipeline Caching Layer                                                                                      1.4.303  version 1
+VK_LAYER_VALVE_steam_overlay      Steam Overlay Layer                                                                                               1.3.207  version 1
+
+Devices:
+========
+GPU0:
+	apiVersion         = 1.4.315
+	driverVersion      = 2.0.353
+	vendorID           = 0x1002
+	deviceID           = 0x13c0
+	deviceType         = PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU
+	deviceName         = AMD Radeon(TM) Graphics
+	driverID           = DRIVER_ID_AMD_PROPRIETARY
+	driverName         = AMD proprietary driver
+	driverInfo         = 26.8.1 (AMD proprietary shader compiler)
+	conformanceVersion = 1.4.0.0
+
+## Step 4: setup, power, clock witness, smoke tests, display-driver check
+
+### Get-Process | Sort-Object CPU -Descending | Select-Object -First 15 (immediately before the orchestrator started)
+### 2026-10-01T01:16:24.0360765Z  Get-Process chrome, msedge, firefox -> 0 processes
+### Get-Process | Sort-Object CPU -Descending | Select-Object -First 15 Name, CPU, WorkingSet64
+
+Name                          CPU WorkingSet64
+----                          --- ------------
+HYTE.Nexus.Service      148.96875    113807360
+explorer                78.703125    591106048
+claude                    57.9375    576684032
+claude                     42.875    245420032
+claude                  42.546875    254955520
+AUEPMaster              40.515625     21999616
+MSIAfterburner          24.203125      7712768
+DCv2                     23.15625    110018560
+HYTE Nexus                 21.875     42606592
+NortonUI                  16.0625     47198208
+claude                  12.234375    287805440
+HYTE Nexus                 8.8125     56508416
+StartMenuExperienceHost    7.9375    232501248
+svchost                  7.703125     47616000
+nvcontainer                 7.625     84123648
+
+### Power plan (powercfg)
+### before (powercfg /getactivescheme) 2026-10-01T01:16:41.6427116Z
+Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+
+### powercfg /setactive SCHEME_MIN; powercfg /getactivescheme 2026-10-01T01:16:41.6427116Z
+Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance)
+
+### powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e; powercfg /getactivescheme 2026-10-01T01:57:56.7081120Z
+Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+
+### Keep-awake
+The brief's snippet, run in the orchestrator, failed in Windows PowerShell 5.1: [Win32.Power]::SetThreadExecutionState(0x80000003) -> Cannot convert argument "esFlags", with value: "-2147483645", for "SetThreadExecutionState" to type "System.UInt32": "Cannot convert value "-2147483645" to type "System.UInt32". Error: "Value was either too large or too small for a UInt32."" (the hex literal parses as a negative Int32; text reproduced after the run, since the orchestrator's error stream was not captured), so it had no effect, and the closing call with 0x80000000 failed the same way. A helper process then held the same flags with [uint32] arguments until the orchestrator exited:
+2026-10-01T01:17:23.4918509Z  SetThreadExecutionState([uint32]0x80000003) returned 2147483648 (previous state; 0 = failure) while watching orchestrator pid
+2026-10-01T01:57:59.7635105Z  orchestrator exited; SetThreadExecutionState([uint32]0x80000000) returned 2147483651
+
+### Clock witness: Get-Counter '\Processor Information(_Total)\% Processor Performance','\Processor Information(_Total)\Processor Frequency' -SampleInterval 1 -MaxSamples 3, before each model in each section
+### 2026-10-01T01:16:43.5500877Z  4a smollm2-135m
+2026-10-01T01:16:45.0424971Z  \processor information(_total)\% processor performance  108.02
+2026-10-01T01:16:45.0424971Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:16:46.0563275Z  \processor information(_total)\% processor performance  110.18
+2026-10-01T01:16:46.0563275Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:16:47.0606674Z  \processor information(_total)\% processor performance  108.98
+2026-10-01T01:16:47.0606674Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-01T01:20:47.5507449Z  4a qwen3-0.6b
+2026-10-01T01:20:48.5572356Z  \processor information(_total)\% processor performance  84.06
+2026-10-01T01:20:48.5572356Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:20:49.5675901Z  \processor information(_total)\% processor performance  84.36
+2026-10-01T01:20:49.5675901Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:20:50.5680033Z  \processor information(_total)\% processor performance  85.77
+2026-10-01T01:20:50.5680033Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-01T01:25:41.4712853Z  4a llama-3.2-1b
+2026-10-01T01:25:42.4809853Z  \processor information(_total)\% processor performance  85.87
+2026-10-01T01:25:42.4809853Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:25:43.4892756Z  \processor information(_total)\% processor performance  86.17
+2026-10-01T01:25:43.4892756Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:25:44.4992532Z  \processor information(_total)\% processor performance  85.64
+2026-10-01T01:25:44.4992532Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-01T01:31:43.9363753Z  4a gemma-4-e2b
+2026-10-01T01:31:44.9434259Z  \processor information(_total)\% processor performance  85.83
+2026-10-01T01:31:44.9434259Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:31:45.9571524Z  \processor information(_total)\% processor performance  84.34
+2026-10-01T01:31:45.9571524Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:31:46.9695360Z  \processor information(_total)\% processor performance  83.41
+2026-10-01T01:31:46.9695360Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-01T01:40:53.2450788Z  4b smollm2-135m
+2026-10-01T01:40:54.2532939Z  \processor information(_total)\% processor performance  84.03
+2026-10-01T01:40:54.2532939Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:40:55.2596620Z  \processor information(_total)\% processor performance  82.39
+2026-10-01T01:40:55.2596620Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:40:56.2709415Z  \processor information(_total)\% processor performance  83.97
+2026-10-01T01:40:56.2709415Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-01T01:43:26.1734960Z  4b qwen3-0.6b
+2026-10-01T01:43:27.1883536Z  \processor information(_total)\% processor performance  83.67
+2026-10-01T01:43:27.1883536Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:43:28.1994458Z  \processor information(_total)\% processor performance  84.94
+2026-10-01T01:43:28.1994458Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:43:29.2066487Z  \processor information(_total)\% processor performance  85.94
+2026-10-01T01:43:29.2066487Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-01T01:46:27.9564203Z  4b llama-3.2-1b
+2026-10-01T01:46:28.9693431Z  \processor information(_total)\% processor performance  83.92
+2026-10-01T01:46:28.9693431Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:46:29.9793343Z  \processor information(_total)\% processor performance  84.68
+2026-10-01T01:46:29.9793343Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:46:30.9899861Z  \processor information(_total)\% processor performance  83.36
+2026-10-01T01:46:30.9899861Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-01T01:50:04.5804377Z  4b gemma-4-e2b
+2026-10-01T01:50:05.5867000Z  \processor information(_total)\% processor performance  84.51
+2026-10-01T01:50:05.5867000Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:50:06.5991368Z  \processor information(_total)\% processor performance  84.37
+2026-10-01T01:50:06.5991368Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:50:07.6082563Z  \processor information(_total)\% processor performance  87.62
+2026-10-01T01:50:07.6082563Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-01T01:55:48.6847000Z  4c bge-small-en
+2026-10-01T01:55:49.6981704Z  \processor information(_total)\% processor performance  87.63
+2026-10-01T01:55:49.6981704Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:55:50.7077586Z  \processor information(_total)\% processor performance  89.45
+2026-10-01T01:55:50.7077586Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:55:51.7202113Z  \processor information(_total)\% processor performance  85.72
+2026-10-01T01:55:51.7202113Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-01T01:57:56.7186729Z  final (after restoring the power plan)
+2026-10-01T01:57:57.7193811Z  \processor information(_total)\% processor performance  99.81
+2026-10-01T01:57:57.7193811Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:57:58.7291142Z  \processor information(_total)\% processor performance  85.15
+2026-10-01T01:57:58.7291142Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-01T01:57:59.7395583Z  \processor information(_total)\% processor performance  82.67
+2026-10-01T01:57:59.7395583Z  \processor information(_total)\processor frequency  4,700.00
+
+### Smoke tests (not measurements), run from inside models
+### smoke cpu 2026-10-01T01:16:42.0343610Z: ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m SmolLM2-135M-Instruct-Q4_K_M.gguf -p 16 -n 8 -r 1  [exit 0]
+--- stderr ---
+
+--- stdout ---
+| model                          |       size |     params | backend    | threads |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | --------------: | -------------------: |
+| llama 256M Q4_K - Medium       |  98.87 MiB |   134.52 M | CPU        |       8 |            pp16 |       1678.82 ± 0.00 |
+| llama 256M Q4_K - Medium       |  98.87 MiB |   134.52 M | CPU        |       8 |             tg8 |        422.77 ± 0.00 |
+
+build: b29c606e2 (10964)
+
+### smoke vulkan 2026-10-01T01:16:43.5328575Z: ..\llama.cpp\build-vulkan\bin\Release\llama-bench.exe -m SmolLM2-135M-Instruct-Q4_K_M.gguf -p 16 -n 8 -r 1 -ngl 99  [exit 0]
+--- stderr ---
+ggml_vulkan: Found 1 Vulkan devices:
+ggml_vulkan: 0 = AMD Radeon(TM) Graphics (AMD proprietary driver) | uma: 1 | fp16: 1 | bf16: 0 | fp4: 0 | warp size: 32 | shared memory: 32768 | int dot: 1 | matrix cores: none
+
+--- stdout ---
+| model                          |       size |     params | backend    | ngl |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | --------------: | -------------------: |
+| llama 256M Q4_K - Medium       |  98.87 MiB |   134.52 M | Vulkan     |  99 |            pp16 |        550.14 ± 0.00 |
+| llama 256M Q4_K - Medium       |  98.87 MiB |   134.52 M | Vulkan     |  99 |             tg8 |         91.34 ± 0.00 |
+
+build: b29c606e2 (10964)
+
+
+(The +/- sign in this log was re-encoded once by the capture script, reading UTF-8 as the ANSI code page; it was repaired by replacing the resulting two-character sequence with the original sign. Nothing else changed.)
+
+### Display-driver event check
+### Get-WinEvent System log since session start (2026-10-01T00:59:46.4938766Z), ProviderName -match 'amdkmdag|Display', checked 2026-10-01T01:55:48.6822332Z
+none
+
