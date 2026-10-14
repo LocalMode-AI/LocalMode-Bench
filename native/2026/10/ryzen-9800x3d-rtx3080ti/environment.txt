@@ -1,0 +1,1970 @@
+# environment.txt: native baseline for the LocalMode Bench methodology, AMD Ryzen 7 9800X3D with an NVIDIA GeForce RTX 3080 Ti
+# Raw command output. Redactions: user-profile paths shortened (to <home> or to the bare file name), the PCI bus id in plain nvidia-smi output replaced by <pci-bus-id>, UUID / Serial / Board ID / LUID lines dropped. Shell: Windows PowerShell 5.1 (pwsh not installed).
+
+## Step 1: environment (captured before measuring)
+
+### (Get-Date).ToUniversalTime().ToString('o')  # Windows PowerShell 5.1 (pwsh not installed)
+2026-10-14T04:59:05.0042913Z
+
+### $PSVersionTable.PSVersion
+5.1.26100.9711
+
+### Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, BuildNumber, OSArchitecture
+
+
+Caption        : Microsoft Windows 11 Pro
+Version        : 10.0.26200
+BuildNumber    : 26200
+OSArchitecture : 64-bit
+
+### Get-ItemProperty 'HKLWindows NT\CurrentVersion' | Select-Object DisplayVersion, CurrentBuild, UBR
+
+
+DisplayVersion : 25H2
+CurrentBuild   : 26200
+UBR            : 9711
+
+### Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed, L2CacheSize, L3CacheSize
+
+
+Name                      : AMD Ryzen 7 9800X3D 8-Core Processor           
+NumberOfCores             : 8
+NumberOfLogicalProcessors : 16
+MaxClockSpeed             : 4700
+L2CacheSize               : 8192
+L3CacheSize               : 98304
+
+### [Environment]::ProcessorCount
+16
+
+### (Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory
+102602493952
+
+### Get-CimInstance Win32_VideoController | Select-Object Name, DriverVersion, DriverDate, VideoProcessor, AdapterRAM
+
+
+Name           : NVIDIA GeForce RTX 3080 Ti
+DriverVersion  : 32.0.16.1742
+DriverDate     : 9/29/2026 7:00:00 PM
+VideoProcessor : NVIDIA GeForce RTX 3080 Ti
+AdapterRAM     : 4293918720
+
+### Get-PnpDevice -Class Display | Select-Object FriendlyName, Status, Present
+
+FriendlyName               Status  Present
+------------               ------  -------
+AMD Radeon(TM) Graphics    Unknown   False
+NVIDIA GeForce RTX 3080 Ti OK         True
+
+### Get-ItemProperty 'HKLGraphicsDrivers' -Name HwSchMode -ErrorAction SilentlyContinue | Select-Object HwSchMode
+HwSchMode value absent (Windows default)
+
+### Get-CimInstance Win32_Battery
+(no output: no battery present; desktop on mains power)
+
+### powercfg /getactivescheme
+Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+
+### powercfg /list
+
+Existing Power Schemes (* Active)
+-----------------------------------
+Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced) *
+Power Scheme GUID: <generated>  (Ultimate Performance)
+Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance)
+Power Scheme GUID: a1841308-3541-4fab-bc81-f71556f20b4a  (Power saver)
+
+### Get-Counter '\Processor Information(_Total)\% Processor Performance','\Processor Information(_Total)\Processor Frequency' -SampleInterval 1 -MaxSamples 3
+2026-10-14T04:59:08.4417360Z  \processor information(_total)\% processor performance  84.98
+2026-10-14T04:59:08.4417360Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-14T04:59:09.4664542Z  \processor information(_total)\% processor performance  84.07
+2026-10-14T04:59:09.4664542Z  \processor information(_total)\processor frequency  4,700.00
+2026-10-14T04:59:10.4792037Z  \processor information(_total)\% processor performance  84.11
+2026-10-14T04:59:10.4792037Z  \processor information(_total)\processor frequency  4,700.00
+
+### nvidia-smi  # run with the browsers closed; process paths reduced to the executable name
+Tue Oct 13 23:59:10 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 617.42                 KMD Version: 617.42        CUDA UMD Version: 13.4     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                  Driver-Model | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 3080 Ti   WDDM  |   <pci-bus-id>  On |                  N/A |
+|  0%   48C    P8             26W /  400W |    1097MiB /  12288MiB |      4%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A            1840    C+G   NVIDIA Overlay.exe      N/A      |
+|    0   N/A  N/A            2728    C+G   TextInputHost.exe      N/A      |
+|    0   N/A  N/A            5356    C+G   claude.exe      N/A      |
+|    0   N/A  N/A            7172    C+G   AMDRSSrcExt.exe      N/A      |
+|    0   N/A  N/A            7252    C+G   claude.exe      N/A      |
+|    0   N/A  N/A            8172    C+G   NVIDIA Overlay.exe      N/A      |
+|    0   N/A  N/A           11600    C+G   explorer.exe               N/A      |
+|    0   N/A  N/A           11728    C+G   ShellHost.exe      N/A      |
+|    0   N/A  N/A           12232    C+G   CrossDeviceResume.exe      N/A      |
+|    0   N/A  N/A           13100    C+G   SearchHost.exe      N/A      |
+|    0   N/A  N/A           13328    C+G   StartMenuExperienceHost.exe      N/A      |
+|    0   N/A  N/A           16116    C+G   LockApp.exe      N/A      |
+|    0   N/A  N/A           16916    C+G   msedgewebview2.exe      N/A      |
+|    0   N/A  N/A           20648    C+G   HYTE Nexus.exe      N/A      |
+|    0   N/A  N/A           21408    C+G   PhoneExperienceHost.exe      N/A      |
+|    0   N/A  N/A           24456    C+G   ShellExperienceHost.exe      N/A      |
+|    0   N/A  N/A           26004    C+G   DCv2.exe      N/A      |
+|    0   N/A  N/A           26676    C+G   explorer.exe               N/A      |
+|    0   N/A  N/A           27260    C+G   ApplicationFrameHost.exe      N/A      |
+|    0   N/A  N/A           27464    C+G   SystemSettings.exe      N/A      |
++-----------------------------------------------------------------------------------------+
+
+### nvidia-smi --query-gpu=name,driver_version,vbios_version,pci.device_id,memory.total,compute_cap,pstate,clocks.gr,clocks.sm,clocks.mem,clocks.max.gr,clocks.max.mem,power.draw,power.limit,enforced.power.limit,power.default_limit,power.max_limit,temperature.gpu,fan.speed,pcie.link.gen.current,pcie.link.gen.max,pcie.link.width.current,pcie.link.width.max --format=csv
+name, driver_version, vbios_version, pci.device_id, memory.total [MiB], compute_cap, pstate, clocks.current.graphics [MHz], clocks.current.sm [MHz], clocks.current.memory [MHz], clocks.max.graphics [MHz], clocks.max.memory [MHz], power.draw [W], power.limit [W], enforced.power.limit [W], power.default_limit [W], power.max_limit [W], temperature.gpu, fan.speed [%], pcie.link.gen.current, pcie.link.gen.max, pcie.link.width.current, pcie.link.width.max
+NVIDIA GeForce RTX 3080 Ti, 617.42, 94.02.71.80.74, 0x220810DE, 12288 MiB, 8.6, P8, 210 MHz, 210 MHz, 405 MHz, 2100 MHz, 9501 MHz, 26.67 W, 400.00 W, 400.00 W, 400.00 W, 450.00 W, 48, 0 %, 1, 4, 8, 16
+
+### nvidia-smi -q -d PERFORMANCE,CLOCK,POWER,TEMPERATURE  # UUID / Serial / Board ID lines dropped
+
+==============NVSMI LOG==============
+
+Timestamp                                              : Tue Oct 13 23:59:10 2026
+Driver Version                                         : 617.42 [Deprecated; will be removed in CUDA 14.0. Use KMD Version instead]
+CUDA Version                                           : 13.4 [Deprecated; will be removed in CUDA 14.0. Use CUDA UMD Version instead]
+KMD Version                                            : 617.42
+CUDA UMD Version                                       : 13.4
+
+Attached GPUs                                          : 1
+GPU <pci-bus-id>
+    Performance State                                  : P8
+    Clocks Event Reasons
+        Idle                                           : Active
+        Applications Clocks Setting                    : Not Active
+        SW Power Cap                                   : Not Active
+        HW Slowdown                                    : Not Active
+            HW Thermal Slowdown                        : Not Active
+            HW Power Brake Slowdown                    : Not Active
+        Sync Boost                                     : Not Active
+        SW Thermal Slowdown                            : Not Active
+        Display Clock Setting                          : Not Active
+        Board Limit                                    : Not Active
+        Reliability                                    : Not Active
+    Clocks Event Reasons Counters
+        SW Power Capping                               : 301344741 us
+        Sync Boost                                     : 0 us
+        SW Thermal Slowdown                            : 0 us
+        HW Thermal Slowdown                            : 0 us
+        HW Power Braking                               : 0 us
+    Sparse Operation Mode                              : N/A
+    Temperature
+        GPU Current Temp                               : 48 C
+        GPU Current Max Temp                           : N/A
+        GPU Current T.Limit Temp                       : N/A
+        GPU Shutdown Temp                              : 98 C
+        GPU Slowdown Temp                              : 95 C
+        GPU Max Operating Temp                         : 93 C
+        GPU Target Temperature Specification           : 83 C
+        Memory Current Temp                            : N/A
+        Memory Max Operating Temp                      : N/A
+    GPU Power Readings
+        Average Power Draw                             : 26.67 W
+        Instantaneous Power Draw                       : 26.23 W
+        GPU Ceiling Power Limit
+            Current Power Limit                        : 400.00 W
+            Requested Power Limit                      : 400.00 W
+            Default Power Limit                        : 400.00 W
+        GPU Base Power
+            Current Base Power                         : N/A
+            Requested Base Power                       : N/A
+            Default Base Power                         : N/A
+            Adaptive TGP Adjusted Base Power           : N/A
+        Min Power Limit                                : 100.00 W
+        Max Power Limit                                : 450.00 W
+    Power Samples
+        Duration                                       : 2.89 sec
+        Number of Samples                              : 119
+        Max                                            : 31.68 W
+        Min                                            : 24.84 W
+        Avg                                            : 26.75 W
+    GPU Memory Power Readings 
+        Average Power Draw                             : N/A
+        Instantaneous Power Draw                       : N/A
+    Module Power Readings
+        Average Power Draw                             : N/A
+        Instantaneous Power Draw                       : N/A
+        Current Power Limit                            : N/A
+        Requested Power Limit                          : N/A
+        Default Power Limit                            : N/A
+        Min Power Limit                                : N/A
+        Max Power Limit                                : N/A
+    EDPp Multiplier                                    : N/A
+    Clocks
+        Graphics                                       : 210 MHz
+        SM                                             : 210 MHz
+        Memory                                         : 405 MHz
+        Video                                          : 555 MHz
+    Applications Clocks
+        Graphics                                       : Requested functionality has been deprecated
+        Memory                                         : Requested functionality has been deprecated
+    Default Applications Clocks
+        Graphics                                       : Requested functionality has been deprecated
+        Memory                                         : Requested functionality has been deprecated
+    Deferred Clocks
+        Memory                                         : N/A
+    Max Clocks
+        Graphics                                       : 2100 MHz
+        SM                                             : 2100 MHz
+        Memory                                         : 9501 MHz
+        Video                                          : 1950 MHz
+    Max Customer Boost Clocks
+        Graphics                                       : N/A
+    SM Clock Samples
+        Duration                                       : Not Found
+        Number of Samples                              : Not Found
+        Max                                            : Not Found
+        Min                                            : Not Found
+        Avg                                            : Not Found
+    Memory Clock Samples
+        Duration                                       : Not Found
+        Number of Samples                              : Not Found
+        Max                                            : Not Found
+        Min                                            : Not Found
+        Avg                                            : Not Found
+    Clock Policy
+        Auto Boost                                     : N/A
+        Auto Boost Default                             : N/A
+    DLA Clocks
+        Engine                                         : N/A
+        Max Engine                                     : N/A
+
+### Get-ChildItem env: | Where-Object Name -match '^(GGML|CUDA|LLAMA)' | Select-Object Name, Value
+(no output: no GGML*, CUDA* or LLAMA* environment variables set)
+
+### git --version; cmake --version
+git version 2.55.0.windows.5
+cmake version 4.4.3
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+
+### Get-MpComputerStatus | Select-Object AntivirusEnabled, RealTimeProtectionEnabled, AMRunningMode  # Defender left on, no exclusions added
+
+
+AntivirusEnabled          : True
+RealTimeProtectionEnabled : True
+AMRunningMode             : Normal
+
+### Get-Process | Sort-Object CPU -Descending | Select-Object -First 15 Name, CPU, WorkingSet64  # load check at environment capture
+
+Name                           CPU WorkingSet64
+----                           --- ------------
+HYTE.Nexus.Service      115.015625    144834560
+claude                   46.046875    272670720
+AUEPMaster               42.140625     20885504
+claude                   39.703125    731746304
+explorer                  38.59375    401510400
+claude                   13.984375    167559168
+OneDrive                 13.359375    125489152
+nvcontainer                 12.125    100069376
+DCv2                      7.015625     97464320
+HYTE Nexus                    6.75    104161280
+NortonUI                   6.53125     56348672
+claude                     5.21875    272130048
+HYTE Nexus                 4.21875     52486144
+claude                     3.78125    208912384
+StartMenuExperienceHost   3.296875    210620416
+
+### Get-Process chrome, msedge, firefox -ErrorAction SilentlyContinue  # must be empty
+(no output: no browser process running)
+
+### Get-Process | Where-Object Name -match 'MSIAfterburner|RTSS|NVIDIA Overlay|HYTE'  # GPU tools / overlays
+
+Name                  Id
+----                  --
+HYTE Nexus         11028
+HYTE Nexus         20648
+HYTE Nexus         20956
+HYTE Nexus         21004
+HYTE.Nexus.Service 22300
+NVIDIA Overlay      1840
+NVIDIA Overlay      8172
+NVIDIA Overlay     12844
+NVIDIA Overlay     17756
+NVIDIA Overlay     27328
+RTSS               10800
+RTSSHooksLoader64  20600
+
+### session start (UTC), recorded before closing the browsers
+2026-10-14T04:57:21.8182843Z
+
+### process state at measurement launch (after RTSS was closed from an elevated prompt by the operator)
+### 2026-10-14T10:04:47.4383983Z  process state at measurement launch
+
+Name                      CPU WorkingSet64
+----                      --- ------------
+HYTE.Nexus.Service 1866.40625    121372672
+claude             113.078125    718372864
+claude             107.296875    179142656
+DCv2                   105.75     97054720
+OneDrive             98.53125    125743104
+claude               73.65625    279265280
+claude              68.546875    262217728
+explorer            64.671875    417329152
+AUEPMaster          62.265625     20439040
+claude              51.078125    203153408
+nvsphelper64        37.546875     19345408
+nvcontainer            29.625    109039616
+NortonUI               22.375     73166848
+NVIDIA Overlay         21.375    107974656
+NVIDIA Overlay          19.25    209080320
+
+
+GPU tools / overlays:
+
+Name              
+----              
+HYTE Nexus        
+HYTE Nexus        
+HYTE Nexus        
+HYTE Nexus        
+HYTE.Nexus.Service
+NVIDIA Overlay    
+NVIDIA Overlay    
+NVIDIA Overlay    
+NVIDIA Overlay    
+NVIDIA Overlay    
+
+
+browsers: 0 processes
+
+## Step 2a: CPU-only build (reused from 1 Oct)
+
+### git rev-parse HEAD
+b29c606e28a01b1bc8c1351026a0fa6e616bf6c4
+
+### git rev-list --count HEAD
+10964
+
+### git status --short
+(no output: clean)
+
+### Get-Item build-cpu\bin\Release\llama-bench.exe, build-vulkan\bin\Release\llama-bench.exe | Select-Object Name, Length, LastWriteTimeUtc
+
+Path                                     Length LastWriteTimeUtc            
+----                                     ------ ----------------            
+build-cpu\bin\Release\llama-bench.exe     10752 2026-10-01T01:13:46.9728723Z
+build-vulkan\bin\Release\llama-bench.exe  10752 2026-10-01T01:15:54.6022487Z
+
+### Select-String build-cpu\CMakeCache.txt -Pattern '^(GGML_|LLAMA_|CMAKE_BUILD_TYPE|CMAKE_GENERATOR|CMAKE_CXX_COMPILER:)'
+GGML_ACCELERATE:BOOL=ON
+GGML_ALL_WARNINGS_3RD_PARTY:BOOL=OFF
+GGML_AVX:BOOL=OFF
+GGML_AVX2:BOOL=OFF
+GGML_AVX512:BOOL=OFF
+GGML_AVX512_BF16:BOOL=OFF
+GGML_AVX512_VBMI:BOOL=OFF
+GGML_AVX512_VNNI:BOOL=OFF
+GGML_AVX_VNNI:BOOL=OFF
+GGML_BACKEND_DIR:PATH=
+GGML_BACKEND_DL:BOOL=OFF
+GGML_BIN_INSTALL_DIR:PATH=bin
+GGML_BLAS:BOOL=OFF
+GGML_BLAS_VENDOR:STRING=Generic
+GGML_BMI2:BOOL=OFF
+GGML_BUILD_EXAMPLES:BOOL=OFF
+GGML_BUILD_TESTS:BOOL=OFF
+GGML_CCACHE:BOOL=ON
+GGML_CCACHE_FOUND:FILEPATH=GGML_CCACHE_FOUND-NOTFOUND
+GGML_CPU:BOOL=ON
+GGML_CPU_ALL_VARIANTS:BOOL=OFF
+GGML_CPU_ARM_ARCH:STRING=
+GGML_CPU_HBM:BOOL=OFF
+GGML_CPU_KLEIDIAI:BOOL=OFF
+GGML_CPU_POWERPC_CPUTYPE:STRING=
+GGML_CPU_REPACK:BOOL=ON
+GGML_CUDA:BOOL=OFF
+GGML_CUDA_COMPRESSION_MODE:STRING=size
+GGML_CUDA_FA:BOOL=ON
+GGML_CUDA_FA_ALL_QUANTS:BOOL=OFF
+GGML_CUDA_FA_QUANTS:STRING=q4_0-q4_0;q8_0-q8_0;f16-f16;bf16-bf16
+GGML_CUDA_FORCE_CUBLAS:BOOL=OFF
+GGML_CUDA_FORCE_MMQ:BOOL=OFF
+GGML_CUDA_GRAPHS:BOOL=ON
+GGML_CUDA_NCCL:BOOL=ON
+GGML_CUDA_NO_PEER_COPY:BOOL=OFF
+GGML_CUDA_NO_VMM:BOOL=OFF
+GGML_ET:BOOL=OFF
+GGML_ET_SYSEMU:BOOL=OFF
+GGML_GPROF:BOOL=OFF
+GGML_HEXAGON:BOOL=OFF
+GGML_HIP:BOOL=OFF
+GGML_HIP_EXPORT_METRICS:BOOL=OFF
+GGML_HIP_GRAPHS:BOOL=ON
+GGML_HIP_MMQ_MFMA:BOOL=ON
+GGML_HIP_NO_VMM:BOOL=ON
+GGML_HIP_RCCL:BOOL=OFF
+GGML_INCLUDE_INSTALL_DIR:PATH=include
+GGML_LASX:BOOL=ON
+GGML_LIB_INSTALL_DIR:PATH=lib
+GGML_LLAMAFILE:BOOL=ON
+GGML_LSX:BOOL=ON
+GGML_LTO:BOOL=OFF
+GGML_METAL:BOOL=OFF
+GGML_METAL_EMBED_LIBRARY:BOOL=OFF
+GGML_METAL_MACOSX_VERSION_MIN:STRING=
+GGML_METAL_NDEBUG:BOOL=OFF
+GGML_METAL_SHADER_DEBUG:BOOL=OFF
+GGML_METAL_STD:STRING=
+GGML_METAL_TARGET_OS:STRING=macos
+GGML_MUSA:BOOL=OFF
+GGML_MUSA_GRAPHS:BOOL=OFF
+GGML_MUSA_MUDNN_COPY:BOOL=OFF
+GGML_NATIVE:BOOL=ON
+GGML_OPENCL:BOOL=OFF
+GGML_OPENCL_EMBED_KERNELS:BOOL=ON
+GGML_OPENCL_PROFILING:BOOL=OFF
+GGML_OPENCL_TARGET_VERSION:STRING=300
+GGML_OPENCL_USE_ADRENO_KERNELS:BOOL=ON
+GGML_OPENMP:BOOL=ON
+GGML_OPENMP_FETCH:BOOL=OFF
+GGML_OPENVINO:BOOL=OFF
+GGML_RPC:BOOL=OFF
+GGML_RVV:BOOL=ON
+GGML_RV_ZFH:BOOL=ON
+GGML_RV_ZICBOP:BOOL=ON
+GGML_RV_ZIHINTPAUSE:BOOL=ON
+GGML_RV_ZVFBFWMA:BOOL=OFF
+GGML_RV_ZVFH:BOOL=ON
+GGML_SANITIZE_ADDRESS:BOOL=OFF
+GGML_SANITIZE_THREAD:BOOL=OFF
+GGML_SANITIZE_UNDEFINED:BOOL=OFF
+GGML_SCCACHE_FOUND:FILEPATH=GGML_SCCACHE_FOUND-NOTFOUND
+GGML_SCHED_MAX_COPIES:STRING=4
+GGML_SCHED_NO_REALLOC:BOOL=OFF
+GGML_SSE42:BOOL=OFF
+GGML_STATIC:BOOL=OFF
+GGML_SYCL:BOOL=OFF
+GGML_SYCL_DEVICE_ARCH:STRING=
+GGML_SYCL_DNN:BOOL=ON
+GGML_SYCL_F16:BOOL=OFF
+GGML_SYCL_GRAPH:BOOL=ON
+GGML_SYCL_HOST_MEM_FALLBACK:BOOL=ON
+GGML_SYCL_SUPPORT_LEVEL_ZERO_API:BOOL=ON
+GGML_SYCL_TARGET:STRING=INTEL
+GGML_VIRTGPU:BOOL=OFF
+GGML_VIRTGPU_BACKEND:BOOL=OFF
+GGML_VULKAN:BOOL=OFF
+GGML_VULKAN_CHECK_RESULTS:BOOL=OFF
+GGML_VULKAN_DEBUG:BOOL=OFF
+GGML_VULKAN_MEMORY_DEBUG:BOOL=OFF
+GGML_VULKAN_RUN_TESTS:BOOL=OFF
+GGML_VULKAN_SHADERS_GEN_TOOLCHAIN:FILEPATH=
+GGML_VULKAN_SHADER_DEBUG_INFO:BOOL=OFF
+GGML_VULKAN_VALIDATE:BOOL=OFF
+GGML_VXE:BOOL=ON
+GGML_WEBGPU:BOOL=OFF
+GGML_WEBGPU_CPU_PROFILE:BOOL=OFF
+GGML_WEBGPU_DEBUG:BOOL=OFF
+GGML_WEBGPU_GPU_PROFILE:BOOL=OFF
+GGML_WEBGPU_JSPI:BOOL=ON
+GGML_XTHEADVECTOR:BOOL=OFF
+GGML_ZDNN:BOOL=OFF
+GGML_ZENDNN:BOOL=OFF
+LLAMA_ALL_WARNINGS:BOOL=ON
+LLAMA_ALL_WARNINGS_3RD_PARTY:BOOL=OFF
+LLAMA_BIN_INSTALL_DIR:PATH=bin
+LLAMA_BUILD_APP:BOOL=ON
+LLAMA_BUILD_COMMON:BOOL=ON
+LLAMA_BUILD_EXAMPLES:BOOL=ON
+LLAMA_BUILD_IS_DEV:BOOL=ON
+LLAMA_BUILD_MTMD:BOOL=OFF
+LLAMA_BUILD_SERVER:BOOL=ON
+LLAMA_BUILD_TESTS:BOOL=ON
+LLAMA_BUILD_TOOLS:BOOL=ON
+LLAMA_BUILD_UI:BOOL=OFF
+LLAMA_FATAL_WARNINGS:BOOL=OFF
+LLAMA_INCLUDE_INSTALL_DIR:PATH=include
+LLAMA_LIB_INSTALL_DIR:PATH=lib
+LLAMA_LLGUIDANCE:BOOL=OFF
+LLAMA_OPENSSL:BOOL=ON
+LLAMA_SANITIZE_ADDRESS:BOOL=OFF
+LLAMA_SANITIZE_THREAD:BOOL=OFF
+LLAMA_SANITIZE_UNDEFINED:BOOL=OFF
+LLAMA_SUBPROCESS:BOOL=ON
+LLAMA_TESTS_INSTALL:BOOL=ON
+LLAMA_TOOLS_INSTALL:BOOL=ON
+LLAMA_UI_GZIP:BOOL=ON
+LLAMA_UI_HF_BUCKET:STRING=ggml-org/llama-ui
+LLAMA_USE_PREBUILT_UI:BOOL=ON
+LLAMA_USE_SYSTEM_GGML:BOOL=OFF
+LLAMA_WASM_MEM64:BOOL=ON
+ggml_BINARY_DIR:STATIC=ggml
+ggml_IS_TOP_LEVEL:STATIC=OFF
+ggml_SOURCE_DIR:STATIC=ggml
+CMAKE_GENERATOR:INTERNAL=Visual Studio 17 2022
+CMAKE_GENERATOR_INSTANCE:INTERNAL=C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools
+CMAKE_GENERATOR_PLATFORM:INTERNAL=
+CMAKE_GENERATOR_TOOLSET:INTERNAL=
+GGML_AVAILABLE_BACKENDS:INTERNAL=ggml-cpu
+GGML_CUDA_COMPRESSION_MODE-STRINGS:INTERNAL=none;speed;balance;size
+GGML_OPENMP_ENABLED:INTERNAL=ON
+
+### Select-String build-vulkan\CMakeCache.txt -Pattern '^(GGML_VULKAN|GGML_NATIVE|GGML_BACKEND_DL|CMAKE_GENERATOR|CMAKE_CXX_COMPILER:|Vulkan_)'
+GGML_BACKEND_DL:BOOL=OFF
+GGML_NATIVE:BOOL=ON
+GGML_VULKAN:BOOL=ON
+GGML_VULKAN_CHECK_RESULTS:BOOL=OFF
+GGML_VULKAN_DEBUG:BOOL=OFF
+GGML_VULKAN_MEMORY_DEBUG:BOOL=OFF
+GGML_VULKAN_RUN_TESTS:BOOL=OFF
+GGML_VULKAN_SHADERS_GEN_TOOLCHAIN:FILEPATH=
+GGML_VULKAN_SHADER_DEBUG_INFO:BOOL=OFF
+GGML_VULKAN_VALIDATE:BOOL=OFF
+Vulkan_GLSLANG_VALIDATOR_EXECUTABLE:FILEPATH=glslangValidator.exe
+Vulkan_GLSLC_EXECUTABLE:FILEPATH=glslc.exe
+Vulkan_INCLUDE_DIR:PATH=include
+Vulkan_LIBRARY:FILEPATH=vulkan-1.lib
+CMAKE_GENERATOR:INTERNAL=Visual Studio 17 2022
+CMAKE_GENERATOR_INSTANCE:INTERNAL=C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools
+CMAKE_GENERATOR_PLATFORM:INTERNAL=
+CMAKE_GENERATOR_TOOLSET:INTERNAL=
+Vulkan_GLSLANG_VALIDATOR_EXECUTABLE-ADVANCED:INTERNAL=1
+Vulkan_GLSLC_EXECUTABLE-ADVANCED:INTERNAL=1
+Vulkan_INCLUDE_DIR-ADVANCED:INTERNAL=1
+Vulkan_LIBRARY-ADVANCED:INTERNAL=1
+
+### CPU feature and compiler lines from the 1 Oct configure logs (results\cmake-configure-cpu.log, results\cmake-configure-vulkan.log)
+cmake-configure-cpu.log: -- The C compiler identification is MSVC 19.44.35229.0
+cmake-configure-cpu.log: -- The CXX compiler identification is MSVC 19.44.35229.0
+cmake-configure-cpu.log: -- The ASM compiler identification is MSVC
+cmake-configure-cpu.log: -- Adding CPU backend variant ggml-cpu: /arch:AVX512 GGML_AVX512
+cmake-configure-vulkan.log: -- The C compiler identification is MSVC 19.44.35229.0
+cmake-configure-vulkan.log: -- The CXX compiler identification is MSVC 19.44.35229.0
+cmake-configure-vulkan.log: -- The ASM compiler identification is MSVC
+cmake-configure-vulkan.log: -- Adding CPU backend variant ggml-cpu: /arch:AVX512 GGML_AVX512
+cmake-configure-vulkan.log: -- Found Vulkan: vulkan-1.lib (found version "1.4.363") found components: glslc glslangValidator
+cmake-configure-vulkan.log: -- GL_KHR_cooperative_matrix supported by glslc
+cmake-configure-vulkan.log: -- GL_NV_cooperative_matrix2 supported by glslc
+cmake-configure-vulkan.log: -- GL_NV_cooperative_matrix_decode_vector supported by glslc
+cmake-configure-vulkan.log: -- GL_EXT_integer_dot_product supported by glslc
+cmake-configure-vulkan.log: -- GL_EXT_bfloat16 supported by glslc
+cmake-configure-vulkan.log: -- GL_EXT_float_e2m1 supported by glslc
+cmake-configure-vulkan.log: -- GL_EXT_float_e4m3 supported by glslc
+cmake-configure-vulkan.log: -- Including Vulkan backend
+
+## Step 2b: CUDA build (release prebuilt b10964, CUDA 12.4)
+
+### curl.exe -L --fail -o <zip> https://github.com/ggml-org/llama.cpp/releases/download/b10964/<zip> (both zips; exit codes and end time)
+start 2026-10-14T04:58:30.1654891Z
+rc1=0
+rc2=0
+end 2026-10-14T04:58:37.7199128Z
+
+### Get-Item *.zip | Select-Object Name, Length
+
+Name                                      Length
+----                                      ------
+cudart-llama-bin-win-cuda-12.4-x64.zip 391443627
+llama-b10964-bin-win-cuda-12.4-x64.zip 254067651
+
+### Get-FileHash -Algorithm SHA256 *.zip | ForEach-Object { $_.Hash.ToLower() + '  ' + (Split-Path $_.Path -Leaf) }
+8c79a9b226de4b3cacfd1f83d24f962d0773be79f1e7b75c6af4ded7e32ae1d6  cudart-llama-bin-win-cuda-12.4-x64.zip
+264f20d7ee3860aecca9ec12418357a9f3e80349a2b186f66c63859ded1a9593  llama-b10964-bin-win-cuda-12.4-x64.zip
+
+### Get-ChildItem llama-b10964-cuda12.4 -Filter *.dll | Select-Object Name, Length
+
+Name                            Length
+----                            ------
+cublas64_12.dll              100033536
+cublasLt64_12.dll            473551360
+cudart64_12.dll                 553984
+ggml-base.dll                   796160
+ggml-cpu-alderlake.dll         1230336
+ggml-cpu-cannonlake.dll        1448448
+ggml-cpu-cascadelake.dll       1434112
+ggml-cpu-cooperlake.dll        1434624
+ggml-cpu-haswell.dll           1235968
+ggml-cpu-icelake.dll           1440768
+ggml-cpu-ivybridge.dll         1127424
+ggml-cpu-piledriver.dll        1131520
+ggml-cpu-sandybridge.dll       1107968
+ggml-cpu-sapphirerapids.dll    1711616
+ggml-cpu-skylakex.dll          1441792
+ggml-cpu-sse42.dll              932352
+ggml-cpu-x64.dll                924160
+ggml-cpu-zen4.dll              1441280
+ggml-cuda.dll                547116544
+ggml-rpc.dll                    168448
+ggml.dll                         79872
+libomp.dll                      768000
+llama-batched-bench-impl.dll     61440
+llama-bench-impl.dll            397824
+llama-cli-impl.dll             3296768
+llama-common.dll               7772672
+llama-completion-impl.dll       133632
+llama-fit-params-impl.dll        41472
+llama-perplexity-impl.dll       194048
+llama-quantize-impl.dll         137216
+llama-server-impl.dll          8904192
+llama.dll                      3154944
+mtmd.dll                       1772032
+
+## Step 2c: Vulkan build (reused from 1 Oct) and vulkaninfo
+
+### vulkaninfo --summary  # deviceUUID / driverUUID / deviceLUID lines dropped; loader warnings kept
+ERROR: [Loader Message] Code 0 : loader_get_json: Failed to open JSON file C:\Program Files\Rockstar Games\Social Club\SocialClubVulkanLayer.json
+WARNING: [Loader Message] Code 0 : Layer VK_LAYER_RTSS uses API version 1.3 which is older than the application specified API version of 1.4. May cause issues.
+==========
+VULKANINFO
+==========
+
+Vulkan Instance Version: 1.4.363
+
+
+Instance Extensions: count = 20
+-------------------------------
+VK_EXT_debug_report                    : extension revision 10
+VK_EXT_debug_utils                     : extension revision 2
+VK_EXT_direct_mode_display             : extension revision 1
+VK_EXT_surface_maintenance1            : extension revision 1
+VK_EXT_swapchain_colorspace            : extension revision 5
+VK_KHR_device_group_creation           : extension revision 1
+VK_KHR_display                         : extension revision 23
+VK_KHR_external_fence_capabilities     : extension revision 1
+VK_KHR_external_memory_capabilities    : extension revision 1
+VK_KHR_external_semaphore_capabilities : extension revision 1
+VK_KHR_get_display_properties2         : extension revision 1
+VK_KHR_get_physical_device_properties2 : extension revision 2
+VK_KHR_get_surface_capabilities2       : extension revision 1
+VK_KHR_portability_enumeration         : extension revision 1
+VK_KHR_surface                         : extension revision 25
+VK_KHR_surface_maintenance1            : extension revision 1
+VK_KHR_surface_protected_capabilities  : extension revision 1
+VK_KHR_win32_surface                   : extension revision 6
+VK_LUNARG_direct_driver_loading        : extension revision 1
+VK_NV_external_memory_capabilities     : extension revision 1
+
+Instance Layers: count = 14
+---------------------------
+VK_LAYER_KHRONOS_profiles         Khronos Profiles layer                                                                                            1.4.363  version 1
+VK_LAYER_KHRONOS_shader_object    Khronos Shader object layer                                                                                       1.4.363  version 1
+VK_LAYER_KHRONOS_synchronization2 Khronos Synchronization2 layer                                                                                    1.4.363  version 1
+VK_LAYER_KHRONOS_validation       Khronos Validation Layer                                                                                          1.4.363  version 1
+VK_LAYER_LUNARG_api_dump          LunarG API dump layer                                                                                             1.4.363  version 2
+VK_LAYER_LUNARG_crash_diagnostic  Crash Diagnostic Layer is a crash/hang debugging tool that helps determines GPU progress in a Vulkan application. 1.4.360  version 1
+VK_LAYER_LUNARG_gfxreconstruct    GFXReconstruct Capture Layer Version 1.0.5                                                                        1.4.363  version 4194309
+VK_LAYER_LUNARG_monitor           Execution Monitoring Layer                                                                                        1.4.363  version 1
+VK_LAYER_LUNARG_screenshot        LunarG image capture layer                                                                                        1.4.363  version 1
+VK_LAYER_NV_optimus               NVIDIA Optimus layer                                                                                              1.4.351  version 1
+VK_LAYER_NV_present               NVIDIA Presentation Layer                                                                                         1.4.351  version 1
+VK_LAYER_RTSS                     RTSS overlay hook bootstrap                                                                                       1.3.224  version 1
+VK_LAYER_VALVE_steam_fossilize    Steam Pipeline Caching Layer                                                                                      1.4.303  version 1
+VK_LAYER_VALVE_steam_overlay      Steam Overlay Layer                                                                                               1.3.207  version 1
+
+Devices:
+========
+GPU0:
+	apiVersion         = 1.4.351
+	driverVersion      = 617.42.0.0
+	vendorID           = 0x10de
+	deviceID           = 0x2208
+	deviceType         = PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+	deviceName         = NVIDIA GeForce RTX 3080 Ti
+	driverID           = DRIVER_ID_NVIDIA_PROPRIETARY
+	driverName         = NVIDIA
+	driverInfo         = 617.42
+	conformanceVersion = 1.4.3.3
+
+### Vulkan SDK (VULKAN_SDK environment variable)
+1.4.363.0
+
+## llama-bench --help (all three builds)
+
+### llama-bench --help (cpu build), exit code 0
+--- stderr ---
+--- stdout ---
+usage: llama-bench.exe [options]
+
+options:
+  -h, --help
+  --numa <distribute|isolate|numactl>         numa mode (default: disabled)
+  -r, --repetitions <n>                       number of times to repeat each test (default: 5)
+  --prio <-1|0|1|2|3>                         process/thread priority (default: 0)
+  --delay <0...N> (seconds)                   delay between each test (default: 0)
+  -o, --output <csv|json|jsonl|md|sql>        output format printed to stdout (default: md)
+  -oe, --output-err <csv|json|jsonl|md|sql>   output format printed to stderr (default: none)
+  --list-devices                              list available devices and exit
+  -v, --verbose                               verbose output
+  --progress                                  print test progress indicators
+  --no-warmup                                 skip warmup runs before benchmarking
+  -fitt, --fit-target <MiB>                   fit model to device memory with this margin per device in MiB (default: off)
+  -fitc, --fit-ctx <n>                        minimum ctx size for --fit-target (default: 4096)
+
+test parameters:
+  -m, --model <filename>                            (default: models/7B/ggml-model-q4_0.gguf)
+  -hf, -hfr, --hf-repo <user>/<model>[:quant]       Hugging Face model repository; quant is optional, case-insensitive
+                                                    default to Q4_K_M, or falls back to the first file in the repo if Q4_K_M doesn't exist.
+                                                    example: ggml-org/GLM-4.7-Flash-GGUF:Q4_K_M
+                                                    (default: unused)
+  -hff, --hf-file <file>                            Hugging Face model file. If specified, it will override the quant in --hf-repo
+                                                    (default: unused)
+  -hft, --hf-token <token>                          Hugging Face access token
+                                                    (default: value from HF_TOKEN environment variable)
+  --offline                                         Offline mode: forces use of cache, prevents network access
+                                                    (default: disabled)
+  -p, --n-prompt <n>                                (default: 512)
+  -n, --n-gen <n>                                   (default: 128)
+  -pg <pp,tg>                                       (default: )
+  -d, --n-depth <n>                                 (default: 0)
+  -b, --batch-size <n>                              (default: 2048)
+  -ub, --ubatch-size <n>                            (default: 512)
+  -ctk, --cache-type-k <t>                          (default: f16)
+  -ctv, --cache-type-v <t>                          (default: f16)
+  -t, --threads <n>                                 (default: 8)
+  -C, --cpu-mask <hex,hex>                          (default: 0x0)
+  --cpu-strict <0|1>                                (default: 0)
+  --poll <0...100>                                  (default: 50)
+  -ngl, --n-gpu-layers <n>                          (default: -1)
+  -ncmoe, --n-cpu-moe <n>                           (default: 0)
+  -sm, --split-mode <none|layer|row|tensor>         (default: layer)
+  -mg, --main-gpu <i>                               (default: 0)
+  -nkvo, --no-kv-offload <0|1>                      (default: 0)
+  -fa, --flash-attn <on|off|auto>                   (default: auto)
+  -dev, --device <dev0/dev1/...>                    (default: auto)
+  -lm, --load-mode <auto|none|mmap|mlock|mmap+mlock|dio> (default: auto)
+  -lzm, --lazy-mode <on|auto|off>                   (default: auto)
+  -embd, --embeddings <0|1>                         (default: 0)
+  -ts, --tensor-split <ts0/ts1/..>                  (default: 0)
+  -ot --override-tensor <tensor name pattern>=<buffer type>;...
+                                                    (default: disabled)
+  -nopo, --no-op-offload <0|1>                      (default: 0)
+  --no-host <0|1>                                   (default: 0)
+
+Multiple values can be given for each parameter by separating them with ','
+or by specifying the parameter multiple times. Ranges can be given as
+'first-last' or 'first-last+step' or 'first-last*mult'.
+
+### llama-bench --help (cuda build), exit code 0
+--- stderr ---
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 12287 MiB):
+  Device 0: NVIDIA GeForce RTX 3080 Ti, compute capability 8.6, VMM: yes, VRAM: 12287 MiB
+load_backend: loaded CUDA backend from ggml-cuda.dll
+load_backend: loaded RPC backend from ggml-rpc.dll
+load_backend: loaded CPU backend from ggml-cpu-zen4.dll
+--- stdout ---
+usage: llama-bench.exe [options]
+
+options:
+  -h, --help
+  --numa <distribute|isolate|numactl>         numa mode (default: disabled)
+  -r, --repetitions <n>                       number of times to repeat each test (default: 5)
+  --prio <-1|0|1|2|3>                         process/thread priority (default: 0)
+  --delay <0...N> (seconds)                   delay between each test (default: 0)
+  -o, --output <csv|json|jsonl|md|sql>        output format printed to stdout (default: md)
+  -oe, --output-err <csv|json|jsonl|md|sql>   output format printed to stderr (default: none)
+  --list-devices                              list available devices and exit
+  -v, --verbose                               verbose output
+  --progress                                  print test progress indicators
+  --no-warmup                                 skip warmup runs before benchmarking
+  -fitt, --fit-target <MiB>                   fit model to device memory with this margin per device in MiB (default: off)
+  -fitc, --fit-ctx <n>                        minimum ctx size for --fit-target (default: 4096)
+  -rpc, --rpc <rpc_servers>                   register RPC devices (comma separated)
+
+test parameters:
+  -m, --model <filename>                            (default: models/7B/ggml-model-q4_0.gguf)
+  -hf, -hfr, --hf-repo <user>/<model>[:quant]       Hugging Face model repository; quant is optional, case-insensitive
+                                                    default to Q4_K_M, or falls back to the first file in the repo if Q4_K_M doesn't exist.
+                                                    example: ggml-org/GLM-4.7-Flash-GGUF:Q4_K_M
+                                                    (default: unused)
+  -hff, --hf-file <file>                            Hugging Face model file. If specified, it will override the quant in --hf-repo
+                                                    (default: unused)
+  -hft, --hf-token <token>                          Hugging Face access token
+                                                    (default: value from HF_TOKEN environment variable)
+  --offline                                         Offline mode: forces use of cache, prevents network access
+                                                    (default: disabled)
+  -p, --n-prompt <n>                                (default: 512)
+  -n, --n-gen <n>                                   (default: 128)
+  -pg <pp,tg>                                       (default: )
+  -d, --n-depth <n>                                 (default: 0)
+  -b, --batch-size <n>                              (default: 2048)
+  -ub, --ubatch-size <n>                            (default: 512)
+  -ctk, --cache-type-k <t>                          (default: f16)
+  -ctv, --cache-type-v <t>                          (default: f16)
+  -t, --threads <n>                                 (default: 8)
+  -C, --cpu-mask <hex,hex>                          (default: 0x0)
+  --cpu-strict <0|1>                                (default: 0)
+  --poll <0...100>                                  (default: 50)
+  -ngl, --n-gpu-layers <n>                          (default: -1)
+  -ncmoe, --n-cpu-moe <n>                           (default: 0)
+  -sm, --split-mode <none|layer|row|tensor>         (default: layer)
+  -mg, --main-gpu <i>                               (default: 0)
+  -nkvo, --no-kv-offload <0|1>                      (default: 0)
+  -fa, --flash-attn <on|off|auto>                   (default: auto)
+  -dev, --device <dev0/dev1/...>                    (default: auto)
+  -lm, --load-mode <auto|none|mmap|mlock|mmap+mlock|dio> (default: auto)
+  -lzm, --lazy-mode <on|auto|off>                   (default: auto)
+  -embd, --embeddings <0|1>                         (default: 0)
+  -ts, --tensor-split <ts0/ts1/..>                  (default: 0)
+  -ot --override-tensor <tensor name pattern>=<buffer type>;...
+                                                    (default: disabled)
+  -nopo, --no-op-offload <0|1>                      (default: 0)
+  --no-host <0|1>                                   (default: 0)
+
+Multiple values can be given for each parameter by separating them with ','
+or by specifying the parameter multiple times. Ranges can be given as
+'first-last' or 'first-last+step' or 'first-last*mult'.
+
+### llama-bench --help (vulkan build), exit code 0
+--- stderr ---
+ggml_vulkan: Found 1 Vulkan devices:
+ggml_vulkan: 0 = NVIDIA GeForce RTX 3080 Ti (NVIDIA) | uma: 0 | fp16: 1 | bf16: 1 | fp4: 0 | warp size: 32 | shared memory: 49152 | int dot: 1 | matrix cores: NV_coopmat2v
+--- stdout ---
+usage: llama-bench.exe [options]
+
+options:
+  -h, --help
+  --numa <distribute|isolate|numactl>         numa mode (default: disabled)
+  -r, --repetitions <n>                       number of times to repeat each test (default: 5)
+  --prio <-1|0|1|2|3>                         process/thread priority (default: 0)
+  --delay <0...N> (seconds)                   delay between each test (default: 0)
+  -o, --output <csv|json|jsonl|md|sql>        output format printed to stdout (default: md)
+  -oe, --output-err <csv|json|jsonl|md|sql>   output format printed to stderr (default: none)
+  --list-devices                              list available devices and exit
+  -v, --verbose                               verbose output
+  --progress                                  print test progress indicators
+  --no-warmup                                 skip warmup runs before benchmarking
+  -fitt, --fit-target <MiB>                   fit model to device memory with this margin per device in MiB (default: off)
+  -fitc, --fit-ctx <n>                        minimum ctx size for --fit-target (default: 4096)
+
+test parameters:
+  -m, --model <filename>                            (default: models/7B/ggml-model-q4_0.gguf)
+  -hf, -hfr, --hf-repo <user>/<model>[:quant]       Hugging Face model repository; quant is optional, case-insensitive
+                                                    default to Q4_K_M, or falls back to the first file in the repo if Q4_K_M doesn't exist.
+                                                    example: ggml-org/GLM-4.7-Flash-GGUF:Q4_K_M
+                                                    (default: unused)
+  -hff, --hf-file <file>                            Hugging Face model file. If specified, it will override the quant in --hf-repo
+                                                    (default: unused)
+  -hft, --hf-token <token>                          Hugging Face access token
+                                                    (default: value from HF_TOKEN environment variable)
+  --offline                                         Offline mode: forces use of cache, prevents network access
+                                                    (default: disabled)
+  -p, --n-prompt <n>                                (default: 512)
+  -n, --n-gen <n>                                   (default: 128)
+  -pg <pp,tg>                                       (default: )
+  -d, --n-depth <n>                                 (default: 0)
+  -b, --batch-size <n>                              (default: 2048)
+  -ub, --ubatch-size <n>                            (default: 512)
+  -ctk, --cache-type-k <t>                          (default: f16)
+  -ctv, --cache-type-v <t>                          (default: f16)
+  -t, --threads <n>                                 (default: 8)
+  -C, --cpu-mask <hex,hex>                          (default: 0x0)
+  --cpu-strict <0|1>                                (default: 0)
+  --poll <0...100>                                  (default: 50)
+  -ngl, --n-gpu-layers <n>                          (default: -1)
+  -ncmoe, --n-cpu-moe <n>                           (default: 0)
+  -sm, --split-mode <none|layer|row|tensor>         (default: layer)
+  -mg, --main-gpu <i>                               (default: 0)
+  -nkvo, --no-kv-offload <0|1>                      (default: 0)
+  -fa, --flash-attn <on|off|auto>                   (default: auto)
+  -dev, --device <dev0/dev1/...>                    (default: auto)
+  -lm, --load-mode <auto|none|mmap|mlock|mmap+mlock|dio> (default: auto)
+  -lzm, --lazy-mode <on|auto|off>                   (default: auto)
+  -embd, --embeddings <0|1>                         (default: 0)
+  -ts, --tensor-split <ts0/ts1/..>                  (default: 0)
+  -ot --override-tensor <tensor name pattern>=<buffer type>;...
+                                                    (default: disabled)
+  -nopo, --no-op-offload <0|1>                      (default: 0)
+  --no-host <0|1>                                   (default: 0)
+
+Multiple values can be given for each parameter by separating them with ','
+or by specifying the parameter multiple times. Ranges can be given as
+'first-last' or 'first-last+step' or 'first-last*mult'.
+
+## Step 4: power plan, keep-awake, smoke tests
+
+### power.txt (orchestrator)
+### before (powercfg /getactivescheme) 2026-10-14T10:04:48.4250387Z
+Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+
+### powercfg /setactive SCHEME_MIN; powercfg /getactivescheme 2026-10-14T10:04:48.4250387Z
+Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance)
+
+### powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e; powercfg /getactivescheme 2026-10-14T10:52:02.0957740Z
+Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+
+### keep-awake.log (orchestrator)
+2026-10-14T10:04:48.5713019Z  SetThreadExecutionState([uint32]2147483651) (ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED) returned 2147483648 (previous state; 0 = failure), called in the orchestrator thread before the smoke tests
+2026-10-14T10:52:02.0957740Z  SetThreadExecutionState([uint32]2147483648) (ES_CONTINUOUS) returned 2147483651 at the end
+
+### smoke.log (default markdown output, as in the brief; mis-decoded "±" restored)
+### smoke cpu 2026-10-14T10:04:48.8800815Z: ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m SmolLM2-135M-Instruct-Q4_K_M.gguf -p 16 -n 8 -r 1  [exit 0]
+--- stderr ---
+
+--- stdout ---
+| model                          |       size |     params | backend    | threads |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | --------------: | -------------------: |
+| llama 256M Q4_K - Medium       |  98.87 MiB |   134.52 M | CPU        |       8 |            pp16 |       2142.70 ± 0.00 |
+| llama 256M Q4_K - Medium       |  98.87 MiB |   134.52 M | CPU        |       8 |             tg8 |        670.33 ± 0.00 |
+
+build: b29c606e2 (10964)
+
+### smoke cuda 2026-10-14T10:04:50.0519011Z: ..\llama-b10964-cuda12.4\llama-bench.exe -m SmolLM2-135M-Instruct-Q4_K_M.gguf -p 16 -n 8 -r 1 -ngl 99  [exit 0]
+--- stderr ---
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 12287 MiB):
+  Device 0: NVIDIA GeForce RTX 3080 Ti, compute capability 8.6, VMM: yes, VRAM: 12287 MiB
+load_backend: loaded CUDA backend from ggml-cuda.dll
+load_backend: loaded RPC backend from ggml-rpc.dll
+load_backend: loaded CPU backend from ggml-cpu-zen4.dll
+
+--- stdout ---
+| model                          |       size |     params | backend    | ngl |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | --------------: | -------------------: |
+| llama 256M Q4_K - Medium       |  98.87 MiB |   134.52 M | CUDA       |  99 |            pp16 |       2331.68 ± 0.00 |
+| llama 256M Q4_K - Medium       |  98.87 MiB |   134.52 M | CUDA       |  99 |             tg8 |        620.54 ± 0.00 |
+
+build: b29c606e2 (10964)
+
+### smoke vulkan 2026-10-14T10:04:52.1525725Z: GGML_VK_VISIBLE_DEVICES=0 ..\llama.cpp\build-vulkan\bin\Release\llama-bench.exe -m SmolLM2-135M-Instruct-Q4_K_M.gguf -p 16 -n 8 -r 1 -ngl 99  [exit 0]
+--- stderr ---
+ggml_vulkan: Found 1 Vulkan devices:
+ggml_vulkan: 0 = NVIDIA GeForce RTX 3080 Ti (NVIDIA) | uma: 0 | fp16: 1 | bf16: 1 | fp4: 0 | warp size: 32 | shared memory: 49152 | int dot: 1 | matrix cores: NV_coopmat2v
+
+--- stdout ---
+| model                          |       size |     params | backend    | ngl |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | --------------: | -------------------: |
+| llama 256M Q4_K - Medium       |  98.87 MiB |   134.52 M | Vulkan     |  99 |            pp16 |       5124.59 ± 0.00 |
+| llama 256M Q4_K - Medium       |  98.87 MiB |   134.52 M | Vulkan     |  99 |             tg8 |        672.36 ± 0.00 |
+
+build: b29c606e2 (10964)
+
+## Step 4: CPU and GPU clock witness (clock.log)
+
+### 2026-10-14T10:06:52.1855129Z  4a smollm2-135m
+cpu  2026-10-14T10:06:53.6900661Z  \processor information(_total)\% processor performance  95.19
+cpu  2026-10-14T10:06:53.6900661Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:06:54.7162844Z  \processor information(_total)\% processor performance  95.62
+cpu  2026-10-14T10:06:54.7162844Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:06:55.7263155Z  \processor information(_total)\% processor performance  88.27
+cpu  2026-10-14T10:06:55.7263155Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-14T10:10:53.7182503Z  4a qwen3-0.6b
+cpu  2026-10-14T10:10:54.7248274Z  \processor information(_total)\% processor performance  87.69
+cpu  2026-10-14T10:10:54.7248274Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:10:55.7380328Z  \processor information(_total)\% processor performance  89.42
+cpu  2026-10-14T10:10:55.7380328Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:10:56.7516191Z  \processor information(_total)\% processor performance  87.10
+cpu  2026-10-14T10:10:56.7516191Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-14T10:15:50.0514600Z  4a llama-3.2-1b
+cpu  2026-10-14T10:15:51.0629346Z  \processor information(_total)\% processor performance  86.83
+cpu  2026-10-14T10:15:51.0629346Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:15:52.0635423Z  \processor information(_total)\% processor performance  86.47
+cpu  2026-10-14T10:15:52.0635423Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:15:53.0771267Z  \processor information(_total)\% processor performance  92.40
+cpu  2026-10-14T10:15:53.0771267Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-14T10:21:53.8164918Z  4a gemma-4-e2b
+cpu  2026-10-14T10:21:54.8306262Z  \processor information(_total)\% processor performance  88.39
+cpu  2026-10-14T10:21:54.8306262Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:21:55.8422441Z  \processor information(_total)\% processor performance  93.11
+cpu  2026-10-14T10:21:55.8422441Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:21:56.8523259Z  \processor information(_total)\% processor performance  95.33
+cpu  2026-10-14T10:21:56.8523259Z  \processor information(_total)\processor frequency  4,700.00
+
+### 2026-10-14T10:31:06.6246727Z  4b smollm2-135m
+cpu  2026-10-14T10:31:07.6259530Z  \processor information(_total)\% processor performance  106.54
+cpu  2026-10-14T10:31:07.6259530Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:31:08.6376958Z  \processor information(_total)\% processor performance  101.65
+cpu  2026-10-14T10:31:08.6376958Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:31:09.6397957Z  \processor information(_total)\% processor performance  95.31
+cpu  2026-10-14T10:31:09.6397957Z  \processor information(_total)\processor frequency  4,700.00
+gpu  (nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,fan.speed --format=csv,noheader; timestamp is local time, sampled at 2026-10-14T10:31:09.6763195Z UTC)  2026/10/14 05:31:09.670, P8, 210 MHz, 405 MHz, 23.49 W, 400.00 W, 44, 0 %
+
+### 2026-10-14T10:33:12.9795410Z  4b qwen3-0.6b
+cpu  2026-10-14T10:33:13.9914267Z  \processor information(_total)\% processor performance  95.47
+cpu  2026-10-14T10:33:13.9914267Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:33:14.9950529Z  \processor information(_total)\% processor performance  93.43
+cpu  2026-10-14T10:33:14.9950529Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:33:16.0102001Z  \processor information(_total)\% processor performance  96.19
+cpu  2026-10-14T10:33:16.0102001Z  \processor information(_total)\processor frequency  4,700.00
+gpu  (nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,fan.speed --format=csv,noheader; timestamp is local time, sampled at 2026-10-14T10:33:16.0465545Z UTC)  2026/10/14 05:33:16.041, P8, 210 MHz, 405 MHz, 25.29 W, 400.00 W, 45, 0 %
+
+### 2026-10-14T10:35:20.6876546Z  4b llama-3.2-1b
+cpu  2026-10-14T10:35:21.6892811Z  \processor information(_total)\% processor performance  96.23
+cpu  2026-10-14T10:35:21.6892811Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:35:22.6911253Z  \processor information(_total)\% processor performance  93.75
+cpu  2026-10-14T10:35:22.6911253Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:35:23.6996206Z  \processor information(_total)\% processor performance  95.88
+cpu  2026-10-14T10:35:23.6996206Z  \processor information(_total)\processor frequency  4,700.00
+gpu  (nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,fan.speed --format=csv,noheader; timestamp is local time, sampled at 2026-10-14T10:35:23.7369029Z UTC)  2026/10/14 05:35:23.730, P8, 210 MHz, 405 MHz, 24.31 W, 400.00 W, 47, 0 %
+
+### 2026-10-14T10:37:28.1613037Z  4b gemma-4-e2b
+cpu  2026-10-14T10:37:29.1765885Z  \processor information(_total)\% processor performance  92.68
+cpu  2026-10-14T10:37:29.1765885Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:37:30.1891512Z  \processor information(_total)\% processor performance  100.35
+cpu  2026-10-14T10:37:30.1891512Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:37:31.1937982Z  \processor information(_total)\% processor performance  94.19
+cpu  2026-10-14T10:37:31.1937982Z  \processor information(_total)\processor frequency  4,700.00
+gpu  (nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,fan.speed --format=csv,noheader; timestamp is local time, sampled at 2026-10-14T10:37:31.2308249Z UTC)  2026/10/14 05:37:31.224, P8, 210 MHz, 405 MHz, 24.79 W, 400.00 W, 48, 0 %
+
+### 2026-10-14T10:39:43.0353157Z  4c smollm2-135m
+cpu  2026-10-14T10:39:44.0487763Z  \processor information(_total)\% processor performance  106.45
+cpu  2026-10-14T10:39:44.0487763Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:39:45.0493640Z  \processor information(_total)\% processor performance  99.32
+cpu  2026-10-14T10:39:45.0493640Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:39:46.0627164Z  \processor information(_total)\% processor performance  99.06
+cpu  2026-10-14T10:39:46.0627164Z  \processor information(_total)\processor frequency  4,700.00
+gpu  (nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,fan.speed --format=csv,noheader; timestamp is local time, sampled at 2026-10-14T10:39:46.1163271Z UTC)  2026/10/14 05:39:46.110, P8, 210 MHz, 405 MHz, 24.37 W, 400.00 W, 48, 0 %
+
+### 2026-10-14T10:41:55.1251765Z  4c qwen3-0.6b
+cpu  2026-10-14T10:41:56.1269203Z  \processor information(_total)\% processor performance  94.51
+cpu  2026-10-14T10:41:56.1269203Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:41:57.1278972Z  \processor information(_total)\% processor performance  94.28
+cpu  2026-10-14T10:41:57.1278972Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:41:58.1424586Z  \processor information(_total)\% processor performance  93.68
+cpu  2026-10-14T10:41:58.1424586Z  \processor information(_total)\processor frequency  4,700.00
+gpu  (nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,fan.speed --format=csv,noheader; timestamp is local time, sampled at 2026-10-14T10:41:58.1994685Z UTC)  2026/10/14 05:41:58.175, P8, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 48, 0 %
+
+### 2026-10-14T10:44:06.7546910Z  4c llama-3.2-1b
+cpu  2026-10-14T10:44:07.7563650Z  \processor information(_total)\% processor performance  97.46
+cpu  2026-10-14T10:44:07.7563650Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:44:08.7688118Z  \processor information(_total)\% processor performance  98.63
+cpu  2026-10-14T10:44:08.7688118Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:44:09.7695985Z  \processor information(_total)\% processor performance  97.00
+cpu  2026-10-14T10:44:09.7695985Z  \processor information(_total)\processor frequency  4,700.00
+gpu  (nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,fan.speed --format=csv,noheader; timestamp is local time, sampled at 2026-10-14T10:44:09.8234720Z UTC)  2026/10/14 05:44:09.816, P8, 210 MHz, 405 MHz, 25.00 W, 400.00 W, 49, 0 %
+
+### 2026-10-14T10:46:14.9327931Z  4c gemma-4-e2b
+cpu  2026-10-14T10:46:15.9360663Z  \processor information(_total)\% processor performance  95.53
+cpu  2026-10-14T10:46:15.9360663Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:46:16.9385332Z  \processor information(_total)\% processor performance  96.28
+cpu  2026-10-14T10:46:16.9385332Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:46:17.9387321Z  \processor information(_total)\% processor performance  93.47
+cpu  2026-10-14T10:46:17.9387321Z  \processor information(_total)\processor frequency  4,700.00
+gpu  (nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,fan.speed --format=csv,noheader; timestamp is local time, sampled at 2026-10-14T10:46:17.9756218Z UTC)  2026/10/14 05:46:17.970, P8, 210 MHz, 405 MHz, 24.90 W, 400.00 W, 48, 0 %
+
+### 2026-10-14T10:48:47.8845993Z  4d bge-small-en
+cpu  2026-10-14T10:48:48.8981841Z  \processor information(_total)\% processor performance  92.54
+cpu  2026-10-14T10:48:48.8981841Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:48:49.9135877Z  \processor information(_total)\% processor performance  90.43
+cpu  2026-10-14T10:48:49.9135877Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:48:50.9184382Z  \processor information(_total)\% processor performance  91.17
+cpu  2026-10-14T10:48:50.9184382Z  \processor information(_total)\processor frequency  4,700.00
+gpu  (nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,fan.speed --format=csv,noheader; timestamp is local time, sampled at 2026-10-14T10:48:50.9553136Z UTC)  2026/10/14 05:48:50.949, P8, 210 MHz, 405 MHz, 24.68 W, 400.00 W, 48, 0 %
+
+### 2026-10-14T10:52:02.1022462Z  final (after restoring the power plan)
+cpu  2026-10-14T10:52:03.1040162Z  \processor information(_total)\% processor performance  106.13
+cpu  2026-10-14T10:52:03.1040162Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:52:04.1192535Z  \processor information(_total)\% processor performance  92.61
+cpu  2026-10-14T10:52:04.1192535Z  \processor information(_total)\processor frequency  4,700.00
+cpu  2026-10-14T10:52:05.1218881Z  \processor information(_total)\% processor performance  86.74
+cpu  2026-10-14T10:52:05.1218881Z  \processor information(_total)\processor frequency  4,700.00
+gpu  (nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,fan.speed --format=csv,noheader; timestamp is local time, sampled at 2026-10-14T10:52:05.1581634Z UTC)  2026/10/14 05:52:05.152, P5, 240 MHz, 810 MHz, 26.67 W, 400.00 W, 49, 0 %
+
+## Step 4: display-driver event check
+
+### Get-WinEvent System log since session start (2026-10-14T04:57:21.8182843Z), ProviderName -match 'nvlddmkm|Display|amdkmdag', checked 2026-10-14T10:46:47.8796872Z
+none
+
+## Step 4: orchestrator progress log
+
+2026-10-14T10:04:48.3031140Z  orchestrator started
+2026-10-14T10:04:48.4280502Z  power plan: Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance)
+2026-10-14T10:04:48.5738090Z  SetThreadExecutionState([uint32]2147483651) returned 2147483648
+2026-10-14T10:04:48.9051892Z  smoke cpu: exit 0
+2026-10-14T10:04:50.0559049Z  smoke cuda: exit 0
+2026-10-14T10:04:52.1555753Z  smoke vulkan: exit 0
+2026-10-14T10:06:52.1726020Z  MEASUREMENT START 2026-10-14T10:06:52.1726020Z
+2026-10-14T10:06:55.7357292Z  START 4a_smollm2-135m_cpu_t16 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m SmolLM2-135M-Instruct-Q4_K_M.gguf -ngl 0 -t 16 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:07:01.6207772Z  END   4a_smollm2-135m_cpu_t16 : OK in 5.9 s
+2026-10-14T10:07:31.6308635Z  START 4a_smollm2-135m_cpu_t12 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m SmolLM2-135M-Instruct-Q4_K_M.gguf -ngl 0 -t 12 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:07:37.2557137Z  END   4a_smollm2-135m_cpu_t12 : OK in 5.6 s
+2026-10-14T10:08:07.2624726Z  START 4a_smollm2-135m_cpu_t8 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m SmolLM2-135M-Instruct-Q4_K_M.gguf -ngl 0 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:08:14.3003712Z  END   4a_smollm2-135m_cpu_t8 : OK in 7 s
+2026-10-14T10:08:44.3080788Z  START 4a_smollm2-135m_cpu_t4 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m SmolLM2-135M-Instruct-Q4_K_M.gguf -ngl 0 -t 4 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:08:53.7112655Z  END   4a_smollm2-135m_cpu_t4 : OK in 9.4 s
+2026-10-14T10:10:56.7527381Z  START 4a_qwen3-0.6b_cpu_t16 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m Qwen3-0.6B-Q4_K_M.gguf -ngl 0 -t 16 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:11:16.3077535Z  END   4a_qwen3-0.6b_cpu_t16 : OK in 19.6 s
+2026-10-14T10:11:46.3243269Z  START 4a_qwen3-0.6b_cpu_t12 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m Qwen3-0.6B-Q4_K_M.gguf -ngl 0 -t 12 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:12:05.7800586Z  END   4a_qwen3-0.6b_cpu_t12 : OK in 19.5 s
+2026-10-14T10:12:35.7832936Z  START 4a_qwen3-0.6b_cpu_t8 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m Qwen3-0.6B-Q4_K_M.gguf -ngl 0 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:12:55.7972397Z  END   4a_qwen3-0.6b_cpu_t8 : OK in 20 s
+2026-10-14T10:13:25.8126865Z  START 4a_qwen3-0.6b_cpu_t4 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m Qwen3-0.6B-Q4_K_M.gguf -ngl 0 -t 4 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:13:50.0363118Z  END   4a_qwen3-0.6b_cpu_t4 : OK in 24.2 s
+2026-10-14T10:15:53.0781790Z  START 4a_llama-3.2-1b_cpu_t16 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m Llama-3.2-1B-Instruct-Q4_K_M.gguf -ngl 0 -t 16 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:16:28.7081415Z  END   4a_llama-3.2-1b_cpu_t16 : OK in 35.6 s
+2026-10-14T10:16:58.7092435Z  START 4a_llama-3.2-1b_cpu_t12 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m Llama-3.2-1B-Instruct-Q4_K_M.gguf -ngl 0 -t 12 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:17:34.7873075Z  END   4a_llama-3.2-1b_cpu_t12 : OK in 36.1 s
+2026-10-14T10:18:04.7971955Z  START 4a_llama-3.2-1b_cpu_t8 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m Llama-3.2-1B-Instruct-Q4_K_M.gguf -ngl 0 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:18:41.2416173Z  END   4a_llama-3.2-1b_cpu_t8 : OK in 36.4 s
+2026-10-14T10:19:11.2515665Z  START 4a_llama-3.2-1b_cpu_t4 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m Llama-3.2-1B-Instruct-Q4_K_M.gguf -ngl 0 -t 4 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:19:53.8164607Z  END   4a_llama-3.2-1b_cpu_t4 : OK in 42.6 s
+2026-10-14T10:21:56.8537293Z  START 4a_gemma-4-e2b_cpu_t16 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m google_gemma-4-E2B-it-Q4_K_M.gguf -ngl 0 -t 16 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:23:18.0048658Z  END   4a_gemma-4-e2b_cpu_t16 : OK in 81.2 s
+2026-10-14T10:23:48.0086406Z  START 4a_gemma-4-e2b_cpu_t12 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m google_gemma-4-E2B-it-Q4_K_M.gguf -ngl 0 -t 12 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:25:08.7208907Z  END   4a_gemma-4-e2b_cpu_t12 : OK in 80.7 s
+2026-10-14T10:25:38.7215282Z  START 4a_gemma-4-e2b_cpu_t8 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m google_gemma-4-E2B-it-Q4_K_M.gguf -ngl 0 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:27:00.0873170Z  END   4a_gemma-4-e2b_cpu_t8 : OK in 81.4 s
+2026-10-14T10:27:30.0989849Z  START 4a_gemma-4-e2b_cpu_t4 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m google_gemma-4-E2B-it-Q4_K_M.gguf -ngl 0 -t 4 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:29:06.5654911Z  END   4a_gemma-4-e2b_cpu_t4 : OK in 96.5 s
+2026-10-14T10:31:06.6236695Z  GPU logger for 4b started (pid 27928): gpu-logger.ps1 -> gpu-log-4b.csv
+2026-10-14T10:31:09.6773787Z  START 4b_smollm2-135m_cuda : ..\llama-b10964-cuda12.4\llama-bench.exe -m SmolLM2-135M-Instruct-Q4_K_M.gguf -ngl 99 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:31:12.9695813Z  END   4b_smollm2-135m_cuda : OK in 3.3 s
+2026-10-14T10:33:16.0475565Z  START 4b_qwen3-0.6b_cuda : ..\llama-b10964-cuda12.4\llama-bench.exe -m Qwen3-0.6B-Q4_K_M.gguf -ngl 99 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:33:20.6813130Z  END   4b_qwen3-0.6b_cuda : OK in 4.6 s
+2026-10-14T10:35:23.7381176Z  START 4b_llama-3.2-1b_cuda : ..\llama-b10964-cuda12.4\llama-bench.exe -m Llama-3.2-1B-Instruct-Q4_K_M.gguf -ngl 99 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:35:28.1572202Z  END   4b_llama-3.2-1b_cuda : OK in 4.4 s
+2026-10-14T10:37:31.2318268Z  START 4b_gemma-4-e2b_cuda : ..\llama-b10964-cuda12.4\llama-bench.exe -m google_gemma-4-E2B-it-Q4_K_M.gguf -ngl 99 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:37:42.0412256Z  END   4b_gemma-4-e2b_cuda : OK in 10.8 s
+2026-10-14T10:37:43.0115483Z  GPU logger for 4b stopped
+2026-10-14T10:39:43.0353157Z  GPU logger for 4c started (pid 13200): gpu-logger.ps1 -> gpu-log-4c.csv
+2026-10-14T10:39:46.1173285Z  START 4c_smollm2-135m_vulkan : GGML_VK_VISIBLE_DEVICES=0 ..\llama.cpp\build-vulkan\bin\Release\llama-bench.exe -m SmolLM2-135M-Instruct-Q4_K_M.gguf -ngl 99 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:39:55.1181575Z  END   4c_smollm2-135m_vulkan : OK in 9 s
+2026-10-14T10:41:58.2004692Z  START 4c_qwen3-0.6b_vulkan : GGML_VK_VISIBLE_DEVICES=0 ..\llama.cpp\build-vulkan\bin\Release\llama-bench.exe -m Qwen3-0.6B-Q4_K_M.gguf -ngl 99 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:42:06.7532976Z  END   4c_qwen3-0.6b_vulkan : OK in 8.6 s
+2026-10-14T10:44:09.8244729Z  START 4c_llama-3.2-1b_vulkan : GGML_VK_VISIBLE_DEVICES=0 ..\llama.cpp\build-vulkan\bin\Release\llama-bench.exe -m Llama-3.2-1B-Instruct-Q4_K_M.gguf -ngl 99 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:44:14.9237401Z  END   4c_llama-3.2-1b_vulkan : OK in 5.1 s
+2026-10-14T10:46:17.9766239Z  START 4c_gemma-4-e2b_vulkan : GGML_VK_VISIBLE_DEVICES=0 ..\llama.cpp\build-vulkan\bin\Release\llama-bench.exe -m google_gemma-4-E2B-it-Q4_K_M.gguf -ngl 99 -t 8 -p 128,512 -n 128 -pg 128,128 -pg 512,128 -r 5 -o json -oe md
+2026-10-14T10:46:47.2629401Z  END   4c_gemma-4-e2b_vulkan : OK in 29.3 s
+2026-10-14T10:46:47.8060256Z  GPU logger for 4c stopped
+2026-10-14T10:46:47.8809169Z  display-driver event check written
+2026-10-14T10:48:50.9564577Z  START 4d_bge-small-en_cpu_t16 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m bge-small-en-v1.5-q8_0.gguf -embd 1 -ngl 0 -t 16 -p 48,1536 -n 0 -r 5 -o json -oe md
+2026-10-14T10:48:52.7906498Z  END   4d_bge-small-en_cpu_t16 : FAILED(rc=-1073740791) in 1.8 s
+2026-10-14T10:49:22.7919644Z  START 4d_bge-small-en_cpu_t8 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m bge-small-en-v1.5-q8_0.gguf -embd 1 -ngl 0 -t 8 -p 48,1536 -n 0 -r 5 -o json -oe md
+2026-10-14T10:49:24.1484598Z  END   4d_bge-small-en_cpu_t8 : FAILED(rc=-1073740791) in 1.4 s
+2026-10-14T10:49:54.1634368Z  START 4d_bge-small-en_cuda : ..\llama-b10964-cuda12.4\llama-bench.exe -m bge-small-en-v1.5-q8_0.gguf -embd 1 -ngl 99 -t 8 -p 48,1536 -n 0 -r 5 -o json -oe md
+2026-10-14T10:49:56.2073772Z  END   4d_bge-small-en_cuda : FAILED(rc=-1073740791) in 2 s
+2026-10-14T10:50:26.2086747Z  START 4d_bge-small-en_vulkan : GGML_VK_VISIBLE_DEVICES=0 ..\llama.cpp\build-vulkan\bin\Release\llama-bench.exe -m bge-small-en-v1.5-q8_0.gguf -embd 1 -ngl 99 -t 8 -p 48,1536 -n 0 -r 5 -o json -oe md
+2026-10-14T10:50:29.3234021Z  END   4d_bge-small-en_vulkan : FAILED(rc=-1073740791) in 3.1 s
+2026-10-14T10:50:59.3302356Z  START 4d_bge-small-en_cpu_t8_p512 : ..\llama.cpp\build-cpu\bin\Release\llama-bench.exe -m bge-small-en-v1.5-q8_0.gguf -embd 1 -ngl 0 -t 8 -p 512 -n 0 -r 5 -o json -oe md
+2026-10-14T10:50:59.7903305Z  END   4d_bge-small-en_cpu_t8_p512 : OK in 0.5 s
+2026-10-14T10:51:29.8031751Z  START 4d_bge-small-en_cuda_p512 : ..\llama-b10964-cuda12.4\llama-bench.exe -m bge-small-en-v1.5-q8_0.gguf -embd 1 -ngl 99 -t 8 -p 512 -n 0 -r 5 -o json -oe md
+2026-10-14T10:51:30.1762356Z  END   4d_bge-small-en_cuda_p512 : OK in 0.4 s
+2026-10-14T10:52:00.1825553Z  START 4d_bge-small-en_vulkan_p512 : GGML_VK_VISIBLE_DEVICES=0 ..\llama.cpp\build-vulkan\bin\Release\llama-bench.exe -m bge-small-en-v1.5-q8_0.gguf -embd 1 -ngl 99 -t 8 -p 512 -n 0 -r 5 -o json -oe md
+2026-10-14T10:52:01.8532533Z  END   4d_bge-small-en_vulkan_p512 : OK in 1.7 s
+2026-10-14T10:52:01.8572899Z  MEASUREMENT END 2026-10-14T10:52:01.8572899Z
+2026-10-14T10:52:02.1022462Z  execution state cleared; power plan restored: Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+2026-10-14T10:52:05.1595111Z  orchestrator done
+
+## Step 4: background GPU logger, section 4b (gpu-log-4b.csv; nvidia-smi timestamps are local time, UTC-5 on this machine; a utc column is prepended)
+
+utc, timestamp, pstate, clocks.current.graphics [MHz], clocks.current.sm [MHz], clocks.current.memory [MHz], power.draw [W], enforced.power.limit [W], temperature.gpu, utilization.gpu [%], memory.used [MiB], fan.speed [%], clocks_event_reasons.active
+2026-10-14T10:31:07.438Z, 2026/10/14 05:31:07.438, P8, 210 MHz, 210 MHz, 405 MHz, 23.65 W, 400.00 W, 44, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:08.452Z, 2026/10/14 05:31:08.452, P8, 210 MHz, 210 MHz, 405 MHz, 23.66 W, 400.00 W, 45, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:09.453Z, 2026/10/14 05:31:09.453, P8, 210 MHz, 210 MHz, 405 MHz, 23.49 W, 400.00 W, 44, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:10.456Z, 2026/10/14 05:31:10.456, P2, 1920 MHz, 1920 MHz, 9251 MHz, 73.82 W, 400.00 W, 50, 93 %, 1556 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:31:11.471Z, 2026/10/14 05:31:11.471, P2, 1920 MHz, 1920 MHz, 9251 MHz, 175.13 W, 400.00 W, 51, 91 %, 1586 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:31:12.479Z, 2026/10/14 05:31:12.479, P2, 1920 MHz, 1920 MHz, 9251 MHz, 177.21 W, 400.00 W, 52, 93 %, 1653 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:31:13.486Z, 2026/10/14 05:31:13.486, P0, 1920 MHz, 1920 MHz, 9501 MHz, 159.23 W, 400.00 W, 51, 0 %, 1169 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:31:14.502Z, 2026/10/14 05:31:14.502, P0, 1920 MHz, 1920 MHz, 9501 MHz, 116.62 W, 400.00 W, 50, 2 %, 1164 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:31:15.518Z, 2026/10/14 05:31:15.518, P0, 1800 MHz, 1800 MHz, 9501 MHz, 110.20 W, 400.00 W, 50, 2 %, 1150 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:16.533Z, 2026/10/14 05:31:16.533, P3, 315 MHz, 315 MHz, 5001 MHz, 69.70 W, 400.00 W, 49, 0 %, 1150 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:17.540Z, 2026/10/14 05:31:17.540, P5, 210 MHz, 210 MHz, 810 MHz, 44.92 W, 400.00 W, 47, 9 %, 1150 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:18.544Z, 2026/10/14 05:31:18.544, P5, 210 MHz, 210 MHz, 810 MHz, 29.01 W, 400.00 W, 47, 11 %, 1150 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:19.554Z, 2026/10/14 05:31:19.554, P8, 210 MHz, 210 MHz, 405 MHz, 28.53 W, 400.00 W, 47, 19 %, 1150 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:20.562Z, 2026/10/14 05:31:20.562, P8, 210 MHz, 210 MHz, 405 MHz, 27.79 W, 400.00 W, 47, 17 %, 1150 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:21.570Z, 2026/10/14 05:31:21.570, P8, 210 MHz, 210 MHz, 405 MHz, 27.67 W, 400.00 W, 47, 18 %, 1150 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:22.575Z, 2026/10/14 05:31:22.575, P8, 210 MHz, 210 MHz, 405 MHz, 27.52 W, 400.00 W, 47, 18 %, 1137 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:23.585Z, 2026/10/14 05:31:23.585, P8, 210 MHz, 210 MHz, 405 MHz, 27.27 W, 400.00 W, 46, 0 %, 1154 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:24.596Z, 2026/10/14 05:31:24.596, P8, 210 MHz, 210 MHz, 405 MHz, 24.61 W, 400.00 W, 46, 0 %, 1154 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:25.610Z, 2026/10/14 05:31:25.610, P8, 210 MHz, 210 MHz, 405 MHz, 24.53 W, 400.00 W, 46, 0 %, 1154 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:26.614Z, 2026/10/14 05:31:26.614, P8, 210 MHz, 210 MHz, 405 MHz, 24.24 W, 400.00 W, 46, 0 %, 1153 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:27.629Z, 2026/10/14 05:31:27.629, P8, 210 MHz, 210 MHz, 405 MHz, 24.58 W, 400.00 W, 46, 0 %, 1152 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:28.641Z, 2026/10/14 05:31:28.641, P8, 210 MHz, 210 MHz, 405 MHz, 24.34 W, 400.00 W, 46, 0 %, 1152 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:29.656Z, 2026/10/14 05:31:29.656, P8, 210 MHz, 210 MHz, 405 MHz, 24.25 W, 400.00 W, 46, 0 %, 1131 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:30.669Z, 2026/10/14 05:31:30.669, P8, 210 MHz, 210 MHz, 405 MHz, 24.10 W, 400.00 W, 46, 0 %, 1125 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:31.675Z, 2026/10/14 05:31:31.675, P8, 210 MHz, 210 MHz, 405 MHz, 26.86 W, 400.00 W, 46, 26 %, 1152 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:32.688Z, 2026/10/14 05:31:32.688, P8, 210 MHz, 210 MHz, 405 MHz, 29.17 W, 400.00 W, 46, 26 %, 1153 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:33.699Z, 2026/10/14 05:31:33.699, P8, 210 MHz, 210 MHz, 405 MHz, 28.51 W, 400.00 W, 46, 25 %, 1153 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:34.738Z, 2026/10/14 05:31:34.738, P8, 210 MHz, 210 MHz, 405 MHz, 28.63 W, 400.00 W, 46, 22 %, 1153 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:35.718Z, 2026/10/14 05:31:35.718, P8, 210 MHz, 210 MHz, 405 MHz, 28.52 W, 400.00 W, 46, 31 %, 1153 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:36.724Z, 2026/10/14 05:31:36.724, P8, 210 MHz, 210 MHz, 405 MHz, 28.83 W, 400.00 W, 46, 22 %, 1141 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:37.735Z, 2026/10/14 05:31:37.735, P8, 210 MHz, 210 MHz, 405 MHz, 27.97 W, 400.00 W, 46, 9 %, 1158 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:38.736Z, 2026/10/14 05:31:38.736, P8, 210 MHz, 210 MHz, 405 MHz, 24.84 W, 400.00 W, 46, 0 %, 1158 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:39.747Z, 2026/10/14 05:31:39.747, P8, 210 MHz, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 46, 7 %, 1162 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:40.752Z, 2026/10/14 05:31:40.752, P8, 210 MHz, 210 MHz, 405 MHz, 24.44 W, 400.00 W, 46, 1 %, 1162 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:41.754Z, 2026/10/14 05:31:41.754, P8, 210 MHz, 210 MHz, 405 MHz, 24.23 W, 400.00 W, 46, 1 %, 1160 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:42.767Z, 2026/10/14 05:31:42.767, P8, 210 MHz, 210 MHz, 405 MHz, 24.33 W, 400.00 W, 46, 0 %, 1159 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:43.781Z, 2026/10/14 05:31:43.781, P8, 210 MHz, 210 MHz, 405 MHz, 24.17 W, 400.00 W, 46, 0 %, 1151 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:44.786Z, 2026/10/14 05:31:44.786, P8, 210 MHz, 210 MHz, 405 MHz, 24.42 W, 400.00 W, 46, 0 %, 1149 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:45.798Z, 2026/10/14 05:31:45.798, P8, 210 MHz, 210 MHz, 405 MHz, 24.59 W, 400.00 W, 46, 0 %, 1138 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:46.802Z, 2026/10/14 05:31:46.802, P8, 210 MHz, 210 MHz, 405 MHz, 24.33 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:47.818Z, 2026/10/14 05:31:47.818, P8, 210 MHz, 210 MHz, 405 MHz, 24.50 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:48.849Z, 2026/10/14 05:31:48.849, P8, 210 MHz, 210 MHz, 405 MHz, 23.96 W, 400.00 W, 46, 2 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:49.832Z, 2026/10/14 05:31:49.832, P8, 210 MHz, 210 MHz, 405 MHz, 24.19 W, 400.00 W, 46, 2 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:50.844Z, 2026/10/14 05:31:50.844, P8, 210 MHz, 210 MHz, 405 MHz, 24.17 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:51.847Z, 2026/10/14 05:31:51.847, P8, 210 MHz, 210 MHz, 405 MHz, 23.63 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:52.846Z, 2026/10/14 05:31:52.846, P8, 210 MHz, 210 MHz, 405 MHz, 23.76 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:53.861Z, 2026/10/14 05:31:53.861, P8, 210 MHz, 210 MHz, 405 MHz, 23.73 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:54.865Z, 2026/10/14 05:31:54.865, P8, 210 MHz, 210 MHz, 405 MHz, 23.97 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:55.866Z, 2026/10/14 05:31:55.866, P8, 210 MHz, 210 MHz, 405 MHz, 24.09 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:56.880Z, 2026/10/14 05:31:56.880, P8, 210 MHz, 210 MHz, 405 MHz, 23.97 W, 400.00 W, 46, 2 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:57.880Z, 2026/10/14 05:31:57.880, P8, 210 MHz, 210 MHz, 405 MHz, 24.03 W, 400.00 W, 46, 2 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:58.893Z, 2026/10/14 05:31:58.893, P8, 210 MHz, 210 MHz, 405 MHz, 24.07 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:31:59.893Z, 2026/10/14 05:31:59.893, P8, 210 MHz, 210 MHz, 405 MHz, 23.89 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:00.906Z, 2026/10/14 05:32:00.906, P8, 210 MHz, 210 MHz, 405 MHz, 24.14 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:01.920Z, 2026/10/14 05:32:01.920, P8, 210 MHz, 210 MHz, 405 MHz, 24.00 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:02.935Z, 2026/10/14 05:32:02.935, P8, 210 MHz, 210 MHz, 405 MHz, 23.86 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:03.948Z, 2026/10/14 05:32:03.948, P8, 210 MHz, 210 MHz, 405 MHz, 24.16 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:04.960Z, 2026/10/14 05:32:04.960, P8, 210 MHz, 210 MHz, 405 MHz, 24.25 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:05.976Z, 2026/10/14 05:32:05.976, P8, 210 MHz, 210 MHz, 405 MHz, 24.16 W, 400.00 W, 46, 2 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:06.992Z, 2026/10/14 05:32:06.992, P8, 210 MHz, 210 MHz, 405 MHz, 24.02 W, 400.00 W, 46, 2 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:08.007Z, 2026/10/14 05:32:08.007, P8, 210 MHz, 210 MHz, 405 MHz, 23.77 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:09.020Z, 2026/10/14 05:32:09.020, P8, 210 MHz, 210 MHz, 405 MHz, 24.08 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:10.020Z, 2026/10/14 05:32:10.020, P8, 210 MHz, 210 MHz, 405 MHz, 23.91 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:11.034Z, 2026/10/14 05:32:11.034, P8, 210 MHz, 210 MHz, 405 MHz, 23.72 W, 400.00 W, 46, 0 %, 1132 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:12.065Z, 2026/10/14 05:32:12.065, P8, 210 MHz, 210 MHz, 405 MHz, 23.85 W, 400.00 W, 46, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:13.049Z, 2026/10/14 05:32:13.049, P8, 210 MHz, 210 MHz, 405 MHz, 24.19 W, 400.00 W, 46, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:14.052Z, 2026/10/14 05:32:14.052, P8, 210 MHz, 210 MHz, 405 MHz, 23.83 W, 400.00 W, 46, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:15.057Z, 2026/10/14 05:32:15.057, P8, 210 MHz, 210 MHz, 405 MHz, 24.23 W, 400.00 W, 46, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:16.072Z, 2026/10/14 05:32:16.072, P8, 210 MHz, 210 MHz, 405 MHz, 24.36 W, 400.00 W, 46, 2 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:17.087Z, 2026/10/14 05:32:17.087, P8, 210 MHz, 210 MHz, 405 MHz, 24.33 W, 400.00 W, 46, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:18.091Z, 2026/10/14 05:32:18.091, P8, 210 MHz, 210 MHz, 405 MHz, 23.95 W, 400.00 W, 46, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:19.097Z, 2026/10/14 05:32:19.097, P8, 210 MHz, 210 MHz, 405 MHz, 23.78 W, 400.00 W, 46, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:20.097Z, 2026/10/14 05:32:20.097, P8, 210 MHz, 210 MHz, 405 MHz, 23.93 W, 400.00 W, 46, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:21.113Z, 2026/10/14 05:32:21.113, P8, 210 MHz, 210 MHz, 405 MHz, 24.02 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:22.118Z, 2026/10/14 05:32:22.118, P8, 210 MHz, 210 MHz, 405 MHz, 24.01 W, 400.00 W, 46, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:23.121Z, 2026/10/14 05:32:23.121, P8, 210 MHz, 210 MHz, 405 MHz, 24.02 W, 400.00 W, 46, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:24.128Z, 2026/10/14 05:32:24.128, P8, 210 MHz, 210 MHz, 405 MHz, 23.83 W, 400.00 W, 46, 2 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:25.132Z, 2026/10/14 05:32:25.132, P8, 210 MHz, 210 MHz, 405 MHz, 23.63 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:26.148Z, 2026/10/14 05:32:26.148, P8, 210 MHz, 210 MHz, 405 MHz, 23.83 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:27.163Z, 2026/10/14 05:32:27.163, P8, 210 MHz, 210 MHz, 405 MHz, 23.81 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:28.174Z, 2026/10/14 05:32:28.174, P8, 210 MHz, 210 MHz, 405 MHz, 23.88 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:29.188Z, 2026/10/14 05:32:29.188, P8, 210 MHz, 210 MHz, 405 MHz, 24.00 W, 400.00 W, 46, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:30.203Z, 2026/10/14 05:32:30.203, P8, 210 MHz, 210 MHz, 405 MHz, 23.99 W, 400.00 W, 46, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:31.204Z, 2026/10/14 05:32:31.204, P8, 210 MHz, 210 MHz, 405 MHz, 23.87 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:32.207Z, 2026/10/14 05:32:32.207, P8, 210 MHz, 210 MHz, 405 MHz, 24.11 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:33.227Z, 2026/10/14 05:32:33.227, P8, 210 MHz, 210 MHz, 405 MHz, 24.23 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:34.236Z, 2026/10/14 05:32:34.236, P8, 210 MHz, 210 MHz, 405 MHz, 24.16 W, 400.00 W, 45, 2 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:35.239Z, 2026/10/14 05:32:35.239, P8, 210 MHz, 210 MHz, 405 MHz, 24.19 W, 400.00 W, 45, 2 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:36.240Z, 2026/10/14 05:32:36.240, P8, 210 MHz, 210 MHz, 405 MHz, 23.91 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:37.255Z, 2026/10/14 05:32:37.255, P8, 210 MHz, 210 MHz, 405 MHz, 24.31 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:38.256Z, 2026/10/14 05:32:38.256, P8, 210 MHz, 210 MHz, 405 MHz, 24.17 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:39.271Z, 2026/10/14 05:32:39.271, P8, 210 MHz, 210 MHz, 405 MHz, 23.72 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:40.283Z, 2026/10/14 05:32:40.283, P8, 210 MHz, 210 MHz, 405 MHz, 23.83 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:41.285Z, 2026/10/14 05:32:41.285, P8, 210 MHz, 210 MHz, 405 MHz, 23.86 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:42.288Z, 2026/10/14 05:32:42.288, P8, 210 MHz, 210 MHz, 405 MHz, 23.85 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:43.298Z, 2026/10/14 05:32:43.298, P8, 210 MHz, 210 MHz, 405 MHz, 23.92 W, 400.00 W, 45, 2 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:44.301Z, 2026/10/14 05:32:44.301, P8, 210 MHz, 210 MHz, 405 MHz, 23.72 W, 400.00 W, 45, 2 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:45.313Z, 2026/10/14 05:32:45.313, P8, 210 MHz, 210 MHz, 405 MHz, 23.97 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:46.331Z, 2026/10/14 05:32:46.331, P8, 210 MHz, 210 MHz, 405 MHz, 23.93 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:47.322Z, 2026/10/14 05:32:47.322, P8, 210 MHz, 210 MHz, 405 MHz, 23.84 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:48.327Z, 2026/10/14 05:32:48.327, P8, 210 MHz, 210 MHz, 405 MHz, 24.04 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:49.331Z, 2026/10/14 05:32:49.331, P8, 210 MHz, 210 MHz, 405 MHz, 24.15 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:50.333Z, 2026/10/14 05:32:50.333, P8, 210 MHz, 210 MHz, 405 MHz, 24.31 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:51.334Z, 2026/10/14 05:32:51.334, P8, 210 MHz, 210 MHz, 405 MHz, 24.09 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:52.351Z, 2026/10/14 05:32:52.351, P8, 210 MHz, 210 MHz, 405 MHz, 24.07 W, 400.00 W, 45, 2 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:53.364Z, 2026/10/14 05:32:53.364, P8, 210 MHz, 210 MHz, 405 MHz, 26.93 W, 400.00 W, 46, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:54.379Z, 2026/10/14 05:32:54.379, P8, 210 MHz, 210 MHz, 405 MHz, 23.91 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:55.409Z, 2026/10/14 05:32:55.409, P8, 210 MHz, 210 MHz, 405 MHz, 23.97 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:56.411Z, 2026/10/14 05:32:56.411, P8, 210 MHz, 210 MHz, 405 MHz, 24.06 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:57.425Z, 2026/10/14 05:32:57.425, P8, 210 MHz, 210 MHz, 405 MHz, 24.34 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:58.426Z, 2026/10/14 05:32:58.426, P8, 210 MHz, 210 MHz, 405 MHz, 24.09 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:32:59.441Z, 2026/10/14 05:32:59.441, P8, 210 MHz, 210 MHz, 405 MHz, 24.23 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:00.441Z, 2026/10/14 05:33:00.441, P8, 210 MHz, 210 MHz, 405 MHz, 24.12 W, 400.00 W, 45, 2 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:01.445Z, 2026/10/14 05:33:01.445, P8, 210 MHz, 210 MHz, 405 MHz, 24.33 W, 400.00 W, 45, 2 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:02.456Z, 2026/10/14 05:33:02.456, P8, 210 MHz, 210 MHz, 405 MHz, 24.19 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:03.458Z, 2026/10/14 05:33:03.458, P8, 210 MHz, 210 MHz, 405 MHz, 24.16 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:04.461Z, 2026/10/14 05:33:04.461, P8, 210 MHz, 210 MHz, 405 MHz, 24.39 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:05.474Z, 2026/10/14 05:33:05.474, P8, 210 MHz, 210 MHz, 405 MHz, 24.27 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:06.511Z, 2026/10/14 05:33:06.511, P8, 210 MHz, 210 MHz, 405 MHz, 24.06 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:07.494Z, 2026/10/14 05:33:07.494, P8, 210 MHz, 210 MHz, 405 MHz, 24.40 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:08.506Z, 2026/10/14 05:33:08.506, P8, 210 MHz, 210 MHz, 405 MHz, 24.16 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:09.528Z, 2026/10/14 05:33:09.528, P8, 210 MHz, 210 MHz, 405 MHz, 24.10 W, 400.00 W, 45, 2 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:10.539Z, 2026/10/14 05:33:10.539, P8, 210 MHz, 210 MHz, 405 MHz, 24.18 W, 400.00 W, 45, 1 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:11.554Z, 2026/10/14 05:33:11.554, P8, 210 MHz, 210 MHz, 405 MHz, 24.11 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:12.570Z, 2026/10/14 05:33:12.570, P8, 210 MHz, 210 MHz, 405 MHz, 24.14 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:13.586Z, 2026/10/14 05:33:13.586, P8, 210 MHz, 210 MHz, 405 MHz, 24.12 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:14.602Z, 2026/10/14 05:33:14.602, P8, 210 MHz, 210 MHz, 405 MHz, 23.85 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:15.620Z, 2026/10/14 05:33:15.620, P8, 210 MHz, 210 MHz, 405 MHz, 24.29 W, 400.00 W, 45, 0 %, 1128 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:16.623Z, 2026/10/14 05:33:16.623, P2, 1800 MHz, 1800 MHz, 9251 MHz, 33.84 W, 400.00 W, 47, 13 %, 2114 MiB, 0 %, 0x0000000000000000
+2026-10-14T10:33:17.630Z, 2026/10/14 05:33:17.630, P2, 1920 MHz, 1920 MHz, 9251 MHz, 213.29 W, 400.00 W, 54, 94 %, 1864 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:33:18.632Z, 2026/10/14 05:33:18.632, P2, 1935 MHz, 1935 MHz, 9251 MHz, 260.57 W, 400.00 W, 56, 95 %, 1942 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:33:19.648Z, 2026/10/14 05:33:19.648, P2, 1935 MHz, 1935 MHz, 9251 MHz, 259.82 W, 400.00 W, 57, 95 %, 2186 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:33:20.678Z, 2026/10/14 05:33:20.678, P2, 1935 MHz, 1935 MHz, 9251 MHz, 265.38 W, 400.00 W, 57, 93 %, 1166 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:33:21.675Z, 2026/10/14 05:33:21.675, P0, 1935 MHz, 1935 MHz, 9501 MHz, 163.30 W, 400.00 W, 53, 0 %, 1168 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:33:22.690Z, 2026/10/14 05:33:22.690, P0, 1935 MHz, 1935 MHz, 9501 MHz, 116.91 W, 400.00 W, 53, 0 %, 1168 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:33:23.703Z, 2026/10/14 05:33:23.703, P3, 285 MHz, 285 MHz, 5001 MHz, 74.36 W, 400.00 W, 51, 0 %, 1167 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:24.719Z, 2026/10/14 05:33:24.719, P3, 210 MHz, 210 MHz, 5001 MHz, 63.04 W, 400.00 W, 50, 13 %, 1149 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:25.732Z, 2026/10/14 05:33:25.732, P3, 210 MHz, 210 MHz, 5001 MHz, 63.24 W, 400.00 W, 50, 9 %, 1149 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:26.734Z, 2026/10/14 05:33:26.734, P5, 210 MHz, 210 MHz, 810 MHz, 60.10 W, 400.00 W, 50, 0 %, 1149 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:27.747Z, 2026/10/14 05:33:27.747, P5, 210 MHz, 210 MHz, 810 MHz, 27.85 W, 400.00 W, 49, 1 %, 1154 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:28.761Z, 2026/10/14 05:33:28.761, P8, 210 MHz, 210 MHz, 405 MHz, 26.19 W, 400.00 W, 48, 0 %, 1154 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:29.773Z, 2026/10/14 05:33:29.773, P8, 210 MHz, 210 MHz, 405 MHz, 24.96 W, 400.00 W, 48, 0 %, 1153 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:30.787Z, 2026/10/14 05:33:30.787, P8, 210 MHz, 210 MHz, 405 MHz, 24.76 W, 400.00 W, 48, 0 %, 1152 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:31.798Z, 2026/10/14 05:33:31.798, P8, 210 MHz, 210 MHz, 405 MHz, 24.78 W, 400.00 W, 48, 0 %, 1148 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:32.819Z, 2026/10/14 05:33:32.819, P8, 210 MHz, 210 MHz, 405 MHz, 24.46 W, 400.00 W, 48, 0 %, 1137 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:33.816Z, 2026/10/14 05:33:33.816, P8, 210 MHz, 210 MHz, 405 MHz, 24.39 W, 400.00 W, 48, 0 %, 1136 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:34.832Z, 2026/10/14 05:33:34.832, P8, 210 MHz, 210 MHz, 405 MHz, 24.59 W, 400.00 W, 48, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:35.860Z, 2026/10/14 05:33:35.860, P8, 210 MHz, 210 MHz, 405 MHz, 24.48 W, 400.00 W, 48, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:36.846Z, 2026/10/14 05:33:36.846, P8, 210 MHz, 210 MHz, 405 MHz, 24.31 W, 400.00 W, 48, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:37.847Z, 2026/10/14 05:33:37.847, P8, 210 MHz, 210 MHz, 405 MHz, 24.56 W, 400.00 W, 48, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:38.863Z, 2026/10/14 05:33:38.863, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 48, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:39.867Z, 2026/10/14 05:33:39.867, P8, 210 MHz, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 48, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:40.879Z, 2026/10/14 05:33:40.879, P8, 210 MHz, 210 MHz, 405 MHz, 24.64 W, 400.00 W, 48, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:41.893Z, 2026/10/14 05:33:41.893, P8, 210 MHz, 210 MHz, 405 MHz, 24.50 W, 400.00 W, 48, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:42.895Z, 2026/10/14 05:33:42.895, P8, 210 MHz, 210 MHz, 405 MHz, 24.62 W, 400.00 W, 48, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:43.896Z, 2026/10/14 05:33:43.896, P8, 210 MHz, 210 MHz, 405 MHz, 24.83 W, 400.00 W, 48, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:44.908Z, 2026/10/14 05:33:44.908, P8, 210 MHz, 210 MHz, 405 MHz, 24.74 W, 400.00 W, 48, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:45.922Z, 2026/10/14 05:33:45.922, P8, 210 MHz, 210 MHz, 405 MHz, 24.47 W, 400.00 W, 48, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:46.923Z, 2026/10/14 05:33:46.923, P8, 210 MHz, 210 MHz, 405 MHz, 24.65 W, 400.00 W, 48, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:47.923Z, 2026/10/14 05:33:47.923, P8, 210 MHz, 210 MHz, 405 MHz, 24.70 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:48.926Z, 2026/10/14 05:33:48.926, P8, 210 MHz, 210 MHz, 405 MHz, 24.49 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:49.927Z, 2026/10/14 05:33:49.927, P8, 210 MHz, 210 MHz, 405 MHz, 24.19 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:50.940Z, 2026/10/14 05:33:50.940, P8, 210 MHz, 210 MHz, 405 MHz, 24.29 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:51.941Z, 2026/10/14 05:33:51.941, P8, 210 MHz, 210 MHz, 405 MHz, 24.56 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:52.955Z, 2026/10/14 05:33:52.955, P8, 210 MHz, 210 MHz, 405 MHz, 24.25 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:53.969Z, 2026/10/14 05:33:53.969, P8, 210 MHz, 210 MHz, 405 MHz, 24.27 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:54.983Z, 2026/10/14 05:33:54.983, P8, 210 MHz, 210 MHz, 405 MHz, 24.24 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:56.000Z, 2026/10/14 05:33:56.000, P8, 210 MHz, 210 MHz, 405 MHz, 24.42 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:57.000Z, 2026/10/14 05:33:57.000, P8, 210 MHz, 210 MHz, 405 MHz, 24.26 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:58.013Z, 2026/10/14 05:33:58.013, P8, 210 MHz, 210 MHz, 405 MHz, 24.43 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:33:59.050Z, 2026/10/14 05:33:59.050, P8, 210 MHz, 210 MHz, 405 MHz, 24.57 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:00.020Z, 2026/10/14 05:34:00.020, P8, 210 MHz, 210 MHz, 405 MHz, 24.64 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:01.022Z, 2026/10/14 05:34:01.022, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:02.036Z, 2026/10/14 05:34:02.036, P8, 210 MHz, 210 MHz, 405 MHz, 24.47 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:03.048Z, 2026/10/14 05:34:03.048, P8, 210 MHz, 210 MHz, 405 MHz, 24.56 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:04.064Z, 2026/10/14 05:34:04.064, P8, 210 MHz, 210 MHz, 405 MHz, 24.13 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:05.078Z, 2026/10/14 05:34:05.078, P8, 210 MHz, 210 MHz, 405 MHz, 24.27 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:06.093Z, 2026/10/14 05:34:06.093, P8, 210 MHz, 210 MHz, 405 MHz, 24.33 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:07.107Z, 2026/10/14 05:34:07.107, P8, 210 MHz, 210 MHz, 405 MHz, 24.21 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:08.111Z, 2026/10/14 05:34:08.111, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:09.126Z, 2026/10/14 05:34:09.126, P8, 210 MHz, 210 MHz, 405 MHz, 24.25 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:10.141Z, 2026/10/14 05:34:10.141, P8, 210 MHz, 210 MHz, 405 MHz, 24.37 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:11.144Z, 2026/10/14 05:34:11.144, P8, 210 MHz, 210 MHz, 405 MHz, 24.43 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:12.148Z, 2026/10/14 05:34:12.148, P8, 210 MHz, 210 MHz, 405 MHz, 24.21 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:13.165Z, 2026/10/14 05:34:13.165, P8, 210 MHz, 210 MHz, 405 MHz, 24.30 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:14.179Z, 2026/10/14 05:34:14.179, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:15.192Z, 2026/10/14 05:34:15.192, P8, 210 MHz, 210 MHz, 405 MHz, 24.15 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:16.207Z, 2026/10/14 05:34:16.207, P8, 210 MHz, 210 MHz, 405 MHz, 24.35 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:17.209Z, 2026/10/14 05:34:17.209, P8, 210 MHz, 210 MHz, 405 MHz, 24.17 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:18.225Z, 2026/10/14 05:34:18.225, P8, 210 MHz, 210 MHz, 405 MHz, 23.91 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:19.238Z, 2026/10/14 05:34:19.238, P8, 210 MHz, 210 MHz, 405 MHz, 24.10 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:20.238Z, 2026/10/14 05:34:20.238, P8, 210 MHz, 210 MHz, 405 MHz, 24.33 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:21.253Z, 2026/10/14 05:34:21.253, P8, 210 MHz, 210 MHz, 405 MHz, 24.19 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:22.269Z, 2026/10/14 05:34:22.269, P8, 210 MHz, 210 MHz, 405 MHz, 24.17 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:23.271Z, 2026/10/14 05:34:23.271, P8, 210 MHz, 210 MHz, 405 MHz, 23.90 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:24.286Z, 2026/10/14 05:34:24.286, P8, 210 MHz, 210 MHz, 405 MHz, 24.02 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:25.303Z, 2026/10/14 05:34:25.303, P8, 210 MHz, 210 MHz, 405 MHz, 24.08 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:26.301Z, 2026/10/14 05:34:26.301, P8, 210 MHz, 210 MHz, 405 MHz, 23.94 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:27.302Z, 2026/10/14 05:34:27.302, P8, 210 MHz, 210 MHz, 405 MHz, 24.09 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:28.302Z, 2026/10/14 05:34:28.302, P8, 210 MHz, 210 MHz, 405 MHz, 24.10 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:29.313Z, 2026/10/14 05:34:29.313, P8, 210 MHz, 210 MHz, 405 MHz, 24.03 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:30.315Z, 2026/10/14 05:34:30.315, P8, 210 MHz, 210 MHz, 405 MHz, 23.80 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:31.329Z, 2026/10/14 05:34:31.329, P8, 210 MHz, 210 MHz, 405 MHz, 24.13 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:32.331Z, 2026/10/14 05:34:32.331, P8, 210 MHz, 210 MHz, 405 MHz, 23.94 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:33.337Z, 2026/10/14 05:34:33.337, P8, 210 MHz, 210 MHz, 405 MHz, 23.83 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:34.348Z, 2026/10/14 05:34:34.348, P8, 210 MHz, 210 MHz, 405 MHz, 23.78 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:35.362Z, 2026/10/14 05:34:35.362, P8, 210 MHz, 210 MHz, 405 MHz, 24.03 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:36.373Z, 2026/10/14 05:34:36.373, P8, 210 MHz, 210 MHz, 405 MHz, 24.06 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:37.376Z, 2026/10/14 05:34:37.376, P8, 210 MHz, 210 MHz, 405 MHz, 23.90 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:38.378Z, 2026/10/14 05:34:38.378, P8, 210 MHz, 210 MHz, 405 MHz, 24.31 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:39.379Z, 2026/10/14 05:34:39.379, P8, 210 MHz, 210 MHz, 405 MHz, 24.16 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:40.380Z, 2026/10/14 05:34:40.380, P8, 210 MHz, 210 MHz, 405 MHz, 24.01 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:41.394Z, 2026/10/14 05:34:41.394, P8, 210 MHz, 210 MHz, 405 MHz, 24.23 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:42.409Z, 2026/10/14 05:34:42.409, P8, 210 MHz, 210 MHz, 405 MHz, 24.15 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:43.408Z, 2026/10/14 05:34:43.408, P8, 210 MHz, 210 MHz, 405 MHz, 24.29 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:44.423Z, 2026/10/14 05:34:44.423, P8, 210 MHz, 210 MHz, 405 MHz, 24.15 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:45.424Z, 2026/10/14 05:34:45.424, P8, 210 MHz, 210 MHz, 405 MHz, 23.94 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:46.440Z, 2026/10/14 05:34:46.440, P8, 210 MHz, 210 MHz, 405 MHz, 24.18 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:47.452Z, 2026/10/14 05:34:47.452, P8, 210 MHz, 210 MHz, 405 MHz, 24.25 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:48.462Z, 2026/10/14 05:34:48.462, P8, 210 MHz, 210 MHz, 405 MHz, 24.16 W, 400.00 W, 47, 2 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:49.478Z, 2026/10/14 05:34:49.478, P8, 210 MHz, 210 MHz, 405 MHz, 24.34 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:50.492Z, 2026/10/14 05:34:50.492, P8, 210 MHz, 210 MHz, 405 MHz, 24.28 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:51.506Z, 2026/10/14 05:34:51.506, P8, 210 MHz, 210 MHz, 405 MHz, 24.26 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:52.521Z, 2026/10/14 05:34:52.521, P8, 210 MHz, 210 MHz, 405 MHz, 25.63 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:53.534Z, 2026/10/14 05:34:53.534, P8, 210 MHz, 210 MHz, 405 MHz, 26.58 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:54.549Z, 2026/10/14 05:34:54.549, P8, 210 MHz, 210 MHz, 405 MHz, 24.25 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:55.552Z, 2026/10/14 05:34:55.552, P8, 210 MHz, 210 MHz, 405 MHz, 24.23 W, 400.00 W, 47, 0 %, 1130 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:56.563Z, 2026/10/14 05:34:56.563, P8, 210 MHz, 210 MHz, 405 MHz, 24.38 W, 400.00 W, 47, 6 %, 1139 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:57.578Z, 2026/10/14 05:34:57.578, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 47, 2 %, 1139 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:58.590Z, 2026/10/14 05:34:58.590, P8, 240 MHz, 240 MHz, 405 MHz, 26.61 W, 400.00 W, 47, 28 %, 1165 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:34:59.595Z, 2026/10/14 05:34:59.595, P8, 240 MHz, 240 MHz, 405 MHz, 29.72 W, 400.00 W, 47, 34 %, 1166 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:00.604Z, 2026/10/14 05:35:00.604, P0, 1800 MHz, 1800 MHz, 9501 MHz, 61.87 W, 400.00 W, 49, 2 %, 1166 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:01.613Z, 2026/10/14 05:35:01.613, P0, 1800 MHz, 1800 MHz, 9501 MHz, 103.89 W, 400.00 W, 50, 0 %, 1163 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:02.615Z, 2026/10/14 05:35:02.615, P0, 1800 MHz, 1800 MHz, 9501 MHz, 103.47 W, 400.00 W, 50, 0 %, 1163 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:03.630Z, 2026/10/14 05:35:03.630, P5, 405 MHz, 405 MHz, 810 MHz, 103.23 W, 400.00 W, 51, 0 %, 1163 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:04.644Z, 2026/10/14 05:35:04.644, P5, 270 MHz, 270 MHz, 810 MHz, 37.29 W, 400.00 W, 48, 0 %, 1153 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:05.656Z, 2026/10/14 05:35:05.656, P8, 210 MHz, 210 MHz, 405 MHz, 29.34 W, 400.00 W, 48, 9 %, 1153 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:06.659Z, 2026/10/14 05:35:06.659, P8, 210 MHz, 210 MHz, 405 MHz, 24.81 W, 400.00 W, 48, 0 %, 1152 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:07.673Z, 2026/10/14 05:35:07.673, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 47, 0 %, 1147 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:08.689Z, 2026/10/14 05:35:08.689, P8, 210 MHz, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 47, 0 %, 1137 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:09.675Z, 2026/10/14 05:35:09.675, P8, 210 MHz, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 47, 0 %, 1136 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:10.687Z, 2026/10/14 05:35:10.687, P8, 210 MHz, 210 MHz, 405 MHz, 24.49 W, 400.00 W, 47, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:11.693Z, 2026/10/14 05:35:11.693, P8, 210 MHz, 210 MHz, 405 MHz, 24.54 W, 400.00 W, 47, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:12.693Z, 2026/10/14 05:35:12.693, P8, 210 MHz, 210 MHz, 405 MHz, 24.44 W, 400.00 W, 47, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:13.708Z, 2026/10/14 05:35:13.708, P8, 210 MHz, 210 MHz, 405 MHz, 24.56 W, 400.00 W, 47, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:14.722Z, 2026/10/14 05:35:14.722, P8, 210 MHz, 210 MHz, 405 MHz, 24.62 W, 400.00 W, 47, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:15.736Z, 2026/10/14 05:35:15.736, P8, 210 MHz, 210 MHz, 405 MHz, 24.58 W, 400.00 W, 47, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:16.738Z, 2026/10/14 05:35:16.738, P8, 210 MHz, 210 MHz, 405 MHz, 24.48 W, 400.00 W, 47, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:17.738Z, 2026/10/14 05:35:17.738, P8, 210 MHz, 210 MHz, 405 MHz, 24.14 W, 400.00 W, 47, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:18.750Z, 2026/10/14 05:35:18.750, P8, 210 MHz, 210 MHz, 405 MHz, 23.85 W, 400.00 W, 47, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:19.751Z, 2026/10/14 05:35:19.751, P8, 210 MHz, 210 MHz, 405 MHz, 24.08 W, 400.00 W, 47, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:20.767Z, 2026/10/14 05:35:20.767, P8, 210 MHz, 210 MHz, 405 MHz, 24.24 W, 400.00 W, 47, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:21.767Z, 2026/10/14 05:35:21.767, P8, 210 MHz, 210 MHz, 405 MHz, 24.09 W, 400.00 W, 47, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:22.769Z, 2026/10/14 05:35:22.769, P8, 210 MHz, 210 MHz, 405 MHz, 24.26 W, 400.00 W, 47, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:23.777Z, 2026/10/14 05:35:23.777, P8, 210 MHz, 210 MHz, 405 MHz, 24.31 W, 400.00 W, 47, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:24.780Z, 2026/10/14 05:35:24.780, P2, 1800 MHz, 1800 MHz, 9251 MHz, 54.35 W, 400.00 W, 50, 35 %, 2221 MiB, 0 %, 0x0000000000000000
+2026-10-14T10:35:25.796Z, 2026/10/14 05:35:25.796, P2, 1920 MHz, 1920 MHz, 9251 MHz, 338.17 W, 400.00 W, 60, 94 %, 2291 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:35:26.780Z, 2026/10/14 05:35:26.780, P2, 1920 MHz, 1920 MHz, 9251 MHz, 380.63 W, 400.00 W, 62, 94 %, 2291 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:35:27.796Z, 2026/10/14 05:35:27.796, P2, 1920 MHz, 1920 MHz, 9251 MHz, 384.23 W, 400.00 W, 64, 93 %, 2437 MiB, 0 %, 0x0000000000000404
+2026-10-14T10:35:28.799Z, 2026/10/14 05:35:28.799, P0, 1920 MHz, 1920 MHz, 9501 MHz, 299.30 W, 400.00 W, 57, 0 %, 1129 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:35:29.800Z, 2026/10/14 05:35:29.800, P0, 1920 MHz, 1920 MHz, 9501 MHz, 118.33 W, 400.00 W, 55, 0 %, 1129 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:35:30.815Z, 2026/10/14 05:35:30.815, P5, 345 MHz, 345 MHz, 810 MHz, 99.58 W, 400.00 W, 54, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:31.828Z, 2026/10/14 05:35:31.828, P5, 210 MHz, 210 MHz, 810 MHz, 39.03 W, 400.00 W, 52, 1 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:32.843Z, 2026/10/14 05:35:32.843, P8, 210 MHz, 210 MHz, 405 MHz, 27.17 W, 400.00 W, 51, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:33.857Z, 2026/10/14 05:35:33.857, P8, 210 MHz, 210 MHz, 405 MHz, 24.91 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:34.860Z, 2026/10/14 05:35:34.860, P8, 210 MHz, 210 MHz, 405 MHz, 24.68 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:35.877Z, 2026/10/14 05:35:35.877, P8, 210 MHz, 210 MHz, 405 MHz, 24.93 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:36.891Z, 2026/10/14 05:35:36.891, P8, 210 MHz, 210 MHz, 405 MHz, 24.89 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:37.906Z, 2026/10/14 05:35:37.906, P8, 210 MHz, 210 MHz, 405 MHz, 24.92 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:38.909Z, 2026/10/14 05:35:38.909, P8, 210 MHz, 210 MHz, 405 MHz, 24.73 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:39.940Z, 2026/10/14 05:35:39.940, P8, 210 MHz, 210 MHz, 405 MHz, 24.45 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:40.928Z, 2026/10/14 05:35:40.928, P8, 210 MHz, 210 MHz, 405 MHz, 24.32 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:41.929Z, 2026/10/14 05:35:41.929, P8, 210 MHz, 210 MHz, 405 MHz, 24.45 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:42.946Z, 2026/10/14 05:35:42.946, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:43.959Z, 2026/10/14 05:35:43.959, P8, 210 MHz, 210 MHz, 405 MHz, 25.03 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:44.972Z, 2026/10/14 05:35:44.972, P8, 210 MHz, 210 MHz, 405 MHz, 25.32 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:45.988Z, 2026/10/14 05:35:45.988, P8, 210 MHz, 210 MHz, 405 MHz, 25.23 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:47.005Z, 2026/10/14 05:35:47.005, P8, 210 MHz, 210 MHz, 405 MHz, 24.92 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:48.003Z, 2026/10/14 05:35:48.003, P8, 210 MHz, 210 MHz, 405 MHz, 24.78 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:49.018Z, 2026/10/14 05:35:49.018, P8, 210 MHz, 210 MHz, 405 MHz, 24.86 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:50.031Z, 2026/10/14 05:35:50.031, P8, 210 MHz, 210 MHz, 405 MHz, 24.97 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:51.043Z, 2026/10/14 05:35:51.043, P8, 210 MHz, 210 MHz, 405 MHz, 25.07 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:52.046Z, 2026/10/14 05:35:52.046, P8, 210 MHz, 210 MHz, 405 MHz, 24.99 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:53.050Z, 2026/10/14 05:35:53.050, P8, 210 MHz, 210 MHz, 405 MHz, 25.01 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:54.061Z, 2026/10/14 05:35:54.061, P8, 210 MHz, 210 MHz, 405 MHz, 24.66 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:55.063Z, 2026/10/14 05:35:55.063, P8, 210 MHz, 210 MHz, 405 MHz, 24.97 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:56.080Z, 2026/10/14 05:35:56.080, P8, 210 MHz, 210 MHz, 405 MHz, 24.95 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:57.093Z, 2026/10/14 05:35:57.093, P8, 210 MHz, 210 MHz, 405 MHz, 24.88 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:58.110Z, 2026/10/14 05:35:58.110, P8, 210 MHz, 210 MHz, 405 MHz, 24.92 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:35:59.110Z, 2026/10/14 05:35:59.110, P8, 210 MHz, 210 MHz, 405 MHz, 24.82 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:00.123Z, 2026/10/14 05:36:00.123, P8, 210 MHz, 210 MHz, 405 MHz, 24.73 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:01.124Z, 2026/10/14 05:36:01.124, P8, 210 MHz, 210 MHz, 405 MHz, 24.66 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:02.133Z, 2026/10/14 05:36:02.133, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:03.151Z, 2026/10/14 05:36:03.151, P8, 210 MHz, 210 MHz, 405 MHz, 24.79 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:04.159Z, 2026/10/14 05:36:04.159, P8, 210 MHz, 210 MHz, 405 MHz, 24.65 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:05.171Z, 2026/10/14 05:36:05.171, P8, 210 MHz, 210 MHz, 405 MHz, 24.62 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:06.186Z, 2026/10/14 05:36:06.186, P8, 210 MHz, 210 MHz, 405 MHz, 24.68 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:07.202Z, 2026/10/14 05:36:07.202, P8, 210 MHz, 210 MHz, 405 MHz, 24.79 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:08.207Z, 2026/10/14 05:36:08.207, P8, 210 MHz, 210 MHz, 405 MHz, 24.80 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:09.239Z, 2026/10/14 05:36:09.239, P8, 210 MHz, 210 MHz, 405 MHz, 25.13 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:10.240Z, 2026/10/14 05:36:10.240, P8, 210 MHz, 210 MHz, 405 MHz, 24.88 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:11.245Z, 2026/10/14 05:36:11.245, P8, 210 MHz, 210 MHz, 405 MHz, 24.66 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:12.258Z, 2026/10/14 05:36:12.258, P8, 210 MHz, 210 MHz, 405 MHz, 24.80 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:13.270Z, 2026/10/14 05:36:13.270, P8, 210 MHz, 210 MHz, 405 MHz, 24.53 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:14.286Z, 2026/10/14 05:36:14.286, P8, 210 MHz, 210 MHz, 405 MHz, 24.64 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:15.290Z, 2026/10/14 05:36:15.290, P8, 210 MHz, 210 MHz, 405 MHz, 24.77 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:16.303Z, 2026/10/14 05:36:16.303, P8, 210 MHz, 210 MHz, 405 MHz, 24.61 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:17.317Z, 2026/10/14 05:36:17.317, P8, 210 MHz, 210 MHz, 405 MHz, 24.78 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:18.331Z, 2026/10/14 05:36:18.331, P8, 210 MHz, 210 MHz, 405 MHz, 27.60 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:19.344Z, 2026/10/14 05:36:19.344, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:20.347Z, 2026/10/14 05:36:20.347, P8, 210 MHz, 210 MHz, 405 MHz, 24.93 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:21.360Z, 2026/10/14 05:36:21.360, P8, 210 MHz, 210 MHz, 405 MHz, 24.84 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:22.363Z, 2026/10/14 05:36:22.363, P8, 210 MHz, 210 MHz, 405 MHz, 24.74 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:23.364Z, 2026/10/14 05:36:23.364, P8, 210 MHz, 210 MHz, 405 MHz, 24.70 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:24.367Z, 2026/10/14 05:36:24.367, P8, 210 MHz, 210 MHz, 405 MHz, 24.50 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:25.384Z, 2026/10/14 05:36:25.384, P8, 210 MHz, 210 MHz, 405 MHz, 24.87 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:26.387Z, 2026/10/14 05:36:26.387, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:27.404Z, 2026/10/14 05:36:27.404, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:28.405Z, 2026/10/14 05:36:28.405, P8, 210 MHz, 210 MHz, 405 MHz, 24.76 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:29.407Z, 2026/10/14 05:36:29.407, P8, 210 MHz, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:30.422Z, 2026/10/14 05:36:30.422, P8, 210 MHz, 210 MHz, 405 MHz, 24.69 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:31.426Z, 2026/10/14 05:36:31.426, P8, 210 MHz, 210 MHz, 405 MHz, 24.73 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:32.441Z, 2026/10/14 05:36:32.441, P8, 210 MHz, 210 MHz, 405 MHz, 24.92 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:33.442Z, 2026/10/14 05:36:33.442, P8, 210 MHz, 210 MHz, 405 MHz, 24.97 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:34.455Z, 2026/10/14 05:36:34.455, P8, 210 MHz, 210 MHz, 405 MHz, 24.93 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:35.455Z, 2026/10/14 05:36:35.455, P8, 210 MHz, 210 MHz, 405 MHz, 24.63 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:36.470Z, 2026/10/14 05:36:36.470, P8, 210 MHz, 210 MHz, 405 MHz, 24.97 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:37.486Z, 2026/10/14 05:36:37.486, P8, 210 MHz, 210 MHz, 405 MHz, 25.04 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:38.500Z, 2026/10/14 05:36:38.500, P8, 210 MHz, 210 MHz, 405 MHz, 25.03 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:39.517Z, 2026/10/14 05:36:39.517, P8, 210 MHz, 210 MHz, 405 MHz, 24.92 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:40.530Z, 2026/10/14 05:36:40.530, P8, 210 MHz, 210 MHz, 405 MHz, 24.83 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:41.531Z, 2026/10/14 05:36:41.531, P8, 210 MHz, 210 MHz, 405 MHz, 24.87 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:42.544Z, 2026/10/14 05:36:42.544, P8, 210 MHz, 210 MHz, 405 MHz, 24.73 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:43.546Z, 2026/10/14 05:36:43.546, P8, 210 MHz, 210 MHz, 405 MHz, 24.84 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:44.550Z, 2026/10/14 05:36:44.550, P8, 210 MHz, 210 MHz, 405 MHz, 24.86 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:45.553Z, 2026/10/14 05:36:45.553, P8, 210 MHz, 210 MHz, 405 MHz, 25.12 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:46.568Z, 2026/10/14 05:36:46.568, P8, 210 MHz, 210 MHz, 405 MHz, 25.06 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:47.582Z, 2026/10/14 05:36:47.582, P8, 210 MHz, 210 MHz, 405 MHz, 25.14 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:48.583Z, 2026/10/14 05:36:48.583, P8, 210 MHz, 210 MHz, 405 MHz, 25.04 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:49.603Z, 2026/10/14 05:36:49.603, P8, 210 MHz, 210 MHz, 405 MHz, 24.76 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:50.590Z, 2026/10/14 05:36:50.590, P8, 210 MHz, 210 MHz, 405 MHz, 24.56 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:51.597Z, 2026/10/14 05:36:51.597, P8, 210 MHz, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:52.598Z, 2026/10/14 05:36:52.598, P8, 210 MHz, 210 MHz, 405 MHz, 24.46 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:53.613Z, 2026/10/14 05:36:53.613, P8, 210 MHz, 210 MHz, 405 MHz, 24.48 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:54.625Z, 2026/10/14 05:36:54.625, P8, 210 MHz, 210 MHz, 405 MHz, 24.46 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:55.627Z, 2026/10/14 05:36:55.627, P8, 210 MHz, 210 MHz, 405 MHz, 24.39 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:56.641Z, 2026/10/14 05:36:56.641, P8, 210 MHz, 210 MHz, 405 MHz, 24.59 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:57.644Z, 2026/10/14 05:36:57.644, P8, 210 MHz, 210 MHz, 405 MHz, 24.35 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:58.645Z, 2026/10/14 05:36:58.645, P8, 210 MHz, 210 MHz, 405 MHz, 24.73 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:36:59.646Z, 2026/10/14 05:36:59.646, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:00.661Z, 2026/10/14 05:37:00.661, P8, 210 MHz, 210 MHz, 405 MHz, 24.49 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:01.673Z, 2026/10/14 05:37:01.673, P8, 210 MHz, 210 MHz, 405 MHz, 24.58 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:02.674Z, 2026/10/14 05:37:02.674, P8, 210 MHz, 210 MHz, 405 MHz, 24.36 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:03.679Z, 2026/10/14 05:37:03.679, P8, 210 MHz, 210 MHz, 405 MHz, 24.57 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:04.696Z, 2026/10/14 05:37:04.696, P8, 210 MHz, 210 MHz, 405 MHz, 24.59 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:05.713Z, 2026/10/14 05:37:05.713, P8, 210 MHz, 210 MHz, 405 MHz, 24.39 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:06.715Z, 2026/10/14 05:37:06.715, P8, 210 MHz, 210 MHz, 405 MHz, 24.48 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:07.721Z, 2026/10/14 05:37:07.721, P8, 210 MHz, 210 MHz, 405 MHz, 24.52 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:08.734Z, 2026/10/14 05:37:08.734, P8, 210 MHz, 210 MHz, 405 MHz, 24.28 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:09.750Z, 2026/10/14 05:37:09.750, P8, 210 MHz, 210 MHz, 405 MHz, 24.34 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:10.751Z, 2026/10/14 05:37:10.751, P8, 210 MHz, 210 MHz, 405 MHz, 24.55 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:11.751Z, 2026/10/14 05:37:11.751, P8, 210 MHz, 210 MHz, 405 MHz, 24.43 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:12.753Z, 2026/10/14 05:37:12.753, P8, 210 MHz, 210 MHz, 405 MHz, 24.48 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:13.767Z, 2026/10/14 05:37:13.767, P8, 210 MHz, 210 MHz, 405 MHz, 24.73 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:14.781Z, 2026/10/14 05:37:14.781, P8, 210 MHz, 210 MHz, 405 MHz, 24.52 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:15.783Z, 2026/10/14 05:37:15.783, P8, 210 MHz, 210 MHz, 405 MHz, 24.46 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:16.799Z, 2026/10/14 05:37:16.799, P8, 210 MHz, 210 MHz, 405 MHz, 24.08 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:17.801Z, 2026/10/14 05:37:17.801, P8, 210 MHz, 210 MHz, 405 MHz, 24.37 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:18.802Z, 2026/10/14 05:37:18.802, P8, 210 MHz, 210 MHz, 405 MHz, 24.34 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:19.816Z, 2026/10/14 05:37:19.816, P8, 210 MHz, 210 MHz, 405 MHz, 24.36 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:20.829Z, 2026/10/14 05:37:20.829, P8, 210 MHz, 210 MHz, 405 MHz, 24.50 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:21.831Z, 2026/10/14 05:37:21.831, P8, 210 MHz, 210 MHz, 405 MHz, 24.41 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:22.845Z, 2026/10/14 05:37:22.845, P8, 210 MHz, 210 MHz, 405 MHz, 24.38 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:23.859Z, 2026/10/14 05:37:23.859, P8, 210 MHz, 210 MHz, 405 MHz, 24.52 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:24.874Z, 2026/10/14 05:37:24.874, P8, 210 MHz, 210 MHz, 405 MHz, 24.77 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:25.877Z, 2026/10/14 05:37:25.877, P8, 210 MHz, 210 MHz, 405 MHz, 24.52 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:26.895Z, 2026/10/14 05:37:26.895, P8, 210 MHz, 210 MHz, 405 MHz, 24.42 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:27.897Z, 2026/10/14 05:37:27.897, P8, 210 MHz, 210 MHz, 405 MHz, 24.09 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:28.909Z, 2026/10/14 05:37:28.909, P8, 210 MHz, 210 MHz, 405 MHz, 24.52 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:29.939Z, 2026/10/14 05:37:29.939, P8, 210 MHz, 210 MHz, 405 MHz, 24.64 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:30.927Z, 2026/10/14 05:37:30.927, P8, 210 MHz, 210 MHz, 405 MHz, 24.54 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:31.931Z, 2026/10/14 05:37:31.931, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 48, 0 %, 1349 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:37:32.935Z, 2026/10/14 05:37:32.935, P2, 1920 MHz, 1920 MHz, 9251 MHz, 90.20 W, 400.00 W, 51, 20 %, 2987 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:37:33.939Z, 2026/10/14 05:37:33.939, P2, 1935 MHz, 1935 MHz, 9251 MHz, 290.98 W, 400.00 W, 59, 96 %, 2987 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:37:34.944Z, 2026/10/14 05:37:34.944, P2, 1935 MHz, 1935 MHz, 9251 MHz, 306.92 W, 400.00 W, 60, 96 %, 2987 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:37:35.948Z, 2026/10/14 05:37:35.948, P2, 1920 MHz, 1920 MHz, 9251 MHz, 307.52 W, 400.00 W, 61, 96 %, 3143 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:37:36.966Z, 2026/10/14 05:37:36.966, P2, 1920 MHz, 1920 MHz, 9251 MHz, 302.56 W, 400.00 W, 61, 94 %, 3143 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:37:37.970Z, 2026/10/14 05:37:37.970, P2, 1920 MHz, 1920 MHz, 9251 MHz, 306.97 W, 400.00 W, 62, 97 %, 3143 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:37:38.971Z, 2026/10/14 05:37:38.971, P2, 1920 MHz, 1920 MHz, 9251 MHz, 307.21 W, 400.00 W, 63, 97 %, 3423 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:37:39.973Z, 2026/10/14 05:37:39.973, P2, 1920 MHz, 1920 MHz, 9251 MHz, 313.15 W, 400.00 W, 64, 91 %, 3423 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:37:40.989Z, 2026/10/14 05:37:40.989, P2, 1920 MHz, 1920 MHz, 9251 MHz, 315.58 W, 400.00 W, 64, 97 %, 3423 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:37:41.994Z, 2026/10/14 05:37:41.994, P2, 1920 MHz, 1920 MHz, 9251 MHz, 290.64 W, 400.00 W, 62, 0 %, 1139 MiB, 0 %, 0x0000000000000400
+
+## Step 4: background GPU logger, section 4c (gpu-log-4c.csv; nvidia-smi timestamps are local time, UTC-5 on this machine; a utc column is prepended)
+
+utc, timestamp, pstate, clocks.current.graphics [MHz], clocks.current.sm [MHz], clocks.current.memory [MHz], power.draw [W], enforced.power.limit [W], temperature.gpu, utilization.gpu [%], memory.used [MiB], fan.speed [%], clocks_event_reasons.active
+2026-10-14T10:39:43.812Z, 2026/10/14 05:39:43.812, P8, 210 MHz, 210 MHz, 405 MHz, 24.81 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:39:44.814Z, 2026/10/14 05:39:44.814, P8, 210 MHz, 210 MHz, 405 MHz, 24.74 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:39:45.827Z, 2026/10/14 05:39:45.827, P8, 210 MHz, 210 MHz, 405 MHz, 24.58 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:39:46.834Z, 2026/10/14 05:39:46.834, P0, 1800 MHz, 1800 MHz, 9501 MHz, 37.58 W, 400.00 W, 50, 3 %, 1270 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:39:47.843Z, 2026/10/14 05:39:47.843, P0, 1800 MHz, 1800 MHz, 9501 MHz, 101.01 W, 400.00 W, 51, 0 %, 1270 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:39:48.848Z, 2026/10/14 05:39:48.848, P3, 480 MHz, 480 MHz, 5001 MHz, 99.83 W, 400.00 W, 51, 1 %, 1272 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:39:49.857Z, 2026/10/14 05:39:49.857, P5, 300 MHz, 300 MHz, 810 MHz, 65.57 W, 400.00 W, 50, 1 %, 1273 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:39:50.867Z, 2026/10/14 05:39:50.867, P5, 210 MHz, 210 MHz, 810 MHz, 31.15 W, 400.00 W, 49, 30 %, 1354 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:39:51.878Z, 2026/10/14 05:39:51.878, P0, 1800 MHz, 1800 MHz, 9501 MHz, 83.42 W, 400.00 W, 52, 0 %, 1354 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:39:52.882Z, 2026/10/14 05:39:52.882, P0, 1935 MHz, 1935 MHz, 9501 MHz, 140.95 W, 400.00 W, 55, 92 %, 1272 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:39:53.898Z, 2026/10/14 05:39:53.898, P0, 1935 MHz, 1935 MHz, 9501 MHz, 185.92 W, 400.00 W, 56, 92 %, 1300 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:39:54.906Z, 2026/10/14 05:39:54.906, P0, 1935 MHz, 1935 MHz, 9501 MHz, 186.50 W, 400.00 W, 57, 87 %, 1364 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:39:55.907Z, 2026/10/14 05:39:55.907, P0, 1935 MHz, 1935 MHz, 9501 MHz, 159.11 W, 400.00 W, 55, 0 %, 1129 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:39:56.921Z, 2026/10/14 05:39:56.921, P0, 1935 MHz, 1935 MHz, 9501 MHz, 118.12 W, 400.00 W, 55, 0 %, 1129 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:39:57.923Z, 2026/10/14 05:39:57.923, P3, 315 MHz, 315 MHz, 5001 MHz, 89.49 W, 400.00 W, 53, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:39:58.953Z, 2026/10/14 05:39:58.953, P5, 210 MHz, 210 MHz, 810 MHz, 63.68 W, 400.00 W, 52, 1 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:39:59.940Z, 2026/10/14 05:39:59.940, P5, 210 MHz, 210 MHz, 810 MHz, 30.48 W, 400.00 W, 51, 1 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:00.951Z, 2026/10/14 05:40:00.951, P8, 210 MHz, 210 MHz, 405 MHz, 26.57 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:01.964Z, 2026/10/14 05:40:01.964, P8, 210 MHz, 210 MHz, 405 MHz, 25.53 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:02.980Z, 2026/10/14 05:40:02.980, P8, 210 MHz, 210 MHz, 405 MHz, 25.00 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:03.994Z, 2026/10/14 05:40:03.994, P8, 210 MHz, 210 MHz, 405 MHz, 25.17 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:05.010Z, 2026/10/14 05:40:05.010, P8, 210 MHz, 210 MHz, 405 MHz, 25.09 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:06.014Z, 2026/10/14 05:40:06.014, P8, 210 MHz, 210 MHz, 405 MHz, 24.92 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:07.028Z, 2026/10/14 05:40:07.028, P8, 210 MHz, 210 MHz, 405 MHz, 24.88 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:08.043Z, 2026/10/14 05:40:08.043, P8, 210 MHz, 210 MHz, 405 MHz, 24.78 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:09.059Z, 2026/10/14 05:40:09.059, P8, 210 MHz, 210 MHz, 405 MHz, 25.42 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:10.070Z, 2026/10/14 05:40:10.070, P8, 210 MHz, 210 MHz, 405 MHz, 25.20 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:11.084Z, 2026/10/14 05:40:11.084, P8, 210 MHz, 210 MHz, 405 MHz, 25.15 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:12.099Z, 2026/10/14 05:40:12.099, P8, 210 MHz, 210 MHz, 405 MHz, 25.03 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:13.112Z, 2026/10/14 05:40:13.112, P8, 210 MHz, 210 MHz, 405 MHz, 24.90 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:14.115Z, 2026/10/14 05:40:14.115, P8, 210 MHz, 210 MHz, 405 MHz, 25.30 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:15.129Z, 2026/10/14 05:40:15.129, P8, 210 MHz, 210 MHz, 405 MHz, 25.10 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:16.140Z, 2026/10/14 05:40:16.140, P8, 210 MHz, 210 MHz, 405 MHz, 27.82 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:17.141Z, 2026/10/14 05:40:17.141, P8, 210 MHz, 210 MHz, 405 MHz, 25.44 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:18.152Z, 2026/10/14 05:40:18.152, P8, 210 MHz, 210 MHz, 405 MHz, 25.45 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:19.165Z, 2026/10/14 05:40:19.165, P8, 210 MHz, 210 MHz, 405 MHz, 25.08 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:20.182Z, 2026/10/14 05:40:20.182, P8, 210 MHz, 210 MHz, 405 MHz, 25.25 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:21.183Z, 2026/10/14 05:40:21.183, P8, 210 MHz, 210 MHz, 405 MHz, 24.99 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:22.217Z, 2026/10/14 05:40:22.217, P8, 210 MHz, 210 MHz, 405 MHz, 25.15 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:23.201Z, 2026/10/14 05:40:23.201, P8, 210 MHz, 210 MHz, 405 MHz, 25.06 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:24.200Z, 2026/10/14 05:40:24.200, P8, 210 MHz, 210 MHz, 405 MHz, 25.21 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:25.203Z, 2026/10/14 05:40:25.203, P8, 210 MHz, 210 MHz, 405 MHz, 25.19 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:26.207Z, 2026/10/14 05:40:26.207, P8, 210 MHz, 210 MHz, 405 MHz, 25.24 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:27.213Z, 2026/10/14 05:40:27.213, P8, 210 MHz, 210 MHz, 405 MHz, 24.80 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:28.229Z, 2026/10/14 05:40:28.229, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:29.243Z, 2026/10/14 05:40:29.243, P8, 210 MHz, 210 MHz, 405 MHz, 24.62 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:30.257Z, 2026/10/14 05:40:30.257, P8, 210 MHz, 210 MHz, 405 MHz, 24.66 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:31.274Z, 2026/10/14 05:40:31.274, P8, 210 MHz, 210 MHz, 405 MHz, 24.56 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:32.288Z, 2026/10/14 05:40:32.288, P8, 210 MHz, 210 MHz, 405 MHz, 24.70 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:33.301Z, 2026/10/14 05:40:33.301, P8, 210 MHz, 210 MHz, 405 MHz, 24.78 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:34.315Z, 2026/10/14 05:40:34.315, P8, 210 MHz, 210 MHz, 405 MHz, 24.74 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:35.330Z, 2026/10/14 05:40:35.330, P8, 210 MHz, 210 MHz, 405 MHz, 24.62 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:36.348Z, 2026/10/14 05:40:36.348, P8, 210 MHz, 210 MHz, 405 MHz, 24.74 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:37.363Z, 2026/10/14 05:40:37.363, P8, 210 MHz, 210 MHz, 405 MHz, 24.76 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:38.377Z, 2026/10/14 05:40:38.377, P8, 210 MHz, 210 MHz, 405 MHz, 24.61 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:39.379Z, 2026/10/14 05:40:39.379, P8, 210 MHz, 210 MHz, 405 MHz, 25.05 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:40.380Z, 2026/10/14 05:40:40.380, P8, 210 MHz, 210 MHz, 405 MHz, 24.88 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:41.394Z, 2026/10/14 05:40:41.394, P8, 210 MHz, 210 MHz, 405 MHz, 24.68 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:42.395Z, 2026/10/14 05:40:42.395, P8, 210 MHz, 210 MHz, 405 MHz, 27.65 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:43.410Z, 2026/10/14 05:40:43.410, P8, 210 MHz, 210 MHz, 405 MHz, 24.95 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:44.414Z, 2026/10/14 05:40:44.414, P8, 210 MHz, 210 MHz, 405 MHz, 24.85 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:45.427Z, 2026/10/14 05:40:45.427, P8, 210 MHz, 210 MHz, 405 MHz, 24.80 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:46.430Z, 2026/10/14 05:40:46.430, P8, 210 MHz, 210 MHz, 405 MHz, 24.68 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:47.442Z, 2026/10/14 05:40:47.442, P8, 210 MHz, 210 MHz, 405 MHz, 24.90 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:48.454Z, 2026/10/14 05:40:48.454, P8, 210 MHz, 210 MHz, 405 MHz, 24.56 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:49.469Z, 2026/10/14 05:40:49.469, P8, 210 MHz, 210 MHz, 405 MHz, 24.54 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:50.471Z, 2026/10/14 05:40:50.471, P8, 210 MHz, 210 MHz, 405 MHz, 24.47 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:51.473Z, 2026/10/14 05:40:51.473, P8, 210 MHz, 210 MHz, 405 MHz, 24.54 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:52.488Z, 2026/10/14 05:40:52.488, P8, 210 MHz, 210 MHz, 405 MHz, 24.74 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:53.503Z, 2026/10/14 05:40:53.503, P8, 210 MHz, 210 MHz, 405 MHz, 24.85 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:54.504Z, 2026/10/14 05:40:54.504, P8, 210 MHz, 210 MHz, 405 MHz, 24.77 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:55.518Z, 2026/10/14 05:40:55.518, P8, 210 MHz, 210 MHz, 405 MHz, 24.65 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:56.530Z, 2026/10/14 05:40:56.530, P8, 210 MHz, 210 MHz, 405 MHz, 24.78 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:57.531Z, 2026/10/14 05:40:57.531, P8, 210 MHz, 210 MHz, 405 MHz, 24.93 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:58.544Z, 2026/10/14 05:40:58.544, P8, 210 MHz, 210 MHz, 405 MHz, 24.88 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:40:59.547Z, 2026/10/14 05:40:59.547, P8, 210 MHz, 210 MHz, 405 MHz, 24.74 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:00.563Z, 2026/10/14 05:41:00.563, P8, 210 MHz, 210 MHz, 405 MHz, 24.81 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:01.574Z, 2026/10/14 05:41:01.574, P8, 210 MHz, 210 MHz, 405 MHz, 24.98 W, 400.00 W, 49, 4 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:02.590Z, 2026/10/14 05:41:02.590, P8, 210 MHz, 210 MHz, 405 MHz, 24.82 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:03.592Z, 2026/10/14 05:41:03.592, P8, 210 MHz, 210 MHz, 405 MHz, 24.66 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:04.605Z, 2026/10/14 05:41:04.605, P8, 210 MHz, 210 MHz, 405 MHz, 24.53 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:05.619Z, 2026/10/14 05:41:05.619, P8, 210 MHz, 210 MHz, 405 MHz, 24.99 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:06.623Z, 2026/10/14 05:41:06.623, P8, 210 MHz, 210 MHz, 405 MHz, 24.78 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:07.638Z, 2026/10/14 05:41:07.638, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:08.661Z, 2026/10/14 05:41:08.661, P8, 210 MHz, 210 MHz, 405 MHz, 24.62 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:09.658Z, 2026/10/14 05:41:09.658, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:10.675Z, 2026/10/14 05:41:10.675, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:11.691Z, 2026/10/14 05:41:11.691, P8, 210 MHz, 210 MHz, 405 MHz, 24.49 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:12.690Z, 2026/10/14 05:41:12.690, P8, 210 MHz, 210 MHz, 405 MHz, 24.73 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:13.694Z, 2026/10/14 05:41:13.694, P8, 210 MHz, 210 MHz, 405 MHz, 24.89 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:14.708Z, 2026/10/14 05:41:14.708, P8, 210 MHz, 210 MHz, 405 MHz, 24.95 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:15.709Z, 2026/10/14 05:41:15.709, P8, 210 MHz, 210 MHz, 405 MHz, 25.02 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:16.716Z, 2026/10/14 05:41:16.716, P8, 210 MHz, 210 MHz, 405 MHz, 24.70 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:17.716Z, 2026/10/14 05:41:17.716, P8, 210 MHz, 210 MHz, 405 MHz, 24.89 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:18.728Z, 2026/10/14 05:41:18.728, P8, 210 MHz, 210 MHz, 405 MHz, 24.93 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:19.741Z, 2026/10/14 05:41:19.741, P8, 210 MHz, 210 MHz, 405 MHz, 24.66 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:20.756Z, 2026/10/14 05:41:20.756, P8, 210 MHz, 210 MHz, 405 MHz, 24.89 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:21.773Z, 2026/10/14 05:41:21.773, P8, 210 MHz, 210 MHz, 405 MHz, 24.88 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:22.786Z, 2026/10/14 05:41:22.786, P8, 210 MHz, 210 MHz, 405 MHz, 24.65 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:23.799Z, 2026/10/14 05:41:23.799, P8, 210 MHz, 210 MHz, 405 MHz, 24.76 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:24.801Z, 2026/10/14 05:41:24.801, P8, 210 MHz, 210 MHz, 405 MHz, 24.54 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:25.846Z, 2026/10/14 05:41:25.846, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:26.816Z, 2026/10/14 05:41:26.816, P8, 210 MHz, 210 MHz, 405 MHz, 24.87 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:27.831Z, 2026/10/14 05:41:27.831, P8, 210 MHz, 210 MHz, 405 MHz, 24.78 W, 400.00 W, 49, 1 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:28.847Z, 2026/10/14 05:41:28.847, P8, 210 MHz, 210 MHz, 405 MHz, 24.98 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:29.849Z, 2026/10/14 05:41:29.849, P8, 210 MHz, 210 MHz, 405 MHz, 24.88 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:30.861Z, 2026/10/14 05:41:30.861, P8, 210 MHz, 210 MHz, 405 MHz, 24.71 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:31.881Z, 2026/10/14 05:41:31.881, P8, 210 MHz, 210 MHz, 405 MHz, 24.58 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:32.874Z, 2026/10/14 05:41:32.874, P8, 210 MHz, 210 MHz, 405 MHz, 24.90 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:33.885Z, 2026/10/14 05:41:33.885, P8, 210 MHz, 210 MHz, 405 MHz, 24.82 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:34.888Z, 2026/10/14 05:41:34.888, P8, 210 MHz, 210 MHz, 405 MHz, 24.76 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:35.896Z, 2026/10/14 05:41:35.896, P8, 210 MHz, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:36.912Z, 2026/10/14 05:41:36.912, P8, 210 MHz, 210 MHz, 405 MHz, 24.59 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:37.914Z, 2026/10/14 05:41:37.914, P8, 210 MHz, 210 MHz, 405 MHz, 24.74 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:38.929Z, 2026/10/14 05:41:38.929, P8, 210 MHz, 210 MHz, 405 MHz, 24.54 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:39.948Z, 2026/10/14 05:41:39.948, P8, 210 MHz, 210 MHz, 405 MHz, 24.63 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:40.951Z, 2026/10/14 05:41:40.951, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:41.956Z, 2026/10/14 05:41:41.956, P8, 210 MHz, 210 MHz, 405 MHz, 24.61 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:42.972Z, 2026/10/14 05:41:42.972, P8, 210 MHz, 210 MHz, 405 MHz, 24.77 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:43.987Z, 2026/10/14 05:41:43.987, P8, 210 MHz, 210 MHz, 405 MHz, 24.62 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:45.000Z, 2026/10/14 05:41:45.000, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:46.000Z, 2026/10/14 05:41:46.000, P8, 210 MHz, 210 MHz, 405 MHz, 24.85 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:47.005Z, 2026/10/14 05:41:47.005, P8, 210 MHz, 210 MHz, 405 MHz, 24.68 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:48.006Z, 2026/10/14 05:41:48.006, P8, 210 MHz, 210 MHz, 405 MHz, 24.98 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:49.053Z, 2026/10/14 05:41:49.053, P8, 210 MHz, 210 MHz, 405 MHz, 24.88 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:50.031Z, 2026/10/14 05:41:50.031, P8, 210 MHz, 210 MHz, 405 MHz, 24.78 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:51.046Z, 2026/10/14 05:41:51.046, P8, 210 MHz, 210 MHz, 405 MHz, 24.82 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:52.048Z, 2026/10/14 05:41:52.048, P8, 210 MHz, 210 MHz, 405 MHz, 24.69 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:53.050Z, 2026/10/14 05:41:53.050, P8, 210 MHz, 210 MHz, 405 MHz, 24.27 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:54.061Z, 2026/10/14 05:41:54.061, P8, 210 MHz, 210 MHz, 405 MHz, 24.52 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:55.062Z, 2026/10/14 05:41:55.062, P8, 210 MHz, 210 MHz, 405 MHz, 24.59 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:56.065Z, 2026/10/14 05:41:56.065, P8, 210 MHz, 210 MHz, 405 MHz, 24.53 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:57.082Z, 2026/10/14 05:41:57.082, P8, 210 MHz, 210 MHz, 405 MHz, 24.61 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:58.095Z, 2026/10/14 05:41:58.095, P8, 210 MHz, 210 MHz, 405 MHz, 24.52 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:41:59.109Z, 2026/10/14 05:41:59.109, P0, 1800 MHz, 1800 MHz, 9501 MHz, 28.52 W, 400.00 W, 50, 17 %, 1617 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:00.143Z, 2026/10/14 05:42:00.143, P0, 1800 MHz, 1800 MHz, 9501 MHz, 101.25 W, 400.00 W, 52, 0 %, 1618 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:01.150Z, 2026/10/14 05:42:01.150, P0, 1800 MHz, 1800 MHz, 9501 MHz, 106.32 W, 400.00 W, 52, 1 %, 1878 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:02.126Z, 2026/10/14 05:42:02.126, P5, 870 MHz, 870 MHz, 810 MHz, 68.71 W, 400.00 W, 51, 43 %, 1879 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:03.128Z, 2026/10/14 05:42:03.128, P0, 1935 MHz, 1935 MHz, 9501 MHz, 185.05 W, 400.00 W, 58, 95 %, 1620 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:42:04.138Z, 2026/10/14 05:42:04.138, P0, 1935 MHz, 1935 MHz, 9501 MHz, 259.64 W, 400.00 W, 59, 93 %, 1699 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:42:05.182Z, 2026/10/14 05:42:05.182, P0, 1935 MHz, 1935 MHz, 9501 MHz, 258.34 W, 400.00 W, 58, 64 %, 1900 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:42:06.165Z, 2026/10/14 05:42:06.165, P0, 1935 MHz, 1935 MHz, 9501 MHz, 241.46 W, 400.00 W, 60, 77 %, 1909 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:42:07.172Z, 2026/10/14 05:42:07.172, P0, 1920 MHz, 1920 MHz, 9501 MHz, 213.32 W, 400.00 W, 56, 0 %, 1129 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:42:08.172Z, 2026/10/14 05:42:08.172, P0, 1920 MHz, 1920 MHz, 9501 MHz, 119.00 W, 400.00 W, 56, 0 %, 1129 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:42:09.187Z, 2026/10/14 05:42:09.187, P3, 300 MHz, 300 MHz, 5001 MHz, 89.89 W, 400.00 W, 54, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:10.202Z, 2026/10/14 05:42:10.202, P3, 210 MHz, 210 MHz, 5001 MHz, 63.42 W, 400.00 W, 54, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:11.203Z, 2026/10/14 05:42:11.203, P3, 210 MHz, 210 MHz, 5001 MHz, 62.96 W, 400.00 W, 53, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:12.218Z, 2026/10/14 05:42:12.218, P5, 210 MHz, 210 MHz, 810 MHz, 50.48 W, 400.00 W, 52, 1 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:13.230Z, 2026/10/14 05:42:13.230, P5, 210 MHz, 210 MHz, 810 MHz, 27.28 W, 400.00 W, 52, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:14.233Z, 2026/10/14 05:42:14.233, P8, 210 MHz, 210 MHz, 405 MHz, 26.68 W, 400.00 W, 52, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:15.250Z, 2026/10/14 05:42:15.250, P8, 210 MHz, 210 MHz, 405 MHz, 25.85 W, 400.00 W, 52, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:16.263Z, 2026/10/14 05:42:16.263, P8, 210 MHz, 210 MHz, 405 MHz, 25.64 W, 400.00 W, 52, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:17.267Z, 2026/10/14 05:42:17.267, P8, 210 MHz, 210 MHz, 405 MHz, 25.69 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:18.282Z, 2026/10/14 05:42:18.282, P8, 210 MHz, 210 MHz, 405 MHz, 25.33 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:19.297Z, 2026/10/14 05:42:19.297, P8, 210 MHz, 210 MHz, 405 MHz, 24.88 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:20.327Z, 2026/10/14 05:42:20.327, P8, 210 MHz, 210 MHz, 405 MHz, 25.47 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:21.317Z, 2026/10/14 05:42:21.317, P8, 210 MHz, 210 MHz, 405 MHz, 25.41 W, 400.00 W, 51, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:22.319Z, 2026/10/14 05:42:22.319, P8, 210 MHz, 210 MHz, 405 MHz, 25.08 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:23.325Z, 2026/10/14 05:42:23.325, P8, 210 MHz, 210 MHz, 405 MHz, 25.45 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:24.338Z, 2026/10/14 05:42:24.338, P8, 210 MHz, 210 MHz, 405 MHz, 25.27 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:25.351Z, 2026/10/14 05:42:25.351, P8, 210 MHz, 210 MHz, 405 MHz, 25.25 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:26.367Z, 2026/10/14 05:42:26.367, P8, 210 MHz, 210 MHz, 405 MHz, 25.22 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:27.380Z, 2026/10/14 05:42:27.380, P8, 210 MHz, 210 MHz, 405 MHz, 25.06 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:28.394Z, 2026/10/14 05:42:28.394, P8, 210 MHz, 210 MHz, 405 MHz, 25.28 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:29.406Z, 2026/10/14 05:42:29.406, P8, 210 MHz, 210 MHz, 405 MHz, 25.31 W, 400.00 W, 51, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:30.407Z, 2026/10/14 05:42:30.407, P8, 210 MHz, 210 MHz, 405 MHz, 25.35 W, 400.00 W, 51, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:31.421Z, 2026/10/14 05:42:31.421, P8, 210 MHz, 210 MHz, 405 MHz, 25.58 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:32.421Z, 2026/10/14 05:42:32.421, P8, 210 MHz, 210 MHz, 405 MHz, 25.55 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:33.437Z, 2026/10/14 05:42:33.437, P8, 210 MHz, 210 MHz, 405 MHz, 25.32 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:34.439Z, 2026/10/14 05:42:34.439, P8, 210 MHz, 210 MHz, 405 MHz, 25.63 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:35.452Z, 2026/10/14 05:42:35.452, P8, 210 MHz, 210 MHz, 405 MHz, 25.51 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:36.465Z, 2026/10/14 05:42:36.465, P8, 210 MHz, 210 MHz, 405 MHz, 25.55 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:37.482Z, 2026/10/14 05:42:37.482, P8, 210 MHz, 210 MHz, 405 MHz, 25.48 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:38.482Z, 2026/10/14 05:42:38.482, P8, 210 MHz, 210 MHz, 405 MHz, 25.35 W, 400.00 W, 51, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:39.498Z, 2026/10/14 05:42:39.498, P8, 210 MHz, 210 MHz, 405 MHz, 25.35 W, 400.00 W, 51, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:40.527Z, 2026/10/14 05:42:40.527, P8, 210 MHz, 210 MHz, 405 MHz, 25.46 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:41.527Z, 2026/10/14 05:42:41.527, P8, 210 MHz, 210 MHz, 405 MHz, 25.29 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:42.541Z, 2026/10/14 05:42:42.541, P8, 210 MHz, 210 MHz, 405 MHz, 25.38 W, 400.00 W, 51, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:43.549Z, 2026/10/14 05:42:43.549, P8, 210 MHz, 210 MHz, 405 MHz, 25.00 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:44.572Z, 2026/10/14 05:42:44.572, P8, 210 MHz, 210 MHz, 405 MHz, 25.03 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:45.576Z, 2026/10/14 05:42:45.576, P8, 210 MHz, 210 MHz, 405 MHz, 25.11 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:46.579Z, 2026/10/14 05:42:46.579, P8, 210 MHz, 210 MHz, 405 MHz, 25.33 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:47.593Z, 2026/10/14 05:42:47.593, P8, 210 MHz, 210 MHz, 405 MHz, 25.71 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:48.607Z, 2026/10/14 05:42:48.607, P8, 210 MHz, 210 MHz, 405 MHz, 25.50 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:49.609Z, 2026/10/14 05:42:49.609, P8, 210 MHz, 210 MHz, 405 MHz, 25.42 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:50.611Z, 2026/10/14 05:42:50.611, P8, 210 MHz, 210 MHz, 405 MHz, 25.53 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:51.627Z, 2026/10/14 05:42:51.627, P8, 210 MHz, 210 MHz, 405 MHz, 25.48 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:52.628Z, 2026/10/14 05:42:52.628, P8, 210 MHz, 210 MHz, 405 MHz, 25.37 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:53.641Z, 2026/10/14 05:42:53.641, P8, 210 MHz, 210 MHz, 405 MHz, 25.30 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:54.642Z, 2026/10/14 05:42:54.642, P8, 210 MHz, 210 MHz, 405 MHz, 25.15 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:55.657Z, 2026/10/14 05:42:55.657, P8, 210 MHz, 210 MHz, 405 MHz, 25.16 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:56.656Z, 2026/10/14 05:42:56.656, P8, 210 MHz, 210 MHz, 405 MHz, 25.29 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:57.657Z, 2026/10/14 05:42:57.657, P8, 210 MHz, 210 MHz, 405 MHz, 25.38 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:58.670Z, 2026/10/14 05:42:58.670, P8, 210 MHz, 210 MHz, 405 MHz, 25.58 W, 400.00 W, 50, 1 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:42:59.673Z, 2026/10/14 05:42:59.673, P8, 210 MHz, 210 MHz, 405 MHz, 25.75 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:00.708Z, 2026/10/14 05:43:00.708, P8, 210 MHz, 210 MHz, 405 MHz, 25.66 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:01.692Z, 2026/10/14 05:43:01.692, P8, 210 MHz, 210 MHz, 405 MHz, 25.49 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:02.707Z, 2026/10/14 05:43:02.707, P8, 210 MHz, 210 MHz, 405 MHz, 25.31 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:03.722Z, 2026/10/14 05:43:03.722, P8, 210 MHz, 210 MHz, 405 MHz, 24.99 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:04.719Z, 2026/10/14 05:43:04.719, P8, 210 MHz, 210 MHz, 405 MHz, 25.51 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:05.722Z, 2026/10/14 05:43:05.722, P8, 210 MHz, 210 MHz, 405 MHz, 25.66 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:06.724Z, 2026/10/14 05:43:06.724, P8, 210 MHz, 210 MHz, 405 MHz, 25.26 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:07.739Z, 2026/10/14 05:43:07.739, P8, 210 MHz, 210 MHz, 405 MHz, 25.10 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:08.750Z, 2026/10/14 05:43:08.750, P8, 210 MHz, 210 MHz, 405 MHz, 25.19 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:09.765Z, 2026/10/14 05:43:09.765, P8, 210 MHz, 210 MHz, 405 MHz, 25.04 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:10.767Z, 2026/10/14 05:43:10.767, P8, 210 MHz, 210 MHz, 405 MHz, 25.08 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:11.783Z, 2026/10/14 05:43:11.783, P8, 210 MHz, 210 MHz, 405 MHz, 24.97 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:12.786Z, 2026/10/14 05:43:12.786, P8, 210 MHz, 210 MHz, 405 MHz, 25.15 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:13.800Z, 2026/10/14 05:43:13.800, P8, 210 MHz, 210 MHz, 405 MHz, 25.24 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:14.814Z, 2026/10/14 05:43:14.814, P8, 210 MHz, 210 MHz, 405 MHz, 24.98 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:15.815Z, 2026/10/14 05:43:15.815, P8, 210 MHz, 210 MHz, 405 MHz, 25.25 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:16.831Z, 2026/10/14 05:43:16.831, P8, 210 MHz, 210 MHz, 405 MHz, 25.09 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:17.833Z, 2026/10/14 05:43:17.833, P8, 210 MHz, 210 MHz, 405 MHz, 25.13 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:18.846Z, 2026/10/14 05:43:18.846, P8, 210 MHz, 210 MHz, 405 MHz, 25.10 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:19.861Z, 2026/10/14 05:43:19.861, P8, 210 MHz, 210 MHz, 405 MHz, 25.27 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:20.877Z, 2026/10/14 05:43:20.877, P8, 210 MHz, 210 MHz, 405 MHz, 25.03 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:21.877Z, 2026/10/14 05:43:21.877, P8, 210 MHz, 210 MHz, 405 MHz, 25.02 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:22.891Z, 2026/10/14 05:43:22.891, P8, 210 MHz, 210 MHz, 405 MHz, 24.81 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:23.909Z, 2026/10/14 05:43:23.909, P8, 210 MHz, 210 MHz, 405 MHz, 24.86 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:24.908Z, 2026/10/14 05:43:24.908, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:25.922Z, 2026/10/14 05:43:25.922, P8, 210 MHz, 210 MHz, 405 MHz, 24.56 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:26.926Z, 2026/10/14 05:43:26.926, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:27.941Z, 2026/10/14 05:43:27.941, P8, 210 MHz, 210 MHz, 405 MHz, 24.81 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:28.953Z, 2026/10/14 05:43:28.953, P8, 210 MHz, 210 MHz, 405 MHz, 24.86 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:29.957Z, 2026/10/14 05:43:29.957, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:30.969Z, 2026/10/14 05:43:30.969, P8, 210 MHz, 210 MHz, 405 MHz, 24.98 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:31.972Z, 2026/10/14 05:43:31.972, P8, 210 MHz, 210 MHz, 405 MHz, 24.89 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:32.986Z, 2026/10/14 05:43:32.986, P8, 210 MHz, 210 MHz, 405 MHz, 24.92 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:33.992Z, 2026/10/14 05:43:33.992, P8, 210 MHz, 210 MHz, 405 MHz, 24.91 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:35.005Z, 2026/10/14 05:43:35.005, P8, 210 MHz, 210 MHz, 405 MHz, 24.82 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:36.008Z, 2026/10/14 05:43:36.008, P8, 210 MHz, 210 MHz, 405 MHz, 24.86 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:37.024Z, 2026/10/14 05:43:37.024, P8, 210 MHz, 210 MHz, 405 MHz, 24.59 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:38.040Z, 2026/10/14 05:43:38.040, P8, 210 MHz, 210 MHz, 405 MHz, 24.80 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:39.046Z, 2026/10/14 05:43:39.046, P8, 210 MHz, 210 MHz, 405 MHz, 25.04 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:40.050Z, 2026/10/14 05:43:40.050, P8, 210 MHz, 210 MHz, 405 MHz, 24.92 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:41.061Z, 2026/10/14 05:43:41.061, P8, 210 MHz, 210 MHz, 405 MHz, 24.91 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:42.065Z, 2026/10/14 05:43:42.065, P8, 210 MHz, 210 MHz, 405 MHz, 24.95 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:43.079Z, 2026/10/14 05:43:43.079, P8, 210 MHz, 210 MHz, 405 MHz, 24.84 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:44.094Z, 2026/10/14 05:43:44.094, P8, 210 MHz, 210 MHz, 405 MHz, 24.78 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:45.095Z, 2026/10/14 05:43:45.095, P8, 210 MHz, 210 MHz, 405 MHz, 24.80 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:46.108Z, 2026/10/14 05:43:46.108, P8, 210 MHz, 210 MHz, 405 MHz, 25.07 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:47.110Z, 2026/10/14 05:43:47.110, P8, 210 MHz, 210 MHz, 405 MHz, 24.81 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:48.125Z, 2026/10/14 05:43:48.125, P8, 210 MHz, 210 MHz, 405 MHz, 24.81 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:49.138Z, 2026/10/14 05:43:49.138, P8, 210 MHz, 210 MHz, 405 MHz, 24.90 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:50.145Z, 2026/10/14 05:43:50.145, P8, 210 MHz, 210 MHz, 405 MHz, 24.94 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:51.146Z, 2026/10/14 05:43:51.146, P8, 210 MHz, 210 MHz, 405 MHz, 24.96 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:52.161Z, 2026/10/14 05:43:52.161, P8, 210 MHz, 210 MHz, 405 MHz, 25.04 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:53.163Z, 2026/10/14 05:43:53.163, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:54.181Z, 2026/10/14 05:43:54.181, P8, 210 MHz, 210 MHz, 405 MHz, 24.72 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:55.185Z, 2026/10/14 05:43:55.185, P8, 210 MHz, 210 MHz, 405 MHz, 24.90 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:56.200Z, 2026/10/14 05:43:56.200, P8, 210 MHz, 210 MHz, 405 MHz, 24.65 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:57.212Z, 2026/10/14 05:43:57.212, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:58.225Z, 2026/10/14 05:43:58.225, P8, 210 MHz, 210 MHz, 405 MHz, 24.58 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:43:59.240Z, 2026/10/14 05:43:59.240, P8, 210 MHz, 210 MHz, 405 MHz, 24.77 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:00.251Z, 2026/10/14 05:44:00.251, P8, 210 MHz, 210 MHz, 405 MHz, 24.87 W, 400.00 W, 49, 4 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:01.254Z, 2026/10/14 05:44:01.254, P8, 210 MHz, 210 MHz, 405 MHz, 24.79 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:02.267Z, 2026/10/14 05:44:02.267, P8, 210 MHz, 210 MHz, 405 MHz, 24.85 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:03.280Z, 2026/10/14 05:44:03.280, P8, 210 MHz, 210 MHz, 405 MHz, 24.88 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:04.297Z, 2026/10/14 05:44:04.297, P8, 210 MHz, 210 MHz, 405 MHz, 24.86 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:05.296Z, 2026/10/14 05:44:05.296, P8, 210 MHz, 210 MHz, 405 MHz, 24.77 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:06.313Z, 2026/10/14 05:44:06.313, P8, 210 MHz, 210 MHz, 405 MHz, 24.74 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:07.318Z, 2026/10/14 05:44:07.318, P8, 210 MHz, 210 MHz, 405 MHz, 24.89 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:08.333Z, 2026/10/14 05:44:08.333, P8, 210 MHz, 210 MHz, 405 MHz, 24.90 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:09.348Z, 2026/10/14 05:44:09.348, P8, 210 MHz, 210 MHz, 405 MHz, 24.81 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:10.350Z, 2026/10/14 05:44:10.350, P0, 1800 MHz, 1800 MHz, 9501 MHz, 25.05 W, 400.00 W, 49, 0 %, 1901 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:11.374Z, 2026/10/14 05:44:11.374, P0, 1935 MHz, 1935 MHz, 9501 MHz, 138.54 W, 400.00 W, 58, 54 %, 1978 MiB, 0 %, 0x0000000000000600
+2026-10-14T10:44:12.369Z, 2026/10/14 05:44:12.369, P0, 1920 MHz, 1920 MHz, 9501 MHz, 367.05 W, 400.00 W, 63, 93 %, 2049 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:44:13.381Z, 2026/10/14 05:44:13.381, P0, 1920 MHz, 1920 MHz, 9501 MHz, 370.56 W, 400.00 W, 64, 94 %, 2049 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:44:14.399Z, 2026/10/14 05:44:14.399, P0, 1920 MHz, 1920 MHz, 9501 MHz, 361.40 W, 400.00 W, 65, 93 %, 2200 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:44:15.412Z, 2026/10/14 05:44:15.412, P0, 1920 MHz, 1920 MHz, 9501 MHz, 303.78 W, 400.00 W, 59, 0 %, 1129 MiB, 0 %, 0x0000000000000400
+2026-10-14T10:44:16.425Z, 2026/10/14 05:44:16.425, P0, 1920 MHz, 1920 MHz, 9501 MHz, 121.64 W, 400.00 W, 57, 1 %, 1129 MiB, 53 %, 0x0000000000000400
+2026-10-14T10:44:17.442Z, 2026/10/14 05:44:17.442, P3, 330 MHz, 330 MHz, 5001 MHz, 96.03 W, 400.00 W, 55, 1 %, 1129 MiB, 49 %, 0x0000000000000001
+2026-10-14T10:44:18.455Z, 2026/10/14 05:44:18.455, P3, 210 MHz, 210 MHz, 5001 MHz, 64.63 W, 400.00 W, 54, 0 %, 1129 MiB, 49 %, 0x0000000000000001
+2026-10-14T10:44:19.458Z, 2026/10/14 05:44:19.458, P3, 210 MHz, 210 MHz, 5001 MHz, 64.26 W, 400.00 W, 54, 0 %, 1129 MiB, 50 %, 0x0000000000000001
+2026-10-14T10:44:20.473Z, 2026/10/14 05:44:20.473, P3, 210 MHz, 210 MHz, 5001 MHz, 64.29 W, 400.00 W, 54, 0 %, 1129 MiB, 52 %, 0x0000000000000001
+2026-10-14T10:44:21.488Z, 2026/10/14 05:44:21.488, P3, 210 MHz, 210 MHz, 5001 MHz, 64.35 W, 400.00 W, 53, 0 %, 1129 MiB, 53 %, 0x0000000000000001
+2026-10-14T10:44:22.500Z, 2026/10/14 05:44:22.500, P5, 210 MHz, 210 MHz, 810 MHz, 36.03 W, 400.00 W, 52, 0 %, 1129 MiB, 53 %, 0x0000000000000001
+2026-10-14T10:44:23.519Z, 2026/10/14 05:44:23.519, P8, 210 MHz, 210 MHz, 405 MHz, 28.66 W, 400.00 W, 52, 0 %, 1129 MiB, 52 %, 0x0000000000000001
+2026-10-14T10:44:24.515Z, 2026/10/14 05:44:24.515, P8, 210 MHz, 210 MHz, 405 MHz, 27.47 W, 400.00 W, 51, 0 %, 1129 MiB, 51 %, 0x0000000000000001
+2026-10-14T10:44:25.531Z, 2026/10/14 05:44:25.531, P8, 210 MHz, 210 MHz, 405 MHz, 26.44 W, 400.00 W, 51, 2 %, 1129 MiB, 48 %, 0x0000000000000001
+2026-10-14T10:44:26.534Z, 2026/10/14 05:44:26.534, P8, 210 MHz, 210 MHz, 405 MHz, 26.28 W, 400.00 W, 51, 2 %, 1129 MiB, 45 %, 0x0000000000000001
+2026-10-14T10:44:27.534Z, 2026/10/14 05:44:27.534, P8, 210 MHz, 210 MHz, 405 MHz, 26.10 W, 400.00 W, 50, 0 %, 1129 MiB, 41 %, 0x0000000000000001
+2026-10-14T10:44:28.548Z, 2026/10/14 05:44:28.548, P8, 210 MHz, 210 MHz, 405 MHz, 25.43 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:29.563Z, 2026/10/14 05:44:29.563, P8, 210 MHz, 210 MHz, 405 MHz, 25.02 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:30.577Z, 2026/10/14 05:44:30.577, P8, 210 MHz, 210 MHz, 405 MHz, 24.90 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:31.580Z, 2026/10/14 05:44:31.580, P8, 210 MHz, 210 MHz, 405 MHz, 24.84 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:32.579Z, 2026/10/14 05:44:32.579, P8, 210 MHz, 210 MHz, 405 MHz, 25.04 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:33.594Z, 2026/10/14 05:44:33.594, P8, 210 MHz, 210 MHz, 405 MHz, 24.95 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:34.593Z, 2026/10/14 05:44:34.593, P8, 210 MHz, 210 MHz, 405 MHz, 24.68 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:35.600Z, 2026/10/14 05:44:35.600, P8, 210 MHz, 210 MHz, 405 MHz, 24.91 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:36.614Z, 2026/10/14 05:44:36.614, P8, 210 MHz, 210 MHz, 405 MHz, 24.91 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:37.630Z, 2026/10/14 05:44:37.630, P8, 210 MHz, 210 MHz, 405 MHz, 24.68 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:38.643Z, 2026/10/14 05:44:38.643, P8, 210 MHz, 210 MHz, 405 MHz, 24.68 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:39.644Z, 2026/10/14 05:44:39.644, P8, 210 MHz, 210 MHz, 405 MHz, 24.33 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:40.660Z, 2026/10/14 05:44:40.660, P8, 210 MHz, 210 MHz, 405 MHz, 24.53 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:41.661Z, 2026/10/14 05:44:41.661, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:42.662Z, 2026/10/14 05:44:42.662, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 50, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:43.676Z, 2026/10/14 05:44:43.676, P8, 210 MHz, 210 MHz, 405 MHz, 25.00 W, 400.00 W, 50, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:44.691Z, 2026/10/14 05:44:44.691, P8, 210 MHz, 210 MHz, 405 MHz, 24.62 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:45.692Z, 2026/10/14 05:44:45.692, P8, 210 MHz, 210 MHz, 405 MHz, 24.78 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:46.705Z, 2026/10/14 05:44:46.705, P8, 210 MHz, 210 MHz, 405 MHz, 24.89 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:47.738Z, 2026/10/14 05:44:47.738, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:48.721Z, 2026/10/14 05:44:48.721, P8, 210 MHz, 210 MHz, 405 MHz, 24.79 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:49.736Z, 2026/10/14 05:44:49.736, P8, 210 MHz, 210 MHz, 405 MHz, 24.82 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:50.781Z, 2026/10/14 05:44:50.781, P8, 210 MHz, 210 MHz, 405 MHz, 24.52 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:51.753Z, 2026/10/14 05:44:51.753, P8, 210 MHz, 210 MHz, 405 MHz, 24.92 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:52.767Z, 2026/10/14 05:44:52.767, P8, 210 MHz, 210 MHz, 405 MHz, 24.80 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:53.770Z, 2026/10/14 05:44:53.770, P8, 210 MHz, 210 MHz, 405 MHz, 24.59 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:54.773Z, 2026/10/14 05:44:54.773, P8, 210 MHz, 210 MHz, 405 MHz, 24.43 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:55.791Z, 2026/10/14 05:44:55.791, P8, 210 MHz, 210 MHz, 405 MHz, 24.58 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:56.808Z, 2026/10/14 05:44:56.808, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:57.813Z, 2026/10/14 05:44:57.813, P8, 210 MHz, 210 MHz, 405 MHz, 24.58 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:58.819Z, 2026/10/14 05:44:58.819, P8, 210 MHz, 210 MHz, 405 MHz, 24.72 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:44:59.839Z, 2026/10/14 05:44:59.839, P8, 210 MHz, 210 MHz, 405 MHz, 24.63 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:00.850Z, 2026/10/14 05:45:00.850, P8, 210 MHz, 210 MHz, 405 MHz, 24.58 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:01.864Z, 2026/10/14 05:45:01.864, P8, 210 MHz, 210 MHz, 405 MHz, 25.77 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:02.875Z, 2026/10/14 05:45:02.875, P8, 210 MHz, 210 MHz, 405 MHz, 24.68 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:03.878Z, 2026/10/14 05:45:03.878, P8, 210 MHz, 210 MHz, 405 MHz, 24.32 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:04.892Z, 2026/10/14 05:45:04.892, P8, 210 MHz, 210 MHz, 405 MHz, 24.34 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:05.907Z, 2026/10/14 05:45:05.907, P8, 210 MHz, 210 MHz, 405 MHz, 24.41 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:06.910Z, 2026/10/14 05:45:06.910, P8, 210 MHz, 210 MHz, 405 MHz, 24.75 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:07.921Z, 2026/10/14 05:45:07.921, P8, 210 MHz, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:08.924Z, 2026/10/14 05:45:08.924, P8, 210 MHz, 210 MHz, 405 MHz, 24.47 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:09.935Z, 2026/10/14 05:45:09.935, P8, 210 MHz, 210 MHz, 405 MHz, 24.57 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:10.934Z, 2026/10/14 05:45:10.934, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:11.949Z, 2026/10/14 05:45:11.949, P8, 210 MHz, 210 MHz, 405 MHz, 24.79 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:12.954Z, 2026/10/14 05:45:12.954, P8, 210 MHz, 210 MHz, 405 MHz, 24.62 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:13.954Z, 2026/10/14 05:45:13.954, P8, 210 MHz, 210 MHz, 405 MHz, 24.99 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:14.957Z, 2026/10/14 05:45:14.957, P8, 210 MHz, 210 MHz, 405 MHz, 24.83 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:15.969Z, 2026/10/14 05:45:15.969, P8, 210 MHz, 210 MHz, 405 MHz, 24.45 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:16.972Z, 2026/10/14 05:45:16.972, P8, 210 MHz, 210 MHz, 405 MHz, 24.69 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:17.984Z, 2026/10/14 05:45:17.984, P8, 210 MHz, 210 MHz, 405 MHz, 24.98 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:18.985Z, 2026/10/14 05:45:18.985, P8, 210 MHz, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:20.000Z, 2026/10/14 05:45:20.000, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:21.012Z, 2026/10/14 05:45:21.012, P8, 210 MHz, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:22.025Z, 2026/10/14 05:45:22.025, P8, 210 MHz, 210 MHz, 405 MHz, 24.69 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:23.039Z, 2026/10/14 05:45:23.039, P8, 210 MHz, 210 MHz, 405 MHz, 24.74 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:24.054Z, 2026/10/14 05:45:24.054, P8, 210 MHz, 210 MHz, 405 MHz, 24.79 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:25.067Z, 2026/10/14 05:45:25.067, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:26.081Z, 2026/10/14 05:45:26.081, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:27.096Z, 2026/10/14 05:45:27.096, P8, 210 MHz, 210 MHz, 405 MHz, 24.38 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:28.098Z, 2026/10/14 05:45:28.098, P8, 210 MHz, 210 MHz, 405 MHz, 24.55 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:29.111Z, 2026/10/14 05:45:29.111, P8, 210 MHz, 210 MHz, 405 MHz, 24.55 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:30.115Z, 2026/10/14 05:45:30.115, P8, 210 MHz, 210 MHz, 405 MHz, 24.48 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:31.134Z, 2026/10/14 05:45:31.134, P8, 210 MHz, 210 MHz, 405 MHz, 24.45 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:32.151Z, 2026/10/14 05:45:32.151, P8, 210 MHz, 210 MHz, 405 MHz, 24.37 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:33.154Z, 2026/10/14 05:45:33.154, P8, 210 MHz, 210 MHz, 405 MHz, 24.59 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:34.167Z, 2026/10/14 05:45:34.167, P8, 210 MHz, 210 MHz, 405 MHz, 24.69 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:35.181Z, 2026/10/14 05:45:35.181, P8, 210 MHz, 210 MHz, 405 MHz, 24.40 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:36.193Z, 2026/10/14 05:45:36.193, P8, 210 MHz, 210 MHz, 405 MHz, 24.58 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:37.207Z, 2026/10/14 05:45:37.207, P8, 210 MHz, 210 MHz, 405 MHz, 24.77 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:38.221Z, 2026/10/14 05:45:38.221, P8, 210 MHz, 210 MHz, 405 MHz, 24.45 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:39.235Z, 2026/10/14 05:45:39.235, P8, 210 MHz, 210 MHz, 405 MHz, 24.48 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:40.251Z, 2026/10/14 05:45:40.251, P8, 210 MHz, 210 MHz, 405 MHz, 24.50 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:41.265Z, 2026/10/14 05:45:41.265, P8, 210 MHz, 210 MHz, 405 MHz, 24.50 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:42.281Z, 2026/10/14 05:45:42.281, P8, 210 MHz, 210 MHz, 405 MHz, 24.38 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:43.293Z, 2026/10/14 05:45:43.293, P8, 210 MHz, 210 MHz, 405 MHz, 24.29 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:44.300Z, 2026/10/14 05:45:44.300, P8, 210 MHz, 210 MHz, 405 MHz, 24.48 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:45.303Z, 2026/10/14 05:45:45.303, P8, 210 MHz, 210 MHz, 405 MHz, 24.48 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:46.315Z, 2026/10/14 05:45:46.315, P8, 210 MHz, 210 MHz, 405 MHz, 24.21 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:47.329Z, 2026/10/14 05:45:47.329, P8, 210 MHz, 210 MHz, 405 MHz, 24.70 W, 400.00 W, 49, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:48.344Z, 2026/10/14 05:45:48.344, P8, 210 MHz, 210 MHz, 405 MHz, 24.53 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:49.375Z, 2026/10/14 05:45:49.375, P8, 210 MHz, 210 MHz, 405 MHz, 24.61 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:50.374Z, 2026/10/14 05:45:50.374, P8, 210 MHz, 210 MHz, 405 MHz, 24.71 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:51.375Z, 2026/10/14 05:45:51.375, P8, 210 MHz, 210 MHz, 405 MHz, 24.61 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:52.391Z, 2026/10/14 05:45:52.391, P8, 210 MHz, 210 MHz, 405 MHz, 25.02 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:53.407Z, 2026/10/14 05:45:53.407, P8, 210 MHz, 210 MHz, 405 MHz, 24.88 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:54.421Z, 2026/10/14 05:45:54.421, P8, 210 MHz, 210 MHz, 405 MHz, 24.66 W, 400.00 W, 49, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:55.436Z, 2026/10/14 05:45:55.436, P8, 210 MHz, 210 MHz, 405 MHz, 24.61 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:56.435Z, 2026/10/14 05:45:56.435, P8, 210 MHz, 210 MHz, 405 MHz, 24.57 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:57.437Z, 2026/10/14 05:45:57.437, P8, 210 MHz, 210 MHz, 405 MHz, 24.40 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:58.452Z, 2026/10/14 05:45:58.452, P8, 210 MHz, 210 MHz, 405 MHz, 24.44 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:45:59.466Z, 2026/10/14 05:45:59.466, P8, 210 MHz, 210 MHz, 405 MHz, 24.45 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:00.466Z, 2026/10/14 05:46:00.466, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:01.468Z, 2026/10/14 05:46:01.468, P8, 210 MHz, 210 MHz, 405 MHz, 24.37 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:02.483Z, 2026/10/14 05:46:02.483, P8, 210 MHz, 210 MHz, 405 MHz, 24.15 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:03.488Z, 2026/10/14 05:46:03.488, P8, 210 MHz, 210 MHz, 405 MHz, 24.67 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:04.490Z, 2026/10/14 05:46:04.490, P8, 210 MHz, 210 MHz, 405 MHz, 24.40 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:05.489Z, 2026/10/14 05:46:05.489, P8, 210 MHz, 210 MHz, 405 MHz, 24.43 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:06.500Z, 2026/10/14 05:46:06.500, P8, 210 MHz, 210 MHz, 405 MHz, 24.77 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:07.516Z, 2026/10/14 05:46:07.516, P8, 210 MHz, 210 MHz, 405 MHz, 24.65 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:08.516Z, 2026/10/14 05:46:08.516, P8, 210 MHz, 210 MHz, 405 MHz, 24.70 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:09.533Z, 2026/10/14 05:46:09.533, P8, 210 MHz, 210 MHz, 405 MHz, 24.60 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:10.528Z, 2026/10/14 05:46:10.528, P8, 210 MHz, 210 MHz, 405 MHz, 24.82 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:11.533Z, 2026/10/14 05:46:11.533, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:12.535Z, 2026/10/14 05:46:12.535, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:13.536Z, 2026/10/14 05:46:13.536, P8, 210 MHz, 210 MHz, 405 MHz, 24.40 W, 400.00 W, 48, 2 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:14.539Z, 2026/10/14 05:46:14.539, P8, 210 MHz, 210 MHz, 405 MHz, 24.48 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:15.558Z, 2026/10/14 05:46:15.558, P8, 210 MHz, 210 MHz, 405 MHz, 24.42 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:16.563Z, 2026/10/14 05:46:16.563, P8, 210 MHz, 210 MHz, 405 MHz, 24.51 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:17.565Z, 2026/10/14 05:46:17.565, P8, 210 MHz, 210 MHz, 405 MHz, 24.58 W, 400.00 W, 48, 0 %, 1129 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:18.571Z, 2026/10/14 05:46:18.571, P8, 210 MHz, 210 MHz, 405 MHz, 25.22 W, 400.00 W, 48, 0 %, 1139 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:19.578Z, 2026/10/14 05:46:19.578, P0, 1875 MHz, 1875 MHz, 9501 MHz, 71.91 W, 400.00 W, 51, 0 %, 2729 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:20.587Z, 2026/10/14 05:46:20.587, P0, 1875 MHz, 1875 MHz, 9501 MHz, 108.52 W, 400.00 W, 52, 0 %, 2733 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:21.601Z, 2026/10/14 05:46:21.601, P5, 420 MHz, 420 MHz, 810 MHz, 92.76 W, 400.00 W, 51, 1 %, 2734 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:22.616Z, 2026/10/14 05:46:22.616, P5, 270 MHz, 270 MHz, 810 MHz, 32.10 W, 400.00 W, 49, 1 %, 2744 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:23.628Z, 2026/10/14 05:46:23.628, P8, 210 MHz, 210 MHz, 405 MHz, 27.12 W, 400.00 W, 49, 0 %, 2744 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:24.639Z, 2026/10/14 05:46:24.639, P8, 210 MHz, 210 MHz, 405 MHz, 25.31 W, 400.00 W, 49, 0 %, 2744 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:25.642Z, 2026/10/14 05:46:25.642, P8, 210 MHz, 210 MHz, 405 MHz, 25.01 W, 400.00 W, 49, 0 %, 2744 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:26.651Z, 2026/10/14 05:46:26.651, P0, 1800 MHz, 1800 MHz, 9501 MHz, 28.34 W, 400.00 W, 51, 98 %, 3192 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:27.660Z, 2026/10/14 05:46:27.660, P0, 1950 MHz, 1950 MHz, 9501 MHz, 118.87 W, 400.00 W, 53, 0 %, 3194 MiB, 0 %, 0x0000000000000600
+2026-10-14T10:46:28.670Z, 2026/10/14 05:46:28.670, P3, 435 MHz, 435 MHz, 5001 MHz, 117.45 W, 400.00 W, 52, 0 %, 3194 MiB, 0 %, 0x0000000000000600
+2026-10-14T10:46:29.679Z, 2026/10/14 05:46:29.679, P3, 285 MHz, 285 MHz, 5001 MHz, 69.61 W, 400.00 W, 51, 0 %, 3204 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:30.688Z, 2026/10/14 05:46:30.688, P3, 210 MHz, 210 MHz, 5001 MHz, 63.03 W, 400.00 W, 51, 1 %, 3204 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:31.693Z, 2026/10/14 05:46:31.693, P5, 210 MHz, 210 MHz, 810 MHz, 49.21 W, 400.00 W, 50, 2 %, 3208 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:32.712Z, 2026/10/14 05:46:32.712, P5, 210 MHz, 210 MHz, 810 MHz, 27.18 W, 400.00 W, 50, 0 %, 3208 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:33.722Z, 2026/10/14 05:46:33.722, P8, 210 MHz, 210 MHz, 405 MHz, 26.09 W, 400.00 W, 50, 0 %, 3208 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:34.722Z, 2026/10/14 05:46:34.722, P8, 210 MHz, 210 MHz, 405 MHz, 25.09 W, 400.00 W, 49, 0 %, 3208 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:35.728Z, 2026/10/14 05:46:35.728, P8, 210 MHz, 210 MHz, 405 MHz, 24.80 W, 400.00 W, 49, 0 %, 3208 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:36.737Z, 2026/10/14 05:46:36.737, P0, 1950 MHz, 1950 MHz, 9501 MHz, 64.91 W, 400.00 W, 56, 86 %, 2789 MiB, 0 %, 0x0000000000000001
+2026-10-14T10:46:37.748Z, 2026/10/14 05:46:37.748, P0, 1935 MHz, 1935 MHz, 9501 MHz, 124.96 W, 400.00 W, 57, 44 %, 2794 MiB, 0 %, 0x0000000000000600
+2026-10-14T10:46:38.755Z, 2026/10/14 05:46:38.755, P0, 1935 MHz, 1935 MHz, 9501 MHz, 306.68 W, 400.00 W, 61, 96 %, 2794 MiB, 0 %, 0x0000000000000600
+2026-10-14T10:46:39.755Z, 2026/10/14 05:46:39.755, P0, 1935 MHz, 1935 MHz, 9501 MHz, 318.72 W, 400.00 W, 62, 96 %, 2794 MiB, 0 %, 0x0000000000000600
+2026-10-14T10:46:40.768Z, 2026/10/14 05:46:40.768, P0, 1920 MHz, 1920 MHz, 9501 MHz, 303.08 W, 400.00 W, 62, 95 %, 3018 MiB, 0 %, 0x0000000000000600
+2026-10-14T10:46:41.772Z, 2026/10/14 05:46:41.772, P0, 1920 MHz, 1920 MHz, 9501 MHz, 313.80 W, 400.00 W, 63, 95 %, 3018 MiB, 0 %, 0x0000000000000600
+2026-10-14T10:46:42.773Z, 2026/10/14 05:46:42.773, P0, 1920 MHz, 1920 MHz, 9501 MHz, 314.57 W, 400.00 W, 64, 96 %, 3018 MiB, 0 %, 0x0000000000000600
+2026-10-14T10:46:43.792Z, 2026/10/14 05:46:43.792, P0, 1920 MHz, 1920 MHz, 9501 MHz, 288.73 W, 400.00 W, 61, 43 %, 3303 MiB, 0 %, 0x0000000000000600
+2026-10-14T10:46:44.793Z, 2026/10/14 05:46:44.793, P0, 1920 MHz, 1920 MHz, 9501 MHz, 292.38 W, 400.00 W, 65, 95 %, 3303 MiB, 55 %, 0x0000000000000600
+2026-10-14T10:46:45.798Z, 2026/10/14 05:46:45.798, P0, 1920 MHz, 1920 MHz, 9501 MHz, 313.26 W, 400.00 W, 65, 96 %, 3303 MiB, 49 %, 0x0000000000000600
+2026-10-14T10:46:46.799Z, 2026/10/14 05:46:46.799, P0, 1920 MHz, 1920 MHz, 9501 MHz, 313.44 W, 400.00 W, 66, 95 %, 3303 MiB, 48 %, 0x0000000000000600
+

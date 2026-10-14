@@ -1,0 +1,228 @@
+{
+  "description": "Native baseline for the LocalMode Bench methodology: llama-bench on an AMD Ryzen 7 9800X3D with an NVIDIA GeForce RTX 3080 Ti. Parsed facts; raw command output is in environment.txt.",
+  "wall_clock_utc": {
+    "session_start": "2026-10-14T04:57:21.8182843Z",
+    "environment_capture": "2026-10-14T04:59:05.0042913Z",
+    "measurement_start": "2026-10-14T10:06:52.1726020Z",
+    "measurement_end": "2026-10-14T10:52:01.8572899Z",
+    "session_end": "2026-10-14T11:01:16.6921765Z",
+    "note": "Between environment capture and the start of measurement the session waited for the operator to close RivaTuner Statistics Server from an elevated prompt (it ran elevated and could not be stopped from this session). The process state was recorded again at 2026-10-14T10:04:47Z, just before the orchestrator started."
+  },
+  "machine": {
+    "form_factor": "desktop",
+    "power_source": "mains (Win32_Battery: no battery present)",
+    "last_boot_utc": "2026-10-14T04:38:40.5Z",
+    "cpu": {
+      "name": "AMD Ryzen 7 9800X3D 8-Core Processor",
+      "microarchitecture": "Zen 5",
+      "cores": 8,
+      "logical_processors": 16,
+      "environment_processor_count": 16,
+      "efficiency_cores": 0,
+      "smt": true,
+      "max_clock_mhz": 4700,
+      "l2_cache_kb": 8192,
+      "l3_cache_kb": 98304
+    },
+    "ram_bytes": 102602493952,
+    "ram_nominal": "96 GB",
+    "ram_note": "TotalPhysicalMemory is 2147483648 bytes (2 GiB) more than the 100455010304 recorded on 1 Oct, when the integrated Radeon with its 2 GB carve-out was enabled.",
+    "gpu": {
+      "name": "NVIDIA GeForce RTX 3080 Ti",
+      "type": "discrete",
+      "architecture": "Ampere GA102",
+      "vram": "12288 MiB (nvidia-smi memory.total); CUDA reports 12287 MiB; Win32_VideoController AdapterRAM 4293918720 (32-bit field, saturated)",
+      "compute_capability": "8.6",
+      "pci_device_id": "0x220810DE",
+      "vbios_version": "94.02.71.80.74",
+      "driver_version": "617.42",
+      "windows_driver_version": "32.0.16.1742",
+      "windows_driver_date": "9/29/2026 7:00:00 PM (Win32_VideoController DriverDate, local time)",
+      "cuda_version_supported_by_driver": "13.4 (plain nvidia-smi header 'CUDA UMD Version: 13.4'; this driver's header no longer prints 'CUDA Version', nvidia-smi -q prints 'CUDA Version : 13.4 [Deprecated; ...]')",
+      "power_limit_default_w": 400.0,
+      "power_limit_enforced_w": 400.0,
+      "power_limit_min_max_w": [100.0, 450.0],
+      "max_clocks": { "graphics_mhz": 2100, "sm_mhz": 2100, "memory_mhz": 9501, "video_mhz": 1950 },
+      "temperature_limits_c": { "target": 83, "max_operating": 93, "slowdown": 95, "shutdown": 98 },
+      "pcie_link": { "gen_current_at_idle": 1, "gen_max": 4, "width_current_at_idle": 8, "width_max": 16, "note": "read once at idle (P8) during environment capture; not logged under load" },
+      "idle_state_at_capture": "P8, 210 MHz graphics, 405 MHz memory, 26.67 W, 48 C, fan 0 %, 1097 MiB used, utilization 4 % (GPU idle reason active)",
+      "display_attached": "the RTX 3080 Ti is the only enumerated display adapter (nvidia-smi Disp.A: On)",
+      "power_management_mode": "not read (NVIDIA Control Panel not opened)",
+      "afterburner_state": "MSI Afterburner 4.6.5 installed, not running at any point of the session. Its profile file for this card (VEN_10DE&DEV_2208) has an empty [Startup] section (no power limit, clock offset, voltage/frequency curve or fan setting applied at startup); enforced power limit equals the default (400 W). RivaTuner Statistics Server 7.3.4 (its on-screen display server) was running elevated at session start; this session could not stop it (Access is denied) and the operator closed it from an elevated prompt before the smoke tests. Its Vulkan implicit layer VK_LAYER_RTSS stays registered and is listed by vulkaninfo.",
+      "hags": "HwSchMode value absent (Windows default)"
+    },
+    "igpu": {
+      "state": "integrated Radeon disabled in BIOS (not enumerated)",
+      "evidence": "Win32_VideoController lists only the NVIDIA GeForce RTX 3080 Ti; Get-PnpDevice -Class Display lists 'AMD Radeon(TM) Graphics' with Status Unknown, Present False (a non-present device entry from when it was enabled); vulkaninfo lists one device (the RTX 3080 Ti)."
+    }
+  },
+  "os": {
+    "caption": "Microsoft Windows 11 Pro",
+    "version": "10.0.26200",
+    "display_version": "25H2",
+    "build": 26200,
+    "ubr": 9711,
+    "architecture": "64-bit"
+  },
+  "shell": "Windows PowerShell 5.1.26100.9711 (PowerShell 7 not installed)",
+  "power_plan": {
+    "before": { "guid": "381b4222-f694-41f0-9685-ff5bb260df2e", "name": "Balanced" },
+    "during": { "guid": "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c", "name": "High performance", "how": "powercfg /setactive SCHEME_MIN at 2026-10-14T10:04:48Z (High performance already existed; no plan created)" },
+    "after": { "guid": "381b4222-f694-41f0-9685-ff5bb260df2e", "name": "Balanced", "how": "powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e at 2026-10-14T10:52:02Z" },
+    "available": ["Balanced", "Ultimate Performance", "High performance", "Power saver"]
+  },
+  "keep_awake": {
+    "call": "[Win32.Power]::SetThreadExecutionState([uint32]2147483651) in the orchestrator thread at 2026-10-14T10:04:48.57Z, before the smoke tests; returned 2147483648 (previous state ES_CONTINUOUS; 0 would mean failure)",
+    "release": "[Win32.Power]::SetThreadExecutionState([uint32]2147483648) at 2026-10-14T10:52:02.10Z; returned 2147483651",
+    "uncovered_interval": "none: the smoke tests and every measurement ran between the two calls"
+  },
+  "ambient": {
+    "browsers": "No Chrome or Edge window was open (so no localmode.ai/bench/run tab); 18 chrome and 5 msedge background processes were stopped at 04:57Z. Get-Process chrome, msedge, firefox returned nothing at environment capture and at measurement launch.",
+    "windows_update": "Not installing: no TiWorker/TrustedInstaller/MoUsoCoreWorker process, BITS and TrustedInstaller stopped. Last WindowsUpdateClient event before the session: 04:49:30Z, Security Intelligence Update for Microsoft Defender Antivirus (KB2267602, version 1.461.18.0) downloaded. The 2026-10 cumulative update (26200.9711) matches the installed UBR.",
+    "defender_realtime_protection": true,
+    "defender_note": "Microsoft Defender real-time protection left on (AntivirusEnabled True, RealTimeProtectionEnabled True, AMRunningMode Normal), no exclusions added. Its scanning of freshly downloaded files can slow the downloads and the first read of each file; llama-bench loads the model and runs a warmup before it times anything, so this does not enter the measurements.",
+    "gpu_tools_and_overlays": "MSI Afterburner not running. RTSS closed by the operator before measuring. NVIDIA Overlay (NVIDIA App) processes were stopped once but are respawned by nvcontainer within seconds; they were running (no game, overlay not shown) during the measurements. Steam and Rockstar Social Club Vulkan layers are registered but neither application was running.",
+    "other_processes_top_cpu_at_measurement_launch": ["HYTE.Nexus.Service", "claude (desktop app, several processes)", "DCv2", "OneDrive", "explorer", "AUEPMaster", "nvsphelper64", "nvcontainer", "NortonUI", "NVIDIA Overlay"],
+    "hyte_nexus": "HYTE Nexus (case control software, service and app) ran throughout; HYTE.Nexus.Service had accumulated 1866 s of CPU time since boot at 10:04Z (about 0.1 core on average). It also appears as a C+G process on the GPU.",
+    "gpu_idle_utilization": "1-21 % reported at P8 by the GPU logger between invocations (desktop composition and the C+G processes listed by nvidia-smi)"
+  },
+  "clock_witness": {
+    "counter": "\\Processor Information(_Total)\\% Processor Performance and \\Processor Information(_Total)\\Processor Frequency, 3 samples at 1 s, before each model in each section",
+    "processor_frequency_mhz_all_samples": 4700,
+    "samples": [
+      { "utc": "2026-10-14T04:59:08Z", "label": "environment capture (Balanced plan)", "pct_processor_performance": [84.98, 84.07, 84.11] },
+      { "utc": "2026-10-14T10:06:52Z", "label": "4a smollm2-135m", "pct_processor_performance": [95.19, 95.62, 88.27] },
+      { "utc": "2026-10-14T10:10:53Z", "label": "4a qwen3-0.6b", "pct_processor_performance": [87.69, 89.42, 87.10] },
+      { "utc": "2026-10-14T10:15:50Z", "label": "4a llama-3.2-1b", "pct_processor_performance": [86.83, 86.47, 92.40] },
+      { "utc": "2026-10-14T10:21:53Z", "label": "4a gemma-4-e2b", "pct_processor_performance": [88.39, 93.11, 95.33] },
+      { "utc": "2026-10-14T10:31:06Z", "label": "4b smollm2-135m", "pct_processor_performance": [106.54, 101.65, 95.31] },
+      { "utc": "2026-10-14T10:33:12Z", "label": "4b qwen3-0.6b", "pct_processor_performance": [95.47, 93.43, 96.19] },
+      { "utc": "2026-10-14T10:35:20Z", "label": "4b llama-3.2-1b", "pct_processor_performance": [96.23, 93.75, 95.88] },
+      { "utc": "2026-10-14T10:37:28Z", "label": "4b gemma-4-e2b", "pct_processor_performance": [92.68, 100.35, 94.19] },
+      { "utc": "2026-10-14T10:39:43Z", "label": "4c smollm2-135m", "pct_processor_performance": [106.45, 99.32, 99.06] },
+      { "utc": "2026-10-14T10:41:55Z", "label": "4c qwen3-0.6b", "pct_processor_performance": [94.51, 94.28, 93.68] },
+      { "utc": "2026-10-14T10:44:06Z", "label": "4c llama-3.2-1b", "pct_processor_performance": [97.46, 98.63, 97.00] },
+      { "utc": "2026-10-14T10:46:14Z", "label": "4c gemma-4-e2b", "pct_processor_performance": [95.53, 96.28, 93.47] },
+      { "utc": "2026-10-14T10:48:47Z", "label": "4d bge-small-en", "pct_processor_performance": [92.54, 90.43, 91.17] },
+      { "utc": "2026-10-14T10:52:02Z", "label": "final, after restoring the Balanced plan", "pct_processor_performance": [106.13, 92.61, 86.74] }
+    ],
+    "note": "Every sample except the first in 4a was taken after a 120 s wait (the first after the 120 s wait following the smoke tests), so it shows the clock between models, not under load. No downward trend between models."
+  },
+  "gpu_clock_witness": {
+    "query": "nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,fan.speed --format=csv,noheader, before each model of sections 4b, 4c and 4d (timestamps converted from local time, UTC-5)",
+    "samples": [
+      { "utc": "2026-10-14T10:31:09.670Z", "label": "4b smollm2-135m", "pstate": "P8", "graphics_mhz": 210, "memory_mhz": 405, "power_w": 23.49, "enforced_limit_w": 400.0, "temp_c": 44, "fan_pct": 0 },
+      { "utc": "2026-10-14T10:33:16.041Z", "label": "4b qwen3-0.6b", "pstate": "P8", "graphics_mhz": 210, "memory_mhz": 405, "power_w": 25.29, "enforced_limit_w": 400.0, "temp_c": 45, "fan_pct": 0 },
+      { "utc": "2026-10-14T10:35:23.730Z", "label": "4b llama-3.2-1b", "pstate": "P8", "graphics_mhz": 210, "memory_mhz": 405, "power_w": 24.31, "enforced_limit_w": 400.0, "temp_c": 47, "fan_pct": 0 },
+      { "utc": "2026-10-14T10:37:31.224Z", "label": "4b gemma-4-e2b", "pstate": "P8", "graphics_mhz": 210, "memory_mhz": 405, "power_w": 24.79, "enforced_limit_w": 400.0, "temp_c": 48, "fan_pct": 0 },
+      { "utc": "2026-10-14T10:39:46.110Z", "label": "4c smollm2-135m", "pstate": "P8", "graphics_mhz": 210, "memory_mhz": 405, "power_w": 24.37, "enforced_limit_w": 400.0, "temp_c": 48, "fan_pct": 0 },
+      { "utc": "2026-10-14T10:41:58.175Z", "label": "4c qwen3-0.6b", "pstate": "P8", "graphics_mhz": 210, "memory_mhz": 405, "power_w": 24.60, "enforced_limit_w": 400.0, "temp_c": 48, "fan_pct": 0 },
+      { "utc": "2026-10-14T10:44:09.816Z", "label": "4c llama-3.2-1b", "pstate": "P8", "graphics_mhz": 210, "memory_mhz": 405, "power_w": 25.00, "enforced_limit_w": 400.0, "temp_c": 49, "fan_pct": 0 },
+      { "utc": "2026-10-14T10:46:17.970Z", "label": "4c gemma-4-e2b", "pstate": "P8", "graphics_mhz": 210, "memory_mhz": 405, "power_w": 24.90, "enforced_limit_w": 400.0, "temp_c": 48, "fan_pct": 0 },
+      { "utc": "2026-10-14T10:48:50.949Z", "label": "4d bge-small-en", "pstate": "P8", "graphics_mhz": 210, "memory_mhz": 405, "power_w": 24.68, "enforced_limit_w": 400.0, "temp_c": 48, "fan_pct": 0 },
+      { "utc": "2026-10-14T10:52:05.152Z", "label": "final, after restoring the Balanced plan", "pstate": "P5", "graphics_mhz": 240, "memory_mhz": 810, "power_w": 26.67, "enforced_limit_w": 400.0, "temp_c": 49, "fan_pct": 0 }
+    ],
+    "background_logger": {
+      "how": "PowerShell loop calling the brief's nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,clocks.sm,clocks.mem,power.draw,enforced.power.limit,temperature.gpu,utilization.gpu,memory.used,fan.speed,clocks_event_reasons.active --format=csv,noheader once per second, appending each line; stopped through a stop file at the end of the section. Used instead of nvidia-smi -lms 1000 -f, which buffered its output and wrote 0 bytes when stopped with Stop-Process in a test on this machine. clocks_event_reasons.active was accepted by this driver.",
+      "4b_cuda": { "window_utc": ["2026-10-14T10:31:07Z", "2026-10-14T10:37:42Z"], "rows": 392, "under_load": "P2 (P0/P3/P5 only during ramps), graphics 1800-1935 MHz once loaded, power up to 384.23 W, temperature 47-64 C, utilization up to 97 %, memory used up to 3423 MiB, fan 0 %", "event_reasons_seen": ["0x0000000000000001 (GPU idle) x364", "0x0000000000000400 x25", "0x0000000000000000 x2", "0x0000000000000404 x1 (0x4 = SW power cap; during 4b_llama-3.2-1b_cuda at 384.23 W)"] },
+      "4c_vulkan": { "window_utc": ["2026-10-14T10:39:43Z", "2026-10-14T10:46:46Z"], "rows": 420, "under_load": "P0 (P3/P5 during ramps), graphics 1800-1950 MHz once loaded, power up to 370.56 W, temperature 48-66 C, utilization up to 98 %, memory used up to 3303 MiB, fan 0-55 %", "event_reasons_seen": ["0x0000000000000001 (GPU idle) x391", "0x0000000000000400 x16", "0x0000000000000600 x13"] },
+      "event_reason_decoding": "0x1 = GPU idle and 0x4 = SW power cap (nvml.h). The 0x200 and 0x400 bits are not described with their bit values by nvidia-smi --help-query-gpu and were not decoded here. No HW slowdown, HW thermal, HW power brake or SW thermal reason was reported in any sample."
+    }
+  },
+  "toolchain": {
+    "cpu_and_vulkan_builds": "the local MSVC builds of 1 Oct, reused unchanged (llama-bench.exe file times 2026-10-01T01:13:46Z and 01:15:54Z): MSVC 19.44.35229.0 (toolset 14.44.35207) from Visual Studio Build Tools 2022, generator Visual Studio 17 2022, Windows SDK 10.0.26100.0, Vulkan SDK 1.4.363.0",
+    "cuda_build": "the release prebuilt llama-b10964-bin-win-cuda-12.4-x64.zip with cudart-llama-bin-win-cuda-12.4-x64.zip (CUDA 12.4 runtime DLLs cudart64_12.dll, cublas64_12.dll, cublasLt64_12.dll); no CUDA Toolkit installed, fallback not used",
+    "git": "2.55.0.windows.5",
+    "cmake": "4.4.3",
+    "python": "not installed (only the Windows Store alias); not needed"
+  },
+  "llama_cpp": {
+    "repository": "https://github.com/ggml-org/llama.cpp",
+    "commit": "b29c606e28a01b1bc8c1351026a0fa6e616bf6c4",
+    "rev_list_count": 10964,
+    "git_status_short": "(empty)",
+    "release_tag": "b10964 ('llama.cpp : bump version to 0.4.1', published 2026-09-14)",
+    "builds": {
+      "cpu": {
+        "source": "local, reused from 1 Oct (not rebuilt)",
+        "directory": "build-cpu",
+        "configure": "cmake -B build-cpu",
+        "build": "cmake --build build-cpu --config Release -j 16 --target llama-bench",
+        "llama_bench_exe_last_write_utc": "2026-10-01T01:13:46.9728723Z",
+        "GGML_NATIVE": "ON",
+        "GGML_CUDA": "OFF",
+        "GGML_VULKAN": "OFF",
+        "GGML_BACKEND_DL": "OFF",
+        "cpu_feature_line": "-- Adding CPU backend variant ggml-cpu: /arch:AVX512 GGML_AVX512 (1 Oct configure log)",
+        "llama_bench_build_line": "build: b29c606e2 (10964)",
+        "json_build_commit": "b29c606e2",
+        "json_build_number": 10964
+      },
+      "cuda": {
+        "source": "release prebuilt b10964, Windows x64, CUDA 12.4",
+        "directory": "llama-b10964-cuda12.4 (both zips expanded into it)",
+        "packages": [
+          { "file": "llama-b10964-bin-win-cuda-12.4-x64.zip", "bytes": 254067651, "sha256": "264f20d7ee3860aecca9ec12418357a9f3e80349a2b186f66c63859ded1a9593", "matches_release_digest": true },
+          { "file": "cudart-llama-bin-win-cuda-12.4-x64.zip", "bytes": 391443627, "sha256": "8c79a9b226de4b3cacfd1f83d24f962d0773be79f1e7b75c6af4ded7e32ae1d6", "matches_release_digest": true }
+        ],
+        "downloaded_utc": "2026-10-14T04:58:30Z to 04:58:37Z, curl.exe -L --fail, both exit 0",
+        "llama_bench_build_line": "build: b29c606e2 (10964)",
+        "json_build_commit": "b29c606e2",
+        "json_build_number": 10964,
+        "json_backends": "CUDA",
+        "json_gpu_info": "NVIDIA GeForce RTX 3080 Ti"
+      },
+      "vulkan": {
+        "source": "local, reused from 1 Oct (not rebuilt)",
+        "directory": "build-vulkan",
+        "configure": "cmake -B build-vulkan -DGGML_VULKAN=ON",
+        "build": "cmake --build build-vulkan --config Release -j 16 --target llama-bench",
+        "llama_bench_exe_last_write_utc": "2026-10-01T01:15:54.6022487Z",
+        "vulkan_sdk": "1.4.363.0",
+        "cpu_feature_line": "-- Adding CPU backend variant ggml-cpu: /arch:AVX512 GGML_AVX512 (1 Oct configure log)",
+        "llama_bench_build_line": "build: b29c606e2 (10964)",
+        "json_build_commit": "b29c606e2",
+        "json_build_number": 10964,
+        "json_backends": "Vulkan",
+        "json_gpu_info": "NVIDIA GeForce RTX 3080 Ti"
+      }
+    },
+    "llama_bench_context_size_option": "absent in all three binaries (no -c / --ctx-size; -C is --cpu-mask; -fitc/--fit-ctx applies only with --fit-target, which is off); nothing added",
+    "resolved_defaults_all_builds": { "n_batch": 2048, "n_ubatch": 512, "flash_attn": -1, "type_k": "f16", "type_v": "f16", "cpu_mask": "0x0", "poll": 50, "split_mode": "layer", "main_gpu": 0, "devices": "auto", "load_mode": "auto", "no_kv_offload": false }
+  },
+  "cuda": {
+    "packages": ["llama-b10964-bin-win-cuda-12.4-x64.zip", "cudart-llama-bin-win-cuda-12.4-x64.zip"],
+    "ggml_cuda_init_lines": [
+      "ggml_cuda_init: found 1 CUDA devices (Total VRAM: 12287 MiB):",
+      "  Device 0: NVIDIA GeForce RTX 3080 Ti, compute capability 8.6, VMM: yes, VRAM: 12287 MiB"
+    ],
+    "load_backend_lines": [
+      "load_backend: loaded CUDA backend from ggml-cuda.dll",
+      "load_backend: loaded RPC backend from ggml-rpc.dll",
+      "load_backend: loaded CPU backend from ggml-cpu-zen4.dll"
+    ],
+    "cpu_variant_dll_loaded": "ggml-cpu-zen4.dll (the release has no Zen 5 variant)",
+    "environment_variables_seen": "none matching ^(GGML|CUDA|LLAMA) at environment capture; GGML_VK_VISIBLE_DEVICES was set only for the Vulkan invocations"
+  },
+  "vulkan": {
+    "vulkaninfo_instance_version": "1.4.363",
+    "devices": [
+      {
+        "index": 0,
+        "deviceName": "NVIDIA GeForce RTX 3080 Ti",
+        "deviceType": "PHYSICAL_DEVICE_TYPE_DISCRETE_GPU",
+        "driverName": "NVIDIA",
+        "driverInfo": "617.42",
+        "apiVersion": "1.4.351",
+        "driverVersion": "617.42.0.0",
+        "conformanceVersion": "1.4.3.3"
+      }
+    ],
+    "implicit_layers_of_note": "VK_LAYER_RTSS (RTSS overlay hook bootstrap 1.3.224), VK_LAYER_VALVE_steam_overlay, VK_LAYER_VALVE_steam_fossilize, VK_LAYER_NV_optimus, VK_LAYER_NV_present are registered; the loader also reports a missing Rockstar Social Club layer manifest. vulkaninfo prints 'Layer VK_LAYER_RTSS uses API version 1.3 which is older than the application specified API version of 1.4'. The llama-bench Vulkan logs print no layer message.",
+    "ggml_vulkan_found": "ggml_vulkan: Found 1 Vulkan devices:",
+    "ggml_vulkan_device_line": "ggml_vulkan: 0 = NVIDIA GeForce RTX 3080 Ti (NVIDIA) | uma: 0 | fp16: 1 | bf16: 1 | fp4: 0 | warp size: 32 | shared memory: 49152 | int dot: 1 | matrix cores: NV_coopmat2v",
+    "GGML_VK_VISIBLE_DEVICES": "0 (Vulkan lists only the RTX 3080 Ti; set anyway, for the Vulkan invocations only)"
+  },
+  "session_end_state": { "powercfg_getactivescheme": "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)", "pct_processor_performance": [85.77, 83.08, 81.33], "gpu_witness_raw": "2026/10/14 06:01:16.650, P8, 210 MHz, 405 MHz, 28.57 W, 400.00 W, 47, 0 % (timestamp local time)" },
+  "display_driver_events": "none (System log, ProviderName matching nvlddmkm|Display|amdkmdag, since session start 2026-10-14T04:57:21Z; checked 2026-10-14T10:46:47Z after section 4c)"
+}
