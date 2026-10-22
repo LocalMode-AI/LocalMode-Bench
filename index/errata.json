@@ -1,0 +1,110 @@
+[
+  {
+    "runId": "514bf170-30be-4dcc-ad42-1207ba9ceb10",
+    "cellIds": [
+      "litert/qwen3-0.6b/quality-mmlu-25"
+    ],
+    "reason": "Loaded the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0; on the litert-lm 0.12.1 the run used, its chat template renders an empty user turn, so this cell's score 0 at parse rate 0 is the empty prompt, not a fidelity reading. The run's LiteRT Qwen3 chat-pp128-tg128 and chat-pp512-tg128 cells are already invalid (degenerate output) and enter no aggregate, so they are not listed.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  },
+  {
+    "runId": "514bf170-30be-4dcc-ad42-1207ba9ceb10",
+    "cellIds": [
+      "litert/qwen3-0.6b/warm-reload"
+    ],
+    "reason": "Recorded ok, but timed the warm reload of the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0, not the file every valid v5 LiteRT Qwen3 cell measured (a3c5d805), so the load time belongs to a different model file and the cell's identity is wrong. This is the only one of the eleven runs with a LiteRT Qwen3 warm-reload cell.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  },
+  {
+    "runId": "8f7f6b49-724a-4799-8ae0-7a3672ffb889",
+    "cellIds": [
+      "litert/qwen3-0.6b/quality-mmlu-25"
+    ],
+    "reason": "Loaded the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0; on the litert-lm 0.12.1 the run used, its chat template renders an empty user turn, so this cell's score 0 at parse rate 0 is the empty prompt, not a fidelity reading. The run's LiteRT Qwen3 chat-pp128-tg128 and chat-pp512-tg128 cells are already invalid (degenerate output) and enter no aggregate, so they are not listed.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  },
+  {
+    "runId": "eafd4448-d0de-48e4-8f64-da8f481f5edf",
+    "cellIds": [
+      "litert/qwen3-0.6b/quality-mmlu-25"
+    ],
+    "reason": "Loaded the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0; on the litert-lm 0.12.1 the run used, its chat template renders an empty user turn, so this cell's score 0 at parse rate 0 is the empty prompt, not a fidelity reading. The run's LiteRT Qwen3 chat-pp128-tg128 and chat-pp512-tg128 cells are already invalid (degenerate output) and enter no aggregate, so they are not listed.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  },
+  {
+    "runId": "42a9f6ba-0977-4438-9b9d-9cf5b6427f20",
+    "cellIds": [
+      "litert/qwen3-0.6b/quality-mmlu-25"
+    ],
+    "reason": "Loaded the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0; on the litert-lm 0.12.1 the run used, its chat template renders an empty user turn, so this cell's score 0 at parse rate 0 is the empty prompt, not a fidelity reading. The run's LiteRT Qwen3 chat-pp128-tg128 and chat-pp512-tg128 cells are already invalid (degenerate output) and enter no aggregate, so they are not listed.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  },
+  {
+    "runId": "1b5e99ab-780f-432c-a80b-01dbcf75fd37",
+    "cellIds": [
+      "litert/qwen3-0.6b/quality-mmlu-25"
+    ],
+    "reason": "Loaded the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0; on the litert-lm 0.12.1 the run used, its chat template renders an empty user turn, so this cell's score 0 at parse rate 0 is the empty prompt, not a fidelity reading. The run's LiteRT Qwen3 chat-pp128-tg128 and chat-pp512-tg128 cells are already invalid (degenerate output) and enter no aggregate, so they are not listed.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  },
+  {
+    "runId": "094063b8-8251-40e1-9978-e069bb764a66",
+    "cellIds": [
+      "litert/qwen3-0.6b/quality-mmlu-25"
+    ],
+    "reason": "Loaded the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0; on the litert-lm 0.12.1 the run used, its chat template renders an empty user turn, so this cell's score 0 at parse rate 0 is the empty prompt, not a fidelity reading. The run's LiteRT Qwen3 chat-pp128-tg128 and chat-pp512-tg128 cells are already invalid (degenerate output) and enter no aggregate, so they are not listed.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  },
+  {
+    "runId": "3b06e45a-a7ad-4b8c-8d5a-97a725018c41",
+    "cellIds": [
+      "litert/qwen3-0.6b/quality-mmlu-25"
+    ],
+    "reason": "Loaded the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0; on the litert-lm 0.12.1 the run used, its chat template renders an empty user turn, so this cell's score 0 at parse rate 0 is the empty prompt, not a fidelity reading. The run's LiteRT Qwen3 chat-pp128-tg128 and chat-pp512-tg128 cells are already invalid (degenerate output) and enter no aggregate, so they are not listed.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  },
+  {
+    "runId": "40aaa83a-0a6f-4949-9341-45320ba1d92a",
+    "cellIds": [
+      "litert/qwen3-0.6b/quality-mmlu-25"
+    ],
+    "reason": "Loaded the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0; on the litert-lm 0.12.1 the run used, its chat template renders an empty user turn, so this cell's score 0 at parse rate 0 is the empty prompt, not a fidelity reading. The run's LiteRT Qwen3 chat-pp128-tg128 and chat-pp512-tg128 cells are already invalid (degenerate output) and enter no aggregate, so they are not listed.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  },
+  {
+    "runId": "651a18d7-b3de-4bbd-afd4-403dba6165e2",
+    "cellIds": [
+      "litert/qwen3-0.6b/quality-mmlu-25"
+    ],
+    "reason": "Loaded the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0; on the litert-lm 0.12.1 the run used, its chat template renders an empty user turn, so this cell's score 0 at parse rate 0 is the empty prompt, not a fidelity reading. The run's LiteRT Qwen3 chat-pp128-tg128 and chat-pp512-tg128 cells are already invalid (degenerate output) and enter no aggregate, so they are not listed.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  },
+  {
+    "runId": "39f75908-0676-4959-b499-fc532a110ca2",
+    "cellIds": [
+      "litert/qwen3-0.6b/quality-mmlu-25"
+    ],
+    "reason": "Loaded the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0; on the litert-lm 0.12.1 the run used, its chat template renders an empty user turn, so this cell's score 0 at parse rate 0 is the empty prompt, not a fidelity reading. The run's LiteRT Qwen3 chat-pp128-tg128 and chat-pp512-tg128 cells are already invalid (degenerate output) and enter no aggregate, so they are not listed.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  },
+  {
+    "runId": "febbece7-76a1-4088-bb17-aa03d1c10708",
+    "cellIds": [
+      "litert/qwen3-0.6b/quality-mmlu-25"
+    ],
+    "reason": "Loaded the Qwen3-0.6B.litertlm that litert-community/Qwen3-0.6B committed on 2026-10-12 (a6e678a1), a build for litert-lm 0.18.0; on the litert-lm 0.12.1 the run used, its chat template renders an empty user turn, so this cell's score 0 at parse rate 0 is the empty prompt, not a fidelity reading. The run's LiteRT Qwen3 chat-pp128-tg128 and chat-pp512-tg128 cells are already invalid (degenerate output) and enter no aggregate, so they are not listed.",
+    "recordedAt": "2026-10-22",
+    "reference": "README.md, Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)"
+  }
+]
