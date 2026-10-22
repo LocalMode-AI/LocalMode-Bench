@@ -1,94 +1,104 @@
 # LocalMode Bench - Open Data
 
-Open dataset of community-submitted [LocalMode Bench](https://localmode.ai/bench) runs: LLM and embedding inference measured across browser AI runtimes on real consumer devices, with raw timing traces so every published number can be independently recomputed.
+Community-submitted [LocalMode Bench](https://localmode.ai/bench) runs: LLM
+and embedding inference measured across browser AI runtimes (WebLLM, wllama,
+Transformers.js, LiteRT-LM, Chrome Built-in AI, MediaPipe) on real consumer
+devices. Every run file carries its raw timing traces, so every published
+number can be recomputed. Background, integrity model and known limitations:
+[NOTES.md](./NOTES.md).
 
-- **What is measured** - time-to-first-token, decode throughput (first token excluded), pp128/pp512 prefill, cold vs warm model loads, single vs batch-32 embedding performance, and optional quality-fidelity scores, per the versioned protocol ([`localmode-bench/5`](https://localmode.ai/bench/methodology) is current; every run file records the version it was measured under, and the leaderboard shows the current protocol and the previous one in separate rows, never mixed, and nothing older).
-- **Which runtimes** - WebLLM (MLC), wllama (llama.cpp WASM), Transformers.js (WebGPU and WASM), LiteRT-LM, Chrome Built-in AI (Gemini Nano), and MediaPipe text embeddings - with the same weights family compared engine-to-engine where the catalogs allow (e.g. Qwen3-0.6B across four runtimes; Gemma 4 E2B across three in the thorough suite). The authoritative model catalog is versioned with the harness ([`catalog.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/apps/ui/src/lib/bench/catalog.ts)); each run file records the exact provider model id, quantization, and declared size of every lane it ran.
-- **Why raw traces** - each run file contains per-chunk timestamp arrays, the generated text for the fixed public prompts, the full environment capture, and a SHA-256 digest. Summaries on the [leaderboard](https://localmode.ai/bench) are recomputed server-side from these traces; nothing is trusted from the client.
-- **License** - [CC0 1.0](./LICENSE) (public domain). Submitters agree at submission time.
-- **Privacy** - a run file describes a device, never a person: browser and OS versions, device model, GPU, screen size, storage quota, network type, and the runtime configuration. It does not carry a time zone or language list, an exact battery figure (level to the quarter only), display preferences, the submission nonce, or the submitter's network address (used by the server as a rate-limit key only and never written). Paid-study runs carry a 12-hex SHA-256 prefix of the participant id, never the id. Files published before schema 3 (2026-09-21) were rewritten to this rule; see `scrubbedAt` in [SCHEMA.md](./SCHEMA.md).
+## Layout
 
-## Repository layout
+```
+runs/YYYY/MM/<runId>.json          verified submissions
+quarantine/YYYY/MM/<runId>.json    submissions flagged by the integrity rules (public, off the leaderboard)
+index/summary.json                 one light entry per run, written by the submission API (do not edit)
+index/errata.json                  published cells excluded from every aggregate, each with a reason
+controls/<kind>/<YYYY-MM-DD>/      control runs for the methodology, never indexed
+native/YYYY/MM/<device>/           native llama-bench baselines on lab machines, not on the leaderboard
+tools/                             run-llama-bench.sh (native baselines), scrub-publication.mjs
+```
 
-| Path | Contents |
-| --- | --- |
-| `runs/YYYY/MM/<runId>.json` | Verified submissions (ran on the official site, passed all integrity rules) |
-| `quarantine/YYYY/MM/<runId>.json` | Submissions flagged by the published integrity rules - kept public and auditable, hidden from the leaderboard |
-| `index/summary.json` | Machine-written leaderboard index (light per-run summaries). **Do not edit by hand** - it is rebuilt by the submission API |
-| `index/errata.json` | Maintainer-written list of published cells excluded from every aggregate, each with its reason (see Errata below and [SCHEMA.md](./SCHEMA.md)). An exclusion, never a re-score: no run file changes |
-| `controls/<kind>/<YYYY-MM-DD>/<runId>.json` | Control runs (`harness.control`), never indexed: a control experiment for the methodology, the same suite with the runtime order reversed (`order-reversed`), in the protocol order as a same-build, same-day reference series (`fixed-order`), or in the protocol order with the Transformers.js WASM lane at the runtime's own defaults, dtype q8 and one ONNX Runtime thread per logical core (`wasm-default`), or with one of those two changes each, q8 at ONNX Runtime's default thread count (`wasm-q8`) or the protocol's files on every logical core (`wasm-threads`), filed by kind and by the UTC date of `createdAt`. Never submitted, so the submission API never writes there; a maintainer files exported control runs with [`apps/ui/scripts/collect-control-runs.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/apps/ui/scripts/collect-control-runs.ts). They never appear in `index/summary.json` and never on the leaderboard. See [SCHEMA.md](./SCHEMA.md) |
-| `native/YYYY/MM/<device>/` | Native `llama-bench` baselines on lab machines that also have browser runs: the same GGUF files and workload shapes as the llama.cpp lanes, run outside the browser (CPU thread sweep and the platform GPU backend), with every result row, the exact commands, the toolchain build and the machine's own capture. Maintainer-committed, not written by the submission API; not part of the leaderboard |
+Run files are written by the submission API only; documentation PRs are welcome.
 
-Files are written by the submission API at [localmode.ai/bench](https://localmode.ai/bench); this repository accepts no direct pull requests for run data (PRs improving documentation are welcome).
+## Reading a run
 
-The submission API appends one entry per run to `index/summary.json`. The index can be regenerated from every file under `runs/` and `quarantine/` with [`apps/ui/scripts/rebuild-bench-index.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/apps/ui/scripts/rebuild-bench-index.ts) in the LocalMode monorepo (`pnpm exec tsx scripts/rebuild-bench-index.ts --dataset <clone>` from `apps/ui`), which writes the same entries the submission API writes, in `createdAt` order, and refuses to drop a run the current index lists.
+Each file is one `BenchRunResult` JSON object, for example
+`runs/2026/10/04c78ea8-c2bc-4652-b93f-9b01a601a727.json`. Start with:
 
-## Integrity model (summary)
+- `protocol`: the protocol version it was measured under (`localmode-bench/5` is current)
+- `environment`: browser, OS, GPU, device type and the rest of the capture
+- `cells[]`: one per runtime, model and workload: `cellId`, `status`, raw `iterations`
 
-Every submission carries a server-issued session nonce and a canonical-JSON SHA-256 digest, and is checked against versioned plausibility rules: timestamp monotonicity, decode-rate envelopes by model size, text/chunk-length agreement, timer-quantization-grid conformance, environment cross-field consistency, and a mandatory deterministic matmul hardware-calibration check. Failing runs are quarantined, never silently dropped. Leaderboard rows need 3+ concordant submissions to leave provisional status, and only medians of per-device medians are shown. Full rules: [methodology](https://localmode.ai/bench/methodology).
+Every field is documented in [SCHEMA.md](./SCHEMA.md).
 
-Known limits, stated honestly: background native load, virtual machines, and browser flags cannot be detected from inside a page. The min-3-submissions rule and median-of-medians aggregation bound their influence.
+## How the leaderboard is derived
 
-Known device limitation: on the Galaxy Z Fold 7 (Adreno 830, Chrome 153 on Android) the llama.cpp WebGPU lane (`wllama-webgpu`) generates incoherent SmolLM2 text. All 18 timed chat iterations recorded on that phone across six runs and three protocol versions are strings of isolated letters and word fragments, and the lane's MMLU cell fails in every run with "Invalid typed array length". The WASM lane and every other runtime on the same phone produce coherent text, and no other device in the dataset shows this. The degenerate-output gate is length-based and 17 of the 18 iterations pass it, so those cells are `ok` and the `android/adreno-830` `wllama-webgpu` SmolLM2 `chat-pp128-tg128` rows (v4 and v5, plus a v2 `android/adreno-830` `wllama` row from before the lane split) are kept: they time a backend that is not producing a usable answer. Each iteration's `text` is in the run files, so anyone can check it. An output-coherence check would be a protocol change and is reserved for a future version.
+The submission API appends one entry per run to `index/summary.json`
+(rebuildable from the run files with
+[`rebuild-bench-index.ts`](https://github.com/LocalMode-AI/LocalMode/blob/main/apps/ui/scripts/rebuild-bench-index.ts)).
+The [leaderboard](https://localmode.ai/bench) aggregates the verified entries
+of the current and the previous protocol version, in separate rows that never
+mix, as medians of per-device medians; a row needs 3 or more concordant
+submissions to leave provisional status. Cells listed in `index/errata.json`
+are excluded and counted, never re-scored. Full rules:
+[methodology](https://localmode.ai/bench/methodology).
 
-Known prompt limitation: the Llama 3.2 1B chat template writes the current local date into its default system header ("Today Date: 25 Sep 2026", through the template's `strftime_now`). The bench sends no system prompt, so on the three Llama lanes that render this template (`transformers-webgpu`, `wllama` and `wllama-webgpu`) the prompt changes with the device's local calendar date. Decoding is greedy, so on the `transformers-webgpu` lane each date yields a different fixed output, and the decode rate follows the text: with no change to the model files, the browser or the harness, the pp128 decode rate of one machine moved by about 9 to 13% from one date to another, stepping at local midnight on the two machines that ran across it, and one tinyMMLU item changed from wrong to right. The `wllama` and `wllama-webgpu` Llama cells already produce a different `text` in every iteration, so there the date changes the prompt without leaving a mark in the output. The Qwen3, Gemma 4 and SmolLM2 templates carry no date on any lane. WebLLM's templates insert a fixed default system message instead (for Llama 3.2 1B, "You are a helpful, respectful and honest assistant."), so the prompts of one pairing already differ across runtimes; runtime-native templating is part of what is measured. In practice: same-day comparisons on a Llama lane use identical prompts; comparisons across days carry the date effect; and for crowd submissions the local date cannot be recovered (schema 3 stopped recording the time zone), so a Llama-lane row aggregates runs made with different prompts. Each iteration's `text` is in the run files, so anyone can partition the `transformers-webgpu` Llama cells by output. Pinning the date (or sending one fixed system prompt on every lane) and recording a digest of the rendered prompt per cell would be a protocol change and are reserved for a future version; no run is re-scored.
-
-Erratum, LiteRT Qwen3 model file (12 and 13 October 2026): until site build 2.16.16 the bench downloaded the LiteRT and llama.cpp model files from each Hugging Face repository's `main` branch (`model.url` in the cells), and the providers cache a file by its URL without checking it again. On 2026-10-12 04:00:59 UTC (commit `a6e678a1`) and 2026-10-13 15:53:23 UTC (`e6687177`) the `litert-community/Qwen3-0.6B` repository replaced `Qwen3-0.6B.litertlm` with builds made for litert-lm 0.18.0. On the litert-lm 0.12.1 every LiteRT cell records as its `runtimeVersion`, their chat template renders an empty user turn and the reply arrives on a channel the provider does not read, so the lane produced empty or prompt-ignoring text. A browser that had cached the earlier file (sha256 `555579ff2f4fd13379abe69c1c3ab5200f7338bc92471557f1d6614a6e5ab0b4`, 614,236,160 bytes, unchanged from 2026-07-17 to 2026-10-12) kept running it, so which file a run loaded depends on when that browser profile first downloaded it, not on the run date. No run file records a digest or revision; the identity is inferred from three witnesses that agree on every run carrying a LiteRT Qwen3 cell: the profile's cold load (`load.cached: false`) against the two commit times, and the `chat-pp512-tg128` text, which is deterministic per file (the earlier file opens every reply with `<think>`; the a6e678a1 file answers without the prompt, e.g. "Sure! Let me know what you need help with!ĠðŁĺĬ", the mojibake being a tokenizer defect that build's model card documents). Eleven published v5 runs loaded the a6e678a1 file, all Thorough runs from one RTX 3080 Ti (Chrome 154.0.8037.58) whose cold LiteRT load was the first run below; every other run under `runs/` whose LiteRT Qwen3 cells produced text loaded the earlier file (16 more runs, all from before 2026-10-12, have LiteRT Qwen3 cells that errored on device or network failures without producing text):
-
-| runId | createdAt | file | excluded by erratum |
-| --- | --- | --- | --- |
-| `514bf170-30be-4dcc-ad42-1207ba9ceb10` | 2026-10-12 14:11 UTC | `runs/2026/10/514bf170-30be-4dcc-ad42-1207ba9ceb10.json` | `quality-mmlu-25`, `warm-reload` |
-| `8f7f6b49-724a-4799-8ae0-7a3672ffb889` | 2026-10-12 15:11 UTC | `runs/2026/10/8f7f6b49-724a-4799-8ae0-7a3672ffb889.json` | `quality-mmlu-25` |
-| `eafd4448-d0de-48e4-8f64-da8f481f5edf` | 2026-10-12 22:43 UTC | `runs/2026/10/eafd4448-d0de-48e4-8f64-da8f481f5edf.json` | `quality-mmlu-25` |
-| `42a9f6ba-0977-4438-9b9d-9cf5b6427f20` | 2026-10-12 23:44 UTC | `runs/2026/10/42a9f6ba-0977-4438-9b9d-9cf5b6427f20.json` | `quality-mmlu-25` |
-| `1b5e99ab-780f-432c-a80b-01dbcf75fd37` | 2026-10-13 00:46 UTC | `runs/2026/10/1b5e99ab-780f-432c-a80b-01dbcf75fd37.json` | `quality-mmlu-25` |
-| `094063b8-8251-40e1-9978-e069bb764a66` | 2026-10-13 01:53 UTC | `runs/2026/10/094063b8-8251-40e1-9978-e069bb764a66.json` | `quality-mmlu-25` |
-| `3b06e45a-a7ad-4b8c-8d5a-97a725018c41` | 2026-10-13 02:54 UTC | `runs/2026/10/3b06e45a-a7ad-4b8c-8d5a-97a725018c41.json` | `quality-mmlu-25` |
-| `40aaa83a-0a6f-4949-9341-45320ba1d92a` | 2026-10-13 03:55 UTC | `runs/2026/10/40aaa83a-0a6f-4949-9341-45320ba1d92a.json` | `quality-mmlu-25` |
-| `651a18d7-b3de-4bbd-afd4-403dba6165e2` | 2026-10-13 05:01 UTC | `runs/2026/10/651a18d7-b3de-4bbd-afd4-403dba6165e2.json` | `quality-mmlu-25` |
-| `39f75908-0676-4959-b499-fc532a110ca2` | 2026-10-13 06:04 UTC | `runs/2026/10/39f75908-0676-4959-b499-fc532a110ca2.json` | `quality-mmlu-25` |
-| `febbece7-76a1-4088-bb17-aa03d1c10708` | 2026-10-13 08:45 UTC | `runs/2026/10/febbece7-76a1-4088-bb17-aa03d1c10708.json` | `quality-mmlu-25` |
-
-In these runs, `litert/qwen3-0.6b/chat-pp128-tg128` and `chat-pp512-tg128` are `invalid` (degenerate output), so no rate of theirs enters an aggregate; `litert/qwen3-0.6b/quality-mmlu-25` is recorded `ok` with `quality.score` 0 and `quality.parseRate` 0, which is the empty prompt, not a fidelity reading; until site build 2.16.17 the leaderboard's quality median for that row included it; the `litert/qwen3-0.6b/warm-reload` cell of the first run is `ok` and times the replaced file. Since 2.16.17 these twelve cells (the eleven `quality-mmlu-25` cells and that `warm-reload` cell, the last column of the table) are listed in `index/errata.json` and leave every aggregate (see Errata below). The other cells of these runs, LiteRT Gemma 4 E2B included, are unaffected. Nothing is re-scored and no run file is changed. Since site build 2.16.16 every LiteRT and llama.cpp model URL is pinned to a repository revision (Qwen3 0.6B to `a3c5d805`, which holds the earlier file) and LiteRT cells record `runtimeConfig.modelRevision` and `modelBytes`. The pin is not a protocol change: it restores the file every valid v5 LiteRT Qwen3 cell measured. Separately, the `resolvedBackend: "gpu"` of LiteRT cells before 2.16.16 came from a WebGPU probe, not from the engine: LiteRT-LM 0.12.1's GPU backend refuses to stream-load the Qwen3 0.6B file (every revision) and the provider then runs it on the CPU backend, so read those Qwen3 cells as most likely CPU runs (observed on Chrome 156 on an Apple M4; not observed on the devices in this dataset). From 2.16.16 the field follows the engine.
-
-Errata: `index/errata.json` lists published cells that enter no aggregate, each with the reason. It is a JSON array of entries `{ "runId", "cellIds", "reason", "recordedAt", "reference" }`: the run, the cells excluded from it, why, when the erratum was recorded (ISO 8601) and where the evidence is documented. An erratum is an exclusion, never a re-score: the run file keeps the cell with its status and values, and the leaderboard, the leaderboard API (`excludedByErratum`), the analysis CLI (`leaderboard.csv` column `excludedByErratum` and `errata.txt`) and the index rebuild tool all count the excluded cells, per row and in total, so an exclusion is never silent; a row whose every cell is excluded stays with zero runs. An entry names only cells recorded `ok`: a cell with any other status already enters no aggregate, so it needs no entry. That is why the LiteRT Qwen3 `chat-pp128-tg128` and `chat-pp512-tg128` cells of the eleven runs above are not listed: they are already `invalid`. The tooling refuses an errata file that is malformed or names a run or a cell this dataset does not hold. Errata change no measurement rule, so they do not change the protocol version. The first twelve entries (recorded 2026-10-22) exclude twelve cells from the eleven runs in the table above: each run's `litert/qwen3-0.6b/quality-mmlu-25` cell, and the `litert/qwen3-0.6b/warm-reload` cell of the first run, which is `ok` but timed the replaced file, so its load time belongs to a different model file.
-
-## Reproduce / analyze
-
-The reference implementation is the MIT-licensed [`@localmode/bench`](https://github.com/LocalMode-AI/LocalMode/tree/main/packages/bench) package in the LocalMode monorepo. To rebuild every statistic from this dataset:
+To recompute everything from a clone:
 
 ```bash
 git clone https://github.com/LocalMode-AI/LocalMode-Bench
 git clone https://github.com/LocalMode-AI/LocalMode
 cd LocalMode && pnpm install
 npx tsx packages/bench/scripts/analyze.ts ../LocalMode-Bench/runs ./analysis
-# -> analysis/leaderboard.csv, iterations.csv, cells.csv, runs.csv, validation.txt, errata.txt
-#    (index/errata.json is applied to leaderboard.csv; --no-errata applies none)
+# -> leaderboard.csv, iterations.csv, cells.csv, runs.csv, validation.txt, errata.txt
+#    (index/errata.json is applied to leaderboard.csv only; --no-errata applies none)
 ```
 
-The run-file schema is documented in [SCHEMA.md](./SCHEMA.md). To contribute a run, open [localmode.ai/bench/run](https://localmode.ai/bench/run) on your device, run a suite, and press "Submit to leaderboard".
+## Contributing a run
 
-## Citing this dataset
+Open [localmode.ai/bench/run](https://localmode.ai/bench/run) on your
+device, run a suite, and press "Submit to leaderboard". What gets published
+is the run file: per-chunk traces, the generated text for the fixed public
+prompts, the environment capture and a SHA-256 digest, under CC0. It
+describes a device, never a person: no time zone, language list, exact
+battery level, submission nonce or network address.
 
-See [CITATION.cff](./CITATION.cff). If you use this data in academic work, please cite the dataset and the protocol version(s) of the runs you used (each run file embeds its `protocol` field).
+## Controls
 
-## Native baseline tooling
+`controls/` holds control runs: the same suite in another runtime order or
+with the Transformers.js WASM lane configured differently, recorded to test
+the methodology. They are never submitted, indexed or shown on the
+leaderboard. Kinds and filing: [NOTES.md, Control runs](./NOTES.md#control-runs).
 
-`tools/run-llama-bench.sh` runs llama.cpp's `llama-bench` on the same four GGUF
-files the browser wllama lanes use, with the protocol's workload shape (pp128
-and pp512 prefill, tg128 decode, 5 repetitions) in a GPU arm (Metal, `-ngl 99`)
-and a CPU arm (`-ngl 0`, the comparator for the WASM lane). It needs a
-`llama-bench` binary on `PATH`. Each baseline folder's `README.md` and
-`environment.json` record the exact llama.cpp build used on that device
-(commit, build number, install route, backends); the M1 Pro baseline
-(`native/2026/09/m1-pro/`) used the Homebrew llama.cpp 0.4.1 bottle
-(`arm64_tahoe`), build `b29c606e2` (10964), backends `BLAS,MTL`. Never run it
-while a browser benchmark runs on the same machine.
+## Errata
 
-| folder | machine | llama.cpp build | configurations |
-| --- | --- | --- | --- |
-| `native/2026/09/m1-pro/` | MacBook Pro, Apple M1 Pro (8 P + 2 E cores), 32 GB, macOS 26.5.2 | Homebrew 0.4.1 bottle, `b29c606e2` (10964), `BLAS,MTL` | CPU `-t 10, 8, 6, 4`; Metal `-ngl 99` |
-| `native/2026/10/ryzen-9800x3d/` | Desktop, AMD Ryzen 7 9800X3D (8 cores, 16 threads), 96 GB, integrated Radeon (2 CUs), Windows 11 25H2 (26200.9457), AMD Software 26.8.1 | local MSVC builds at `b29c606e2` (10964): CPU-only (`GGML_NATIVE`, AVX-512) and Vulkan | CPU `-t 16, 12, 8, 4`; Vulkan `-ngl 99 -t 8` |
-| `native/2026/10/core-ultra-165h/` | Dell XPS 13 9340, Intel Core Ultra 7 165H (6 P + 8 E + 2 LP-E cores, 22 threads), 16 GB, Arc iGPU, CachyOS kernel 7.0.3-1, Mesa 26.2.3 | local GCC builds at `b29c606e2` (10964): CPU-only (`-march=native`) and Vulkan (ANV) | CPU `-t 22, 16, 11, 6, 4` and `-t 6` pinned one per P-core; Vulkan `-ngl 99 -t 11` |
+A published cell that turns out not to measure what the protocol describes
+is listed in `index/errata.json` with its reason and left out of every
+aggregate; the run file is never changed and nothing is re-scored. The
+full record is in [NOTES.md, Errata](./NOTES.md#errata).
 
-Each folder's `README.md` records the exact commands, the waits, the machine's state and every failure. The bge-small embedding run (`-embd 1 -p 48,1536`) aborts at `pp1536` on all three machines at this commit (`encoder requires n_ubatch >= n_tokens`), after `pp48` completes; the two newer folders add a `-p 512` embedding run inside the default micro-batch. The Core Ultra Vulkan rows ran on Mesa 26.2.3, not the 26.0.6 of that machine's browser runs.
+- **Erratum, LiteRT Qwen3 model file (12 and 13 October 2026)**: 12 cells
+  of 11 v5 Thorough runs from one RTX 3080 Ti that loaded a replaced
+  `Qwen3-0.6B.litertlm`. Evidence and the run table:
+  [NOTES.md](./NOTES.md#erratum-litert-qwen3-model-file-12-and-13-october-2026).
+
+<details><summary>The 11 affected runs</summary>
+
+`514bf170-30be-4dcc-ad42-1207ba9ceb10`, `8f7f6b49-724a-4799-8ae0-7a3672ffb889`,
+`eafd4448-d0de-48e4-8f64-da8f481f5edf`, `42a9f6ba-0977-4438-9b9d-9cf5b6427f20`,
+`1b5e99ab-780f-432c-a80b-01dbcf75fd37`, `094063b8-8251-40e1-9978-e069bb764a66`,
+`3b06e45a-a7ad-4b8c-8d5a-97a725018c41`, `40aaa83a-0a6f-4949-9341-45320ba1d92a`,
+`651a18d7-b3de-4bbd-afd4-403dba6165e2`, `39f75908-0676-4959-b499-fc532a110ca2`,
+`febbece7-76a1-4088-bb17-aa03d1c10708`
+
+</details>
+
+## License and citation
+
+Data: [CC0 1.0](./LICENSE) (public domain); submitters agree at submission
+time. The reference implementation is the MIT-licensed
+[`@localmode/bench`](https://github.com/LocalMode-AI/LocalMode/tree/main/packages/bench).
+
+To cite, see [CITATION.cff](./CITATION.cff), and name the protocol
+version(s) of the runs you used (each run file records its `protocol`).
